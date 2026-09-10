@@ -1,0 +1,12 @@
+import { Head, Link, useForm } from '@inertiajs/react';
+import AppLayout from '../../../Layouts/AppLayout';
+import Icon from '../../../Components/Icon';
+
+export default function Form({ user, mode }) {
+    const editing=mode==='edit';
+    const form=useForm({name:user.name||'',email:user.email||'',role:user.role||'sales',is_active:user.is_active??true,password:'',password_confirmation:''});
+    const submit=(e)=>{e.preventDefault();editing?form.put(`/admin/users/${user.id}`):form.post('/admin/users');};
+    return <AppLayout title={editing?'Edit User':'Tambah User'} subtitle="Akun untuk administrator atau anggota tim Account Executive." action={<Link href="/admin/users" className="btn btn-secondary"><Icon name="arrowLeft" size={17}/>Kembali</Link>}><Head title={editing?'Edit User':'Tambah User'}/>
+        <form className="panel user-form" onSubmit={submit}><div className="form-grid"><label className="field"><span>Nama *</span><input value={form.data.name} onChange={e=>form.setData('name',e.target.value)}/>{form.errors.name&&<small className="field-error">{form.errors.name}</small>}</label><label className="field"><span>Email *</span><input type="email" value={form.data.email} onChange={e=>form.setData('email',e.target.value)}/>{form.errors.email&&<small className="field-error">{form.errors.email}</small>}</label><label className="field"><span>Role</span><select value={form.data.role} onChange={e=>form.setData('role',e.target.value)}><option value="sales">Account Executive</option><option value="admin">Administrator</option></select></label><label className="field toggle-field"><span>Status akun</span><label className="toggle"><input type="checkbox" checked={form.data.is_active} onChange={e=>form.setData('is_active',e.target.checked)}/><i/><b>{form.data.is_active?'Aktif':'Nonaktif'}</b></label></label><label className="field"><span>{editing?'Password baru (opsional)':'Password *'}</span><input type="password" value={form.data.password} onChange={e=>form.setData('password',e.target.value)}/>{form.errors.password&&<small className="field-error">{form.errors.password}</small>}</label><label className="field"><span>Konfirmasi password</span><input type="password" value={form.data.password_confirmation} onChange={e=>form.setData('password_confirmation',e.target.value)}/></label></div><div className="form-submit-row"><Link href="/admin/users" className="btn btn-secondary">Batal</Link><button className="btn btn-primary" disabled={form.processing}>{editing?'Simpan Perubahan':'Buat User'}</button></div></form>
+    </AppLayout>;
+}
