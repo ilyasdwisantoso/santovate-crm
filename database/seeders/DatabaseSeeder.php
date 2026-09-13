@@ -10,7 +10,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'admin@santovate.local'],
+            ['email' => 'admin@santovate.com'],
             [
                 'name' => 'Santovate Admin',
                 'password' => 'Santovate123!',
@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         );
 
         User::updateOrCreate(
-            ['email' => 'sales@santovate.local'],
+            ['email' => 'sales@santovate.com'],
             [
                 'name' => 'Santovate Sales',
                 'password' => 'Sales123!',
