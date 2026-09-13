@@ -11,12 +11,32 @@ class DatabaseSeeder extends Seeder
     {
         User::updateOrCreate(
             ['email' => 'admin@santovate.local'],
-            ['name' => 'Santovate Admin', 'password' => 'Santovate123!', 'role' => 'admin', 'is_active' => true]
+            [
+                'name' => 'Santovate Admin',
+                'password' => 'Santovate123!',
+                'role' => 'admin',
+                'is_active' => true,
+            ]
         );
 
         User::updateOrCreate(
             ['email' => 'sales@santovate.local'],
-            ['name' => 'Santovate Sales', 'password' => 'Sales123!', 'role' => 'sales', 'is_active' => true]
+            [
+                'name' => 'Santovate Sales',
+                'password' => 'Sales123!',
+                'role' => 'sales',
+                'is_active' => true,
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'ahmadmazkur@santovate.com'],
+            [
+                'name' => 'Ahmad Mazkur',
+                'password' => 'Mazkur!@#',
+                'role' => 'sales',
+                'is_active' => true,
+            ]
         );
     }
 }
