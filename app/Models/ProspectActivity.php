@@ -13,7 +13,7 @@ class ProspectActivity extends Model
     public const TYPES = [
         'note'=>'Catatan','call'=>'Telepon','whatsapp'=>'WhatsApp','email'=>'Email','meeting'=>'Meeting',
         'demo'=>'Demo','proposal'=>'Proposal','status_change'=>'Perubahan Status','follow_up'=>'Follow-up',
-        'customer_reply'=>'Balasan Customer',
+        'customer_reply'=>'Balasan Customer','follow_up_feedback'=>'Feedback Follow-up',
     ];
 
     protected $fillable=['prospect_id','user_id','type','title','description','occurred_at'];

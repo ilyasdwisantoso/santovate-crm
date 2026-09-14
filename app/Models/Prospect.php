@@ -39,6 +39,7 @@ class Prospect extends Model
         'contact_position','phone','email','current_system','tracking_portal','pain_hypothesis','fit_score',
         'pain_score','contact_score','total_score','priority','status','last_contact_at','next_follow_up_at',
         'last_outbound_at','last_customer_reply_at','follow_up_snoozed_until','follow_up_count','last_follow_up_message',
+        'last_feedback_at','last_feedback_status','last_feedback_note',
         'contacted_at','replied_at','meeting_at','demo_at','proposal_at','negotiation_at','deal_at','closed_at',
         'source_name','source_url','notes','estimated_deal_value','actual_deal_value','assigned_to','created_by','import_batch_id',
     ];
@@ -49,6 +50,7 @@ class Prospect extends Model
             'tracking_portal' => 'boolean',
             'last_contact_at' => 'datetime', 'next_follow_up_at' => 'datetime', 'last_outbound_at' => 'datetime',
             'last_customer_reply_at' => 'datetime', 'follow_up_snoozed_until' => 'datetime', 'follow_up_count' => 'integer',
+            'last_feedback_at' => 'datetime',
             'contacted_at' => 'datetime',
             'replied_at' => 'datetime', 'meeting_at' => 'datetime', 'demo_at' => 'datetime', 'proposal_at' => 'datetime',
             'negotiation_at' => 'datetime', 'deal_at' => 'datetime', 'closed_at' => 'datetime',

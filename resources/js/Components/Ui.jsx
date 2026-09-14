@@ -15,8 +15,20 @@ export function StatusBadge({ status, label }) {
     return <Badge tone={tones[status] || 'neutral'}>{label || status}</Badge>;
 }
 
-export function Avatar({ name, size = 'md' }) {
-    return <span className={`avatar avatar-${size}`}>{initials(name)}</span>;
+const avatarText = (name = '', email = '', initialsText = '') => {
+    if (initialsText?.trim()) return initialsText.trim().slice(0, 2).toUpperCase();
+
+    const base = initials(name);
+    if (base !== 'SS') return base;
+
+    const local = String(email || '').split('@')[0].replace(/[^a-z0-9]/gi, '');
+    if (local.length >= 2) return local.slice(0, 2).toUpperCase();
+
+    return 'SV';
+};
+
+export function Avatar({ name, email = '', initialsText = '', size = 'md' }) {
+    return <span className={`avatar avatar-${size}`}>{avatarText(name, email, initialsText)}</span>;
 }
 
 export function Progress({ value = 0, tone = 'green' }) {

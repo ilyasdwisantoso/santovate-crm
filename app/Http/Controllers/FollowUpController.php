@@ -8,6 +8,7 @@ use App\Services\FollowUpService;
 use App\Services\ProspectStageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -50,12 +51,26 @@ class FollowUpController extends Controller
     public function markSent(Request $request, Prospect $prospect, ProspectStageService $stages): RedirectResponse
     {
         $prospect = $this->visibleProspect($request, $prospect);
+
         $data = $request->validate([
             'message' => ['required', 'string', 'max:5000'],
+            'queue_type' => ['nullable', Rule::in(['response_needed', 'lead_age_due', 'no_reply', 'scheduled'])],
+            'feedback_note' => ['nullable', 'string', 'max:2000'],
             'next_follow_up_days' => ['nullable', 'integer', 'min:0', 'max:60'],
         ]);
+
+        $isLeadAge = ($data['queue_type'] ?? null) === 'lead_age_due';
+
+        if ($isLeadAge && blank($data['feedback_note'] ?? null)) {
+            return back()->withErrors([
+                'feedback_note' => 'Feedback wajib diisi untuk lead yang sudah melewati batas umur H-3.',
+            ]);
+        }
+
         $now = now();
-        $days = array_key_exists('next_follow_up_days', $data) ? (int) $data['next_follow_up_days'] : 5;
+        $days = array_key_exists('next_follow_up_days', $data)
+            ? (int) $data['next_follow_up_days']
+            : 5;
 
         ProspectActivity::create([
             'prospect_id' => $prospect->id,
@@ -66,7 +81,7 @@ class FollowUpController extends Controller
             'occurred_at' => $now,
         ]);
 
-        $prospect->update([
+        $update = [
             'last_outbound_at' => $now,
             'last_contact_at' => $now,
             'contacted_at' => $prospect->contacted_at ?: $now,
@@ -74,7 +89,26 @@ class FollowUpController extends Controller
             'follow_up_snoozed_until' => null,
             'follow_up_count' => ((int) $prospect->follow_up_count) + 1,
             'last_follow_up_message' => $data['message'],
-        ]);
+        ];
+
+        if ($isLeadAge) {
+            $update += [
+                'last_feedback_at' => $now,
+                'last_feedback_status' => 'follow_up_sent',
+                'last_feedback_note' => $data['feedback_note'],
+            ];
+
+            ProspectActivity::create([
+                'prospect_id' => $prospect->id,
+                'user_id' => $request->user()->id,
+                'type' => 'follow_up_feedback',
+                'title' => 'Feedback wajib H-3',
+                'description' => $data['feedback_note'],
+                'occurred_at' => $now,
+            ]);
+        }
+
+        $prospect->update($update);
 
         if (in_array($prospect->status, ['baru', 'diriset'], true)) {
             $stages->transition($prospect, 'dihubungi', $request->user(), 'Follow-up WhatsApp');
@@ -83,17 +117,70 @@ class FollowUpController extends Controller
         return back()->with('success', 'Follow-up dicatat sebagai sudah dikirim.');
     }
 
+    public function markFeedback(Request $request, Prospect $prospect): RedirectResponse
+    {
+        $prospect = $this->visibleProspect($request, $prospect);
+
+        $data = $request->validate([
+            'feedback_status' => [
+                'required',
+                Rule::in(['no_answer', 'invalid_contact', 'need_research', 'follow_up_later', 'interested', 'not_interested']),
+            ],
+            'feedback_note' => ['required', 'string', 'min:3', 'max:2000'],
+            'next_follow_up_days' => ['nullable', 'integer', 'min:0', 'max:60'],
+        ]);
+
+        $labels = [
+            'no_answer' => 'Belum ada jawaban',
+            'invalid_contact' => 'Kontak tidak valid',
+            'need_research' => 'Perlu riset tambahan',
+            'follow_up_later' => 'Follow-up lagi nanti',
+            'interested' => 'Ada potensi / tertarik',
+            'not_interested' => 'Belum tertarik',
+        ];
+
+        $now = now();
+        $days = (int) ($data['next_follow_up_days'] ?? 3);
+
+        ProspectActivity::create([
+            'prospect_id' => $prospect->id,
+            'user_id' => $request->user()->id,
+            'type' => 'follow_up_feedback',
+            'title' => 'Feedback Account Executive: '.$labels[$data['feedback_status']],
+            'description' => $data['feedback_note'],
+            'occurred_at' => $now,
+        ]);
+
+        $prospect->update([
+            'last_feedback_at' => $now,
+            'last_feedback_status' => $data['feedback_status'],
+            'last_feedback_note' => $data['feedback_note'],
+            'next_follow_up_at' => $days > 0 ? $now->copy()->addDays($days) : null,
+            'follow_up_snoozed_until' => null,
+        ]);
+
+        return back()->with('success', 'Feedback Account Executive berhasil disimpan.');
+    }
+
     public function snooze(Request $request, Prospect $prospect): RedirectResponse
     {
         $prospect = $this->visibleProspect($request, $prospect);
         $data = $request->validate(['until' => ['required', 'date', 'after:now']]);
         $prospect->update(['follow_up_snoozed_until' => $data['until']]);
+
         return back()->with('success', 'Tugas follow-up ditunda.');
     }
 
     private function visibleProspect(Request $request, Prospect $prospect): Prospect
     {
-        abort_unless(Prospect::query()->visibleTo($request->user())->whereKey($prospect->id)->exists(), 403);
+        abort_unless(
+            Prospect::query()
+                ->visibleTo($request->user())
+                ->whereKey($prospect->id)
+                ->exists(),
+            403
+        );
+
         return $prospect;
     }
 }
