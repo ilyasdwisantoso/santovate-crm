@@ -5,7 +5,7 @@ import Flash from '../Components/Flash';
 import { Avatar } from '../Components/Ui';
 
 const nav = [
-    { href: '/dashboard', label: 'Dashboard', icon: 'home', match: (u) => u.startsWith('/dashboard') },
+    { href: '/', label: 'Dashboard', icon: 'home', match: (u) => u === '/' },
     { href: '/prospects', label: 'Prospek', icon: 'building', match: (u) => u.startsWith('/prospects') },
     { href: '/follow-ups', label: 'Follow Up', icon: 'whatsapp', match: (u) => u.startsWith('/follow-ups') },
     { href: '/pipeline', label: 'Pipeline', icon: 'pipeline', match: (u) => u.startsWith('/pipeline') },
@@ -210,7 +210,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
 
             <nav className="bottom-nav" aria-label="Navigasi utama mobile">
                 {nav
-                    .filter((item) => ['/dashboard', '/prospects', '/follow-ups', '/pipeline'].includes(item.href))
+                    .filter((item) => ['/', '/prospects', '/follow-ups', '/pipeline'].includes(item.href))
                     .map((item) => <NavLink key={item.href} item={item} url={url} mobile/>)}
 
                 <button

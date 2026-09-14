@@ -13,9 +13,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProspectController;
 use App\Http\Controllers\SalesTargetController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::get('/', fn () => Inertia::render('Landing/Home'))->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');
@@ -28,7 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
     Route::patch('/profile',[ProfileController::class,'update'])->name('profile.update');
 
-    Route::get('/dashboard',DashboardController::class)->name('dashboard');
+    Route::get('/',DashboardController::class)->name('dashboard');
     Route::patch('/prospects/{prospect}/status',[ProspectController::class,'updateStatus'])->name('prospects.status');
     Route::resource('prospects',ProspectController::class);
     Route::post('/prospects/{prospect}/activities',[ActivityController::class,'store'])->name('prospects.activities.store');
