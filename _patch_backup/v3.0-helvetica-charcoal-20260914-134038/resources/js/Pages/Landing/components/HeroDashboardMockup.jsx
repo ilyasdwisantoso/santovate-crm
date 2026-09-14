@@ -3,6 +3,7 @@ import Icon from '../../../Components/Icon';
 const kpis = [
     {
         icon: 'users',
+        tone: 'blue',
         label: 'Prospects',
         value: '1,248',
         delta: '+12%',
@@ -10,6 +11,7 @@ const kpis = [
     },
     {
         icon: 'calendar',
+        tone: 'rose',
         label: 'Follow-up Queue',
         value: '320',
         delta: '+8%',
@@ -17,6 +19,7 @@ const kpis = [
     },
     {
         icon: 'pipeline',
+        tone: 'blue',
         label: 'Pipeline Value',
         value: 'Rp480M',
         delta: '+24%',
@@ -24,6 +27,7 @@ const kpis = [
     },
     {
         icon: 'target',
+        tone: 'amber',
         label: 'Deals Won',
         value: '87',
         delta: '+35%',
@@ -32,12 +36,12 @@ const kpis = [
 ];
 
 const stages = [
-    { label: 'Lead', height: 44 },
-    { label: 'Contacted', height: 61 },
-    { label: 'Qualified', height: 78 },
-    { label: 'Proposal', height: 66 },
-    { label: 'Negotiation', height: 52 },
-    { label: 'Won', height: 87, highlight: true },
+    { label: 'Lead', height: 44, tone: 'blue' },
+    { label: 'Contacted', height: 61, tone: 'blue' },
+    { label: 'Qualified', height: 78, tone: 'blue' },
+    { label: 'Proposal', height: 66, tone: 'blue' },
+    { label: 'Negotiation', height: 52, tone: 'blue' },
+    { label: 'Won', height: 87, tone: 'green' },
 ];
 
 const navigation = [
@@ -92,14 +96,14 @@ export default function HeroDashboardMockup() {
                             <strong>Alex Carter</strong>
                             <small>Sales Manager</small>
                         </span>
-                        <b>v</b>
+                        <b>⌄</b>
                     </div>
                 </header>
 
                 <div className="svdash-heading">
                     <div>
-                        <h3>Good morning, Alex</h3>
-                        <p>Here is what is happening with your sales today.</p>
+                        <h3>Good morning, Alex <span>👋</span></h3>
+                        <p>Here&apos;s what&apos;s happening with your sales today.</p>
                     </div>
 
                     <div className="svdash-date">
@@ -112,7 +116,7 @@ export default function HeroDashboardMockup() {
                     {kpis.map((item) => (
                         <article key={item.label}>
                             <div className="svdash-kpi-label">
-                                <span className="svdash-kpi-icon">
+                                <span className={`svdash-kpi-icon tone-${item.tone}`}>
                                     <Icon name={item.icon} size={13}/>
                                 </span>
                                 <small>{item.label}</small>
@@ -120,7 +124,9 @@ export default function HeroDashboardMockup() {
 
                             <div className="svdash-kpi-value">
                                 <strong>{item.value}</strong>
-                                <em>{item.delta}</em>
+                                <em className={item.tone === 'rose' ? 'negative' : ''}>
+                                    {item.delta}
+                                </em>
                             </div>
 
                             <p>{item.note}</p>
@@ -132,7 +138,7 @@ export default function HeroDashboardMockup() {
                     <article className="svdash-pipeline-card">
                         <header>
                             <strong>Sales Pipeline</strong>
-                            <button type="button">This Quarter <span>v</span></button>
+                            <button type="button">This Quarter <span>⌄</span></button>
                         </header>
 
                         <div className="svdash-chart-layout">
@@ -153,7 +159,7 @@ export default function HeroDashboardMockup() {
                                 {stages.map((stage, index) => (
                                     <div className="svdash-bar-slot" key={stage.label}>
                                         <div
-                                            className={`svdash-bar ${stage.highlight ? 'highlight' : ''}`}
+                                            className={`svdash-bar tone-${stage.tone}`}
                                             style={{
                                                 '--bar-height': `${stage.height}%`,
                                                 '--bar-delay': `${320 + index * 90}ms`,
@@ -184,12 +190,12 @@ export default function HeroDashboardMockup() {
                         </div>
 
                         <div className="svdash-ahead">
-                            <span>+</span>
+                            <span>↗</span>
                             <p>
-                                You are <strong>20% ahead</strong>
+                                You&apos;re <strong>20% ahead</strong>
                                 <small>of last quarter</small>
                             </p>
-                            <b>&gt;</b>
+                            <b>›</b>
                         </div>
                     </article>
                 </section>

@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react';
 import Icon from '../../../Components/Icon';
 import HeroDashboardMockup from './HeroDashboardMockup';
-import '../../../../css/landing-hero-v30.css';
+import '../../../../css/landing-hero-v29.css';
 
 const trustPeople = [
-    { initials: 'AE' },
-    { initials: 'AM' },
-    { initials: 'SA' },
-    { initials: 'BD' },
+    { initials: 'AE', tone: 'blue' },
+    { initials: 'AM', tone: 'violet' },
+    { initials: 'SA', tone: 'cyan' },
+    { initials: 'BD', tone: 'amber' },
 ];
 
 const heroBenefits = [
@@ -53,10 +53,10 @@ export default function HeroSection() {
             if (rafId) window.cancelAnimationFrame(rafId);
 
             rafId = window.requestAnimationFrame(() => {
-                productElement.style.setProperty('--svhero-rx', `${(-y * 1.15).toFixed(2)}deg`);
-                productElement.style.setProperty('--svhero-ry', `${(x * 1.75).toFixed(2)}deg`);
-                productElement.style.setProperty('--svhero-tx', `${(x * 3).toFixed(1)}px`);
-                productElement.style.setProperty('--svhero-ty', `${(y * 3).toFixed(1)}px`);
+                productElement.style.setProperty('--svhero-rx', `${(-y * 1.65).toFixed(2)}deg`);
+                productElement.style.setProperty('--svhero-ry', `${(x * 2.35).toFixed(2)}deg`);
+                productElement.style.setProperty('--svhero-tx', `${(x * 5).toFixed(1)}px`);
+                productElement.style.setProperty('--svhero-ty', `${(y * 4).toFixed(1)}px`);
             });
         };
 
@@ -79,12 +79,13 @@ export default function HeroSection() {
     }, []);
 
     return (
-        <section ref={heroRef} className="svhero svhero-v30" aria-labelledby="svhero-title">
+        <section ref={heroRef} className="svhero svhero-v29" aria-labelledby="svhero-title">
             <div className="svhero-bg" aria-hidden="true">
-                <div className="svhero-texture texture-a"/>
-                <div className="svhero-texture texture-b"/>
-                <div className="svhero-ridge ridge-a"/>
-                <div className="svhero-ridge ridge-b"/>
+                <div className="svhero-rock rock-a"/>
+                <div className="svhero-rock rock-b"/>
+                <div className="svhero-rock rock-c"/>
+                <div className="svhero-blue-rim rim-a"/>
+                <div className="svhero-blue-rim rim-b"/>
                 <div className="svhero-noise"/>
                 <div className="svhero-vignette"/>
             </div>
@@ -99,7 +100,7 @@ export default function HeroSection() {
 
                     <div className="svhero-eyebrow svhero-enter enter-2">
                         <i/>
-                        <span>SMART SALES / STRONGER RELATIONSHIPS / REAL GROWTH</span>
+                        <span>SMART SALES · STRONGER RELATIONSHIPS · REAL GROWTH</span>
                     </div>
 
                     <h1 id="svhero-title" aria-label="B2B Sales CRM That Drives Real Revenue">
@@ -115,21 +116,21 @@ export default function HeroSection() {
                     <div className="svhero-actions svhero-enter enter-5">
                         <a href="#pricing" className="svhero-btn primary">
                             <span>Request Demo</span>
-                            <span className="svhero-btn-arrow" aria-hidden="true">-&gt;</span>
+                            <span className="svhero-btn-arrow" aria-hidden="true">→</span>
                         </a>
 
                         <a href="#features" className="svhero-btn secondary">
-                            <span className="svhero-play" aria-hidden="true">+</span>
+                            <span className="svhero-play" aria-hidden="true">▶</span>
                             <span>Explore Features</span>
                         </a>
                     </div>
 
                     <div className="svhero-proof svhero-enter enter-6">
                         <div className="svhero-avatar-stack" aria-hidden="true">
-                            {trustPeople.map((person, index) => (
+                            {trustPeople.map((person) => (
                                 <span
                                     key={person.initials}
-                                    className={`svhero-proof-avatar avatar-${index + 1}`}
+                                    className={`svhero-proof-avatar tone-${person.tone}`}
                                 >
                                     {person.initials}
                                 </span>
@@ -138,7 +139,7 @@ export default function HeroSection() {
                         </div>
 
                         <div className="svhero-stars" aria-label="Rated 4.8 out of 5">
-                            *****
+                            ★★★★★
                         </div>
 
                         <strong>4.8/5</strong>
@@ -165,7 +166,7 @@ export default function HeroSection() {
                     <HeroDashboardMockup/>
 
                     <article className="svhero-float-card new-lead">
-                        <span className="svhero-float-icon">
+                        <span className="svhero-float-icon violet">
                             <Icon name="users" size={17}/>
                         </span>
                         <span>
@@ -177,13 +178,13 @@ export default function HeroSection() {
                     </article>
 
                     <article className="svhero-float-card deal-won">
-                        <span className="svhero-float-icon">
+                        <span className="svhero-float-icon mint">
                             <Icon name="check" size={18}/>
                         </span>
                         <span>
                             <small>Deal Moved to Won</small>
                             <strong>BluePeak Solutions</strong>
-                            <em>Rp28M / Annual Contract</em>
+                            <em>Rp28M · Annual Contract</em>
                         </span>
                         <time>12m</time>
                     </article>

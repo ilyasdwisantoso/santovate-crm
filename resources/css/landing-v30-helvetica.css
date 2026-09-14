@@ -1,0 +1,293 @@
+/* =========================================================
+   Santovate CRM v3.0
+   HELVETICA-STYLE LANDING TYPOGRAPHY + COMPACT SPACING
+   No font binaries are bundled.
+   ========================================================= */
+
+.fl-page{
+    --fl-display:"Helvetica Now Display","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --fl-text:"Helvetica Now Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family:var(--fl-text)!important;
+}
+
+.fl-page button,
+.fl-page input,
+.fl-page textarea,
+.fl-page select{
+    font-family:var(--fl-text)!important;
+}
+
+.fl-container{
+    width:min(calc(100% - 44px),1320px)!important;
+}
+
+.fl-nav{
+    font-family:var(--fl-text)!important;
+}
+
+.fl-brand strong{
+    font-family:var(--fl-display)!important;
+    font-weight:700!important;
+    letter-spacing:-.045em!important;
+}
+
+.fl-nav-links a,
+.fl-nav-login,
+.fl-nav-cta{
+    font-family:var(--fl-text)!important;
+    font-weight:500!important;
+    letter-spacing:-.02em!important;
+}
+
+.fl-section{
+    padding:84px 0!important;
+}
+
+.fl-section-heading{
+    margin-bottom:42px!important;
+}
+
+.fl-section-heading.split{
+    gap:42px!important;
+}
+
+.fl-section-heading h2,
+.fl-why-copy h2,
+.fl-integration-copy h2,
+.fl-faq-intro h2,
+.fl-final-inner h2{
+    font-family:var(--fl-display)!important;
+    font-size:clamp(66px,5.7vw,88px)!important;
+    line-height:.92!important;
+    letter-spacing:-.067em!important;
+    font-weight:700!important;
+    text-wrap:balance;
+}
+
+.fl-feature-copy h3{
+    font-family:var(--fl-display)!important;
+    font-size:clamp(58px,5vw,76px)!important;
+    line-height:.93!important;
+    letter-spacing:-.065em!important;
+    font-weight:700!important;
+    text-wrap:balance;
+}
+
+.fl-benefit-feature h3{
+    font-family:var(--fl-display)!important;
+    font-size:clamp(38px,3vw,48px)!important;
+    line-height:.96!important;
+    letter-spacing:-.055em!important;
+    font-weight:700!important;
+}
+
+.fl-benefit-item h3,
+.fl-industry-grid h3,
+.fl-pricing-grid h3{
+    font-family:var(--fl-display)!important;
+    letter-spacing:-.05em!important;
+    font-weight:700!important;
+}
+
+.fl-section-heading p,
+.fl-feature-copy p,
+.fl-integration-copy>p,
+.fl-faq-intro>p{
+    font-family:var(--fl-text)!important;
+    font-size:17px!important;
+    line-height:1.55!important;
+    letter-spacing:-.025em!important;
+    color:#666662!important;
+}
+
+.fl-section-label,
+.fl-feature-number,
+.fl-industry-num,
+.fl-test-number{
+    font-family:var(--fl-text)!important;
+    font-weight:500!important;
+    letter-spacing:-.02em!important;
+}
+
+.fl-benefits-grid,
+.fl-benefit-grid{
+    gap:12px!important;
+}
+
+.fl-benefit-list{
+    gap:12px!important;
+}
+
+.fl-benefit-item{
+    min-height:230px!important;
+    padding:21px!important;
+}
+
+.fl-feature-row{
+    gap:clamp(34px,4.8vw,70px)!important;
+    padding:52px 0!important;
+}
+
+.fl-feature-copy{
+    max-width:560px!important;
+}
+
+.fl-mockup-canvas{
+    min-height:420px!important;
+}
+
+.fl-industries .fl-section-heading,
+.fl-testimonials .fl-section-heading,
+.fl-pricing .fl-section-heading{
+    margin-bottom:38px!important;
+}
+
+.fl-industry-grid,
+.fl-testimonial-grid,
+.fl-pricing-grid{
+    gap:12px!important;
+}
+
+.fl-testimonial-grid article{
+    min-height:450px!important;
+    padding:24px!important;
+}
+
+.fl-test-metric{
+    margin-top:46px!important;
+}
+
+.fl-testimonial-grid blockquote{
+    margin:36px 0 24px!important;
+}
+
+.fl-integration-grid{
+    gap:clamp(40px,5vw,72px)!important;
+}
+
+.fl-integration-copy{
+    max-width:620px!important;
+}
+
+.fl-integration-orbit{
+    height:500px!important;
+}
+
+.fl-pricing-grid article{
+    padding:25px!important;
+}
+
+.fl-faq-grid{
+    gap:70px!important;
+}
+
+.fl-faq-list button{
+    min-height:72px!important;
+}
+
+.fl-faq-list button>span{
+    font-family:var(--fl-text)!important;
+    font-size:18px!important;
+    font-weight:500!important;
+    letter-spacing:-.035em!important;
+}
+
+.fl-final-inner{
+    min-height:520px!important;
+    padding:66px 55px!important;
+}
+
+.fl-footer{
+    padding-top:52px!important;
+}
+
+/* Fix any residual card overflow */
+.fl-feature-row,
+.fl-mockup-canvas,
+.fl-kanban-column,
+.fl-deal-card,
+.fl-message-row{
+    min-width:0!important;
+}
+
+.fl-deal-card>strong,
+.fl-deal-card>small,
+.fl-deal-card>em{
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+}
+
+/* Use a monochrome icon treatment outside hero as well */
+.fl-integration-icon>span{
+    color:#191919!important;
+    background:#fff!important;
+    border-color:#d8d8d4!important;
+}
+
+.fl-integration-icon svg{
+    stroke-width:1.7!important;
+}
+
+@media(max-width:1100px){
+    .fl-section{
+        padding:72px 0!important;
+    }
+
+    .fl-section-heading h2,
+    .fl-why-copy h2,
+    .fl-integration-copy h2,
+    .fl-faq-intro h2{
+        font-size:clamp(58px,7.2vw,76px)!important;
+    }
+
+    .fl-feature-copy h3{
+        font-size:clamp(52px,6.5vw,68px)!important;
+    }
+}
+
+@media(max-width:560px){
+    .fl-container{
+        width:min(calc(100% - 22px),1320px)!important;
+    }
+
+    .fl-section{
+        padding:58px 0!important;
+    }
+
+    .fl-section-heading{
+        margin-bottom:30px!important;
+    }
+
+    .fl-section-heading h2,
+    .fl-why-copy h2,
+    .fl-integration-copy h2,
+    .fl-faq-intro h2{
+        font-size:clamp(44px,12.5vw,58px)!important;
+        line-height:.94!important;
+    }
+
+    .fl-feature-copy h3{
+        font-size:clamp(42px,11.5vw,54px)!important;
+    }
+
+    .fl-section-heading p,
+    .fl-feature-copy p,
+    .fl-integration-copy>p,
+    .fl-faq-intro>p{
+        font-size:15px!important;
+    }
+
+    .fl-feature-row{
+        padding:38px 0!important;
+    }
+
+    .fl-testimonial-grid article{
+        min-height:390px!important;
+    }
+
+    .fl-final-inner{
+        min-height:450px!important;
+        padding:52px 18px!important;
+    }
+}
