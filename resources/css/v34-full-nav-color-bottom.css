@@ -1,0 +1,359 @@
+/* =========================================================
+   Santovate CRM v3.4
+   FULL LANDING NAV + COLORFUL MOBILE BOTTOM BAR + OVERLAP AUDIT
+   Load AFTER v33.
+   ========================================================= */
+
+:root{
+    --sv34-dashboard:#0891b2;
+    --sv34-dashboard-soft:#e7f8fb;
+    --sv34-prospect:#2563eb;
+    --sv34-prospect-soft:#eaf1ff;
+    --sv34-followup:#e45878;
+    --sv34-followup-soft:#fff0f4;
+    --sv34-pipeline:#7c3aed;
+    --sv34-pipeline-soft:#f2ebff;
+    --sv34-more:#d97706;
+    --sv34-more-soft:#fff5e6;
+    --sv34-ink:#111827;
+    --sv34-line:#e5e7eb;
+}
+
+/* =========================================================
+   1. LANDING NAVBAR - COMPLETE MENU, SAFE AT EVERY WIDTH
+   ========================================================= */
+
+.fl-nav{
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    gap:clamp(14px,2vw,28px)!important;
+}
+
+.fl-nav-links{
+    min-width:0!important;
+    justify-content:center!important;
+    gap:clamp(14px,1.75vw,28px)!important;
+}
+
+.fl-nav-links a{
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
+    font-size:clamp(11px,.9vw,13px)!important;
+    letter-spacing:-.02em!important;
+}
+
+.fl-nav-actions{
+    gap:clamp(12px,1.5vw,20px)!important;
+    white-space:nowrap!important;
+}
+
+.fl-brand{
+    min-width:max-content!important;
+}
+
+/* Anchors must not hide below fixed navbar. */
+#features,
+#industries,
+#workflow,
+#pricing,
+#resources,
+#faq{
+    scroll-margin-top:105px!important;
+}
+
+/* Switch to menu BEFORE desktop nav becomes crowded. */
+@media (max-width:1180px){
+    .fl-nav-links,
+    .fl-nav-actions{
+        display:none!important;
+    }
+
+    .fl-nav{
+        grid-template-columns:minmax(0,1fr) auto!important;
+    }
+
+    .fl-nav-toggle{
+        width:44px!important;
+        height:44px!important;
+        padding:0!important;
+        display:grid!important;
+        place-items:center!important;
+        border:0!important;
+        border-radius:50%!important;
+        background:#0b0d11!important;
+        color:#fff!important;
+        cursor:pointer!important;
+    }
+
+    .fl-mobile-nav{
+        display:block!important;
+        pointer-events:auto!important;
+        max-height:0!important;
+        opacity:0!important;
+        overflow:hidden!important;
+        transform:translateY(-8px)!important;
+        transition:max-height .36s cubic-bezier(.22,.72,.18,1),opacity .24s ease,transform .3s ease!important;
+    }
+
+    .fl-mobile-nav.open{
+        max-height:min(680px,calc(100dvh - 96px))!important;
+        opacity:1!important;
+        transform:none!important;
+    }
+
+    .fl-mobile-nav>.fl-container{
+        overflow-y:auto!important;
+        overscroll-behavior:contain!important;
+        scrollbar-width:none!important;
+    }
+
+    .fl-mobile-nav>.fl-container::-webkit-scrollbar{
+        display:none!important;
+    }
+}
+
+@media (max-width:820px){
+    #features,
+    #industries,
+    #workflow,
+    #pricing,
+    #resources,
+    #faq{
+        scroll-margin-top:96px!important;
+    }
+
+    .fl-mobile-nav>.fl-container{
+        max-height:calc(100dvh - 96px)!important;
+        padding-bottom:calc(16px + env(safe-area-inset-bottom))!important;
+    }
+
+    .fl-mobile-nav a:not(.fl-nav-cta){
+        min-height:48px!important;
+    }
+}
+
+/* =========================================================
+   2. ADMIN + SALES MOBILE BOTTOM NAV - DISTINCT COLORS
+   Shared AppLayout means this applies to both roles.
+   ========================================================= */
+
+@media (max-width:768px){
+    .main-area{
+        padding-bottom:calc(104px + env(safe-area-inset-bottom))!important;
+    }
+
+    .bottom-nav{
+        z-index:220!important;
+        overflow:visible!important;
+        isolation:isolate!important;
+    }
+
+    .bottom-link{
+        position:relative!important;
+        overflow:visible!important;
+        color:#707887!important;
+        transition:transform .22s ease,color .22s ease,background .22s ease!important;
+    }
+
+    .bottom-link .bottom-icon-wrap{
+        border:1px solid transparent!important;
+        transition:transform .22s ease,background .22s ease,color .22s ease,border-color .22s ease,box-shadow .22s ease!important;
+    }
+
+    /* Dashboard */
+    .bottom-nav>.bottom-link:nth-child(1) .bottom-icon-wrap{
+        background:var(--sv34-dashboard-soft)!important;
+        color:var(--sv34-dashboard)!important;
+        border-color:#cfeef4!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(1).active{
+        color:#0b7187!important;
+        background:#f1fbfc!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(1).active .bottom-icon-wrap{
+        background:var(--sv34-dashboard)!important;
+        color:#fff!important;
+        border-color:var(--sv34-dashboard)!important;
+        box-shadow:0 7px 16px rgba(8,145,178,.22)!important;
+    }
+
+    /* Prospek */
+    .bottom-nav>.bottom-link:nth-child(2) .bottom-icon-wrap{
+        background:var(--sv34-prospect-soft)!important;
+        color:var(--sv34-prospect)!important;
+        border-color:#d8e5ff!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(2).active{
+        color:#1d4ed8!important;
+        background:#f3f7ff!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(2).active .bottom-icon-wrap{
+        background:var(--sv34-prospect)!important;
+        color:#fff!important;
+        border-color:var(--sv34-prospect)!important;
+        box-shadow:0 7px 16px rgba(37,99,235,.22)!important;
+    }
+
+    /* Follow Up */
+    .bottom-nav>.bottom-link:nth-child(3) .bottom-icon-wrap{
+        background:var(--sv34-followup-soft)!important;
+        color:var(--sv34-followup)!important;
+        border-color:#ffdbe4!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(3).active{
+        color:#c53f60!important;
+        background:#fff5f7!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(3).active .bottom-icon-wrap{
+        background:var(--sv34-followup)!important;
+        color:#fff!important;
+        border-color:var(--sv34-followup)!important;
+        box-shadow:0 7px 16px rgba(228,88,120,.23)!important;
+    }
+
+    /* Pipeline */
+    .bottom-nav>.bottom-link:nth-child(4) .bottom-icon-wrap{
+        background:var(--sv34-pipeline-soft)!important;
+        color:var(--sv34-pipeline)!important;
+        border-color:#e7d9ff!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(4).active{
+        color:#6d28d9!important;
+        background:#f8f4ff!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(4).active .bottom-icon-wrap{
+        background:var(--sv34-pipeline)!important;
+        color:#fff!important;
+        border-color:var(--sv34-pipeline)!important;
+        box-shadow:0 7px 16px rgba(124,58,237,.22)!important;
+    }
+
+    /* Lainnya */
+    .bottom-nav>.bottom-link:nth-child(5) .bottom-icon-wrap{
+        background:var(--sv34-more-soft)!important;
+        color:var(--sv34-more)!important;
+        border-color:#ffe4b8!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(5).active{
+        color:#b45309!important;
+        background:#fff9ef!important;
+    }
+    .bottom-nav>.bottom-link:nth-child(5).active .bottom-icon-wrap{
+        background:var(--sv34-more)!important;
+        color:#fff!important;
+        border-color:var(--sv34-more)!important;
+        box-shadow:0 7px 16px rgba(217,119,6,.22)!important;
+    }
+
+    .bottom-link.active{
+        transform:translateY(-1px)!important;
+    }
+
+    .bottom-link.active .bottom-icon-wrap{
+        transform:translateY(-2px) scale(1.04)!important;
+    }
+
+    .bottom-link>span:last-child{
+        font-weight:650!important;
+    }
+}
+
+/* =========================================================
+   3. OVERLAP / RESPONSIVE AUDIT
+   ========================================================= */
+
+@media (max-width:768px){
+    .topbar{
+        isolation:isolate!important;
+    }
+
+    .page-content,
+    .panel,
+    .dashboard-layout,
+    .dashboard-main,
+    .dashboard-side,
+    .dashboard-layout-v24,
+    .profile-layout-v24,
+    .followup-mobile-list,
+    .pipeline-board,
+    .kanban-board{
+        min-width:0!important;
+        max-width:100%!important;
+    }
+
+    .notification-popover{
+        z-index:260!important;
+    }
+
+    .mobile-sidebar-backdrop{
+        z-index:300!important;
+    }
+
+    .mobile-sidebar-drawer{
+        padding-bottom:env(safe-area-inset-bottom)!important;
+    }
+
+    .mobile-sidebar-footer{
+        padding-bottom:calc(12px + env(safe-area-inset-bottom))!important;
+    }
+
+    .modal-backdrop{
+        z-index:400!important;
+    }
+
+    .modal-card,
+    .followup-composer{
+        overscroll-behavior:contain!important;
+    }
+
+    .clean-table-wrap,
+    .prospect-table-wrap,
+    .table-wrap,
+    .targets-table-wrap,
+    .import-preview-table{
+        max-width:100%!important;
+    }
+
+    img,
+    svg,
+    canvas{
+        max-width:100%;
+    }
+}
+
+@media (max-width:390px){
+    .bottom-nav{
+        left:4px!important;
+        right:4px!important;
+        bottom:calc(4px + env(safe-area-inset-bottom))!important;
+        gap:0!important;
+    }
+
+    .bottom-link{
+        min-width:0!important;
+        padding-inline:0!important;
+    }
+
+    .bottom-icon-wrap{
+        width:30px!important;
+        height:29px!important;
+    }
+
+    .bottom-link>span:last-child{
+        font-size:7.6px!important;
+    }
+}
+
+@media (max-width:350px){
+    .main-area{
+        padding-bottom:calc(100px + env(safe-area-inset-bottom))!important;
+    }
+
+    .bottom-icon-wrap{
+        width:28px!important;
+        height:27px!important;
+    }
+
+    .bottom-link>span:last-child{
+        font-size:7px!important;
+    }
+}

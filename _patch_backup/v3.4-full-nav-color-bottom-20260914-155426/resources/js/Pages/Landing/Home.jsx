@@ -511,7 +511,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                <section className="fl-section fl-testimonials" id="resources">
+                <section className="fl-section fl-testimonials">
                     <div className="fl-container">
                         <SectionLabel>Testimonials</SectionLabel>
                         <div className="fl-section-heading split">
@@ -640,7 +640,6 @@ export default function Home() {
         </div>
     );
 }
-
 
 
 

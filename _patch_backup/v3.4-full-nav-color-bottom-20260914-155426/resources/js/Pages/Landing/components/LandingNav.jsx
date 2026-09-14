@@ -5,10 +5,6 @@ import Icon from '../../../Components/Icon';
 const navItems = [
     { href: '#features', label: 'Features' },
     { href: '#industries', label: 'Industries' },
-    { href: '#workflow', label: 'Solutions' },
-    { href: '#pricing', label: 'Pricing' },
-    { href: '#resources', label: 'Resources' },
-    { href: '#faq', label: 'FAQ' },
 ];
 
 export default function LandingNav() {
@@ -64,6 +60,5 @@ export default function LandingNav() {
         </header>
     );
 }
-
 
 
