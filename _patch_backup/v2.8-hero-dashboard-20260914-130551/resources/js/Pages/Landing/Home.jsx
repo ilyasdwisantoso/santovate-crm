@@ -1,9 +1,8 @@
-﻿import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import Icon from '../../Components/Icon';
 import LandingNav from './components/LandingNav';
 import LandingFooter from './components/LandingFooter';
-import HeroSection from './components/HeroSection';
 
 const benefits = [
     {
@@ -230,7 +229,7 @@ function PipelineMockup() {
                         <div className="fl-kanban-title"><span><i className={`dot d${colIndex + 1}`}/>{title}</span><b>{count}</b></div>
                         {cards.map(([name,value,avatar], idx) => (
                             <div className="fl-deal-card" key={name}>
-                                <div><Avatar label={avatar} tone={['blue','orange','lime','violet'][colIndex]}/><i>â€¢â€¢â€¢</i></div>
+                                <div><Avatar label={avatar} tone={['blue','orange','lime','violet'][colIndex]}/><i>•••</i></div>
                                 <strong>{name}</strong>
                                 <small>{value}</small>
                                 <em>{idx === 0 ? 'Follow-up today' : 'Active opportunity'}</em>
@@ -249,7 +248,7 @@ function FollowupMockup() {
             <div className="fl-followup-left">
                 <div className="fl-mock-head"><span>Follow-up workspace</span><b>24</b></div>
                 {[
-                    ['Atlas Cargo','Need feedback Â· H-3','AC','violet'],
+                    ['Atlas Cargo','Need feedback · H-3','AC','violet'],
                     ['Prima Niaga','Customer replied','PN','lime'],
                     ['Lumina Tech','Scheduled today','LT','orange'],
                     ['Nova Freight','Need reply','NF','blue'],
@@ -264,7 +263,7 @@ function FollowupMockup() {
             <div className="fl-composer">
                 <div className="fl-composer-person">
                     <Avatar label="AC" tone="violet"/>
-                    <span><strong>Atlas Cargo</strong><small>Prospect Â· Logistics</small></span>
+                    <span><strong>Atlas Cargo</strong><small>Prospect · Logistics</small></span>
                     <em>Review first</em>
                 </div>
                 <div className="fl-message-bubble">Halo Bapak/Ibu, saya ingin follow-up terkait kebutuhan pengiriman yang sempat kita bahas sebelumnya.</div>
@@ -337,11 +336,39 @@ export default function Home() {
 
     return (
         <div className="fl-page" id="top">
-            <Head title="Santovate CRM â€” B2B Sales Workspace"/>
+            <Head title="Santovate CRM — B2B Sales Workspace"/>
             <LandingNav/>
 
             <main>
-                <HeroSection user={user}/>
+                <section className="fl-hero">
+                    <div className="fl-container">
+                        <div className="fl-hero-copy">
+                            <SectionLabel>Welcome to Santovate CRM</SectionLabel>
+                            <h1>B2B Sales CRM<br/>That Powers <em>Real Growth</em></h1>
+                            <p>From prospect management to disciplined follow-up, Santovate CRM helps your team stay focused, move faster, and turn pipeline into measurable revenue.</p>
+                            <div className="fl-button-group">
+                                <Link href={ctaHref} className="fl-btn primary">{ctaText}<Icon name="chevron" size={17}/></Link>
+                                <a href="#features" className="fl-btn secondary">Explore Features</a>
+                            </div>
+                            <div className="fl-hero-review">
+                                <div className="fl-avatar-stack">
+                                    <Avatar label="AE" tone="blue"/>
+                                    <Avatar label="SA" tone="lime"/>
+                                    <Avatar label="AM" tone="orange"/>
+                                </div>
+                                <div className="fl-review-stars"><span>★★★★★</span><b>4.8/5</b><small>Built for modern B2B teams</small></div>
+                            </div>
+                        </div>
+
+                        <div className="fl-hero-product">
+                            <span className="fl-hero-shape shape-a"/>
+                            <span className="fl-hero-shape shape-b"/>
+                            <HeroDashboard/>
+                            <div className="fl-float-card fc-one"><span>+18%</span><small>Pipeline growth</small></div>
+                            <div className="fl-float-card fc-two"><Icon name="check" size={16}/><span>Follow-up done</span></div>
+                        </div>
+                    </div>
+                </section>
 
                 <section className="fl-logo-section">
                     <div className="fl-container">
@@ -512,7 +539,7 @@ export default function Home() {
                         <SectionLabel>Testimonials</SectionLabel>
                         <div className="fl-section-heading split">
                             <h2>Built Around The Way<br/>B2B Teams Actually Sell</h2>
-                            <p>Fokus pada clarity, velocity, dan consistencyâ€”tiga hal yang menentukan apakah pipeline bergerak atau hanya menjadi data.</p>
+                            <p>Fokus pada clarity, velocity, dan consistency—tiga hal yang menentukan apakah pipeline bergerak atau hanya menjadi data.</p>
                         </div>
                         <div className="fl-testimonial-grid">
                             {testimonials.map((item, idx) => (
@@ -598,7 +625,7 @@ export default function Home() {
                     <div className="fl-container fl-faq-grid">
                         <div className="fl-faq-intro">
                             <SectionLabel>FAQ</SectionLabel>
-                            <h2>Everything You Need<br/>to Knowâ€”Upfront</h2>
+                            <h2>Everything You Need<br/>to Know—Upfront</h2>
                             <p>Pertanyaan paling umum sebelum tim mulai menggunakan atau mengimplementasikan Santovate CRM.</p>
                             <Link href={ctaHref} className="fl-btn secondary">Request Demo <Icon name="chevron" size={17}/></Link>
                         </div>
@@ -606,7 +633,7 @@ export default function Home() {
                             {faqs.map((item, idx) => (
                                 <article className={faqOpen === idx ? 'open' : ''} key={item.q}>
                                     <button onClick={() => setFaqOpen(faqOpen === idx ? -1 : idx)} type="button">
-                                        <span>{item.q}</span><i>{faqOpen === idx ? 'âˆ’' : '+'}</i>
+                                        <span>{item.q}</span><i>{faqOpen === idx ? '−' : '+'}</i>
                                     </button>
                                     <div className="fl-faq-answer"><p>{item.a}</p></div>
                                 </article>
@@ -636,4 +663,3 @@ export default function Home() {
         </div>
     );
 }
-
