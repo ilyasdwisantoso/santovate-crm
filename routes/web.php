@@ -1,64 +1,57 @@
 <?php
-
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\Admin\BusinessSettingsController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WhatsAppSettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\FollowUpTemplateController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PipelineController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProspectController;
+use App\Http\Controllers\PublicController;
+use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SalesTargetController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\WhatsAppSendController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-Route::get('/', fn () => Inertia::render('Landing/Home'))->name('home');
-
-Route::middleware('guest')->group(function () {
-    Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');
-    Route::post('/login',[AuthenticatedSessionController::class,'store'])->name('login.store');
-});
-
-Route::middleware('auth')->group(function () {
+Route::get('/',fn()=>Inertia::render('Landing/Home'))->name('home');
+Route::get('/plans',[PublicController::class,'plans'])->name('plans.index');
+Route::get('/business-configurations',[PublicController::class,'configurations'])->name('business-configurations.index');
+Route::get('/terms',fn()=>app(PublicController::class)->legal('terms'))->name('terms');
+Route::get('/refund-policy',fn()=>app(PublicController::class)->legal('refund-policy'))->name('refund-policy');
+Route::get('/privacy-policy',fn()=>app(PublicController::class)->legal('privacy-policy'))->name('privacy-policy');
+Route::get('/faq',fn()=>app(PublicController::class)->legal('faq'))->name('faq.public');
+Route::get('/contact',fn()=>app(PublicController::class)->legal('contact'))->name('contact');
+Route::middleware('guest')->group(function(){Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');Route::post('/login',[AuthenticatedSessionController::class,'store'])->name('login.store');Route::get('/register',[RegistrationController::class,'create'])->name('register');Route::post('/register',[RegistrationController::class,'store'])->name('register.store');});
+Route::middleware('auth')->group(function(){
     Route::post('/logout',[AuthenticatedSessionController::class,'destroy'])->name('logout');
-
-    Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
-    Route::patch('/profile',[ProfileController::class,'update'])->name('profile.update');
-
-    Route::get('/dashboard',DashboardController::class)->name('dashboard');
-    Route::patch('/prospects/{prospect}/status',[ProspectController::class,'updateStatus'])->name('prospects.status');
-    Route::resource('prospects',ProspectController::class);
-    Route::post('/prospects/{prospect}/activities',[ActivityController::class,'store'])->name('prospects.activities.store');
-
-    Route::get('/pipeline',PipelineController::class)->name('pipeline');
-
-    Route::get('/follow-ups',[FollowUpController::class,'index'])->name('follow-ups.index');
-    Route::post('/follow-ups/{prospect}/customer-reply',[FollowUpController::class,'markCustomerReply'])->name('follow-ups.customer-reply');
-    Route::post('/follow-ups/{prospect}/sent',[FollowUpController::class,'markSent'])->name('follow-ups.sent');
-    Route::post('/follow-ups/{prospect}/feedback',[FollowUpController::class,'markFeedback'])->name('follow-ups.feedback');
-    Route::post('/follow-ups/{prospect}/snooze',[FollowUpController::class,'snooze'])->name('follow-ups.snooze');
-
-    Route::get('/targets',[SalesTargetController::class,'index'])->name('targets.index');
-
-    Route::post('/notifications/{notification}/read',[NotificationController::class,'read'])->name('notifications.read');
-    Route::post('/notifications/read-all',[NotificationController::class,'readAll'])->name('notifications.read-all');
-
-    Route::middleware('role:admin')->group(function () {
-        Route::put('/targets/{user}',[SalesTargetController::class,'update'])->name('targets.update');
-        Route::put('/follow-up-templates/{template}',[FollowUpTemplateController::class,'update'])->name('follow-up-templates.update');
-
-        Route::get('/imports',[ImportController::class,'index'])->name('imports.index');
-        Route::get('/imports/template',[ImportController::class,'template'])->name('imports.template');
-        Route::get('/imports/sample',[ImportController::class,'sample'])->name('imports.sample');
-        Route::post('/imports/preview',[ImportController::class,'preview'])->name('imports.preview');
-        Route::post('/imports/commit',[ImportController::class,'commit'])->name('imports.commit');
-        Route::get('/imports/{batch}',[ImportController::class,'show'])->name('imports.show');
-
-        Route::prefix('admin')->name('admin.')->group(function () {
-            Route::resource('users',UserController::class)->except(['show','destroy']);
+    Route::get('/subscription/checkout',[SubscriptionController::class,'checkout'])->name('subscription.checkout');
+    Route::patch('/subscription/checkout',[SubscriptionController::class,'updateSelection'])->name('subscription.selection');
+    Route::post('/subscription/pay',[SubscriptionController::class,'pay'])->name('subscription.pay');
+    Route::get('/subscription/payment-result',[SubscriptionController::class,'result'])->name('subscription.payment-result');
+    Route::get('/subscription/status',[SubscriptionController::class,'status'])->name('subscription.status');
+    Route::middleware('subscription.active')->group(function(){
+        Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');Route::patch('/profile',[ProfileController::class,'update'])->name('profile.update');
+        Route::get('/dashboard',DashboardController::class)->name('dashboard');
+        Route::patch('/prospects/{prospect}/status',[ProspectController::class,'updateStatus'])->name('prospects.status');Route::resource('prospects',ProspectController::class);Route::post('/prospects/{prospect}/activities',[ActivityController::class,'store'])->name('prospects.activities.store');
+        Route::get('/pipeline',PipelineController::class)->name('pipeline');
+        Route::get('/follow-ups',[FollowUpController::class,'index'])->name('follow-ups.index');Route::post('/follow-ups/{prospect}/customer-reply',[FollowUpController::class,'markCustomerReply'])->name('follow-ups.customer-reply');Route::post('/follow-ups/{prospect}/sent',[FollowUpController::class,'markSent'])->name('follow-ups.sent');Route::post('/follow-ups/{prospect}/feedback',[FollowUpController::class,'markFeedback'])->name('follow-ups.feedback');Route::post('/follow-ups/{prospect}/snooze',[FollowUpController::class,'snooze'])->name('follow-ups.snooze');Route::post('/follow-ups/{prospect}/cloud-send',[WhatsAppSendController::class,'store'])->name('follow-ups.cloud-send');
+        Route::get('/targets',[SalesTargetController::class,'index'])->name('targets.index');
+        Route::post('/notifications/{notification}/read',[NotificationController::class,'read'])->name('notifications.read');Route::post('/notifications/read-all',[NotificationController::class,'readAll'])->name('notifications.read-all');
+        Route::middleware('role:admin')->group(function(){
+            Route::put('/targets/{user}',[SalesTargetController::class,'update'])->name('targets.update');Route::put('/follow-up-templates/{template}',[FollowUpTemplateController::class,'update'])->name('follow-up-templates.update');
+            Route::get('/imports',[ImportController::class,'index'])->name('imports.index');Route::get('/imports/template',[ImportController::class,'template'])->name('imports.template');Route::get('/imports/sample',[ImportController::class,'sample'])->name('imports.sample');Route::post('/imports/preview',[ImportController::class,'preview'])->name('imports.preview');Route::post('/imports/commit',[ImportController::class,'commit'])->name('imports.commit');Route::get('/imports/{batch}',[ImportController::class,'show'])->name('imports.show');
+            Route::resource('products',ProductController::class)->only(['index','store','update','destroy']);
+            Route::get('/campaigns',[CampaignController::class,'index'])->name('campaigns.index');Route::post('/campaigns',[CampaignController::class,'store'])->name('campaigns.store');Route::post('/campaigns/{campaign}/send',[CampaignController::class,'send'])->name('campaigns.send');
+            Route::get('/settings/business',[BusinessSettingsController::class,'index'])->name('settings.business');Route::get('/settings/whatsapp',[WhatsAppSettingsController::class,'edit'])->name('settings.whatsapp');Route::put('/settings/whatsapp',[WhatsAppSettingsController::class,'update'])->name('settings.whatsapp.update');
+            Route::prefix('admin')->name('admin.')->group(function(){Route::resource('users',UserController::class)->except(['show','destroy']);});
         });
     });
 });

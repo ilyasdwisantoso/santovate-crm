@@ -5,10 +5,6 @@ import Icon from '../../../Components/Icon';
 const navItems = [
     { href: '#features', label: 'Features' },
     { href: '#industries', label: 'Industries' },
-    { href: '#workflow', label: 'Solutions' },
-    { href: '#pricing', label: 'Pricing' },
-    { href: '#resources', label: 'Resources' },
-    { href: '#faq', label: 'FAQ' },
 ];
 
 export default function LandingNav() {
@@ -32,7 +28,7 @@ export default function LandingNav() {
                     <Link href={user ? '/dashboard' : '/login'} className="fl-nav-login">
                         {user ? 'Dashboard' : 'Log in'}
                     </Link>
-                    <a href="#pricing" className="fl-nav-cta">
+                    <a href="/business-configurations" className="fl-nav-cta">
                         Request Demo <Icon name="chevron" size={15}/>
                     </a>
                 </div>
@@ -58,12 +54,14 @@ export default function LandingNav() {
                     <Link href={user ? '/dashboard' : '/login'} onClick={() => setOpen(false)}>
                         {user ? 'Open Dashboard' : 'Log in'}<Icon name="chevron" size={16}/>
                     </Link>
-                    <a href="#pricing" className="fl-nav-cta mobile" onClick={() => setOpen(false)}>Request Demo</a>
+                    <a href="/business-configurations" className="fl-nav-cta mobile" onClick={() => setOpen(false)}>Request Demo</a>
                 </div>
             </div>
         </header>
     );
 }
+
+
 
 
 

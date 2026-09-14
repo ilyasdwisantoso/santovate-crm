@@ -1,4 +1,4 @@
-import { Link, router, usePage } from '@inertiajs/react';
+﻿import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../Components/Icon';
 import Flash from '../Components/Flash';
@@ -198,7 +198,14 @@ function MobileSidebar({ user, url, notifications, onClose, onNotifications, onL
                         </span>
                         <Icon name="chevron" size={17}/>
                     </Link>
-                </nav>
+                                    {user.is_admin && <>
+                        <p className="mobile-sidebar-label">SaaS & Automation</p>
+                        <Link href="/products" onClick={onClose} className={`mobile-sidebar-link mobile-tone-2 ${url.startsWith('/products') ? 'active' : ''}`}><span className="mobile-sidebar-link-icon"><Icon name="briefcase" size={19}/></span><span className="mobile-sidebar-link-copy"><strong>Product Catalog</strong><small>Produk, varian, harga dan gambar</small></span><Icon name="chevron" size={17}/></Link>
+                        <Link href="/campaigns" onClick={onClose} className={`mobile-sidebar-link mobile-tone-3 ${url.startsWith('/campaigns') ? 'active' : ''}`}><span className="mobile-sidebar-link-icon"><Icon name="whatsapp" size={19}/></span><span className="mobile-sidebar-link-copy"><strong>WA Campaign</strong><small>Campaign untuk kontak opt-in</small></span><Icon name="chevron" size={17}/></Link>
+                        <Link href="/settings/whatsapp" onClick={onClose} className={`mobile-sidebar-link mobile-tone-4 ${url.startsWith('/settings/whatsapp') ? 'active' : ''}`}><span className="mobile-sidebar-link-icon"><Icon name="whatsapp" size={19}/></span><span className="mobile-sidebar-link-copy"><strong>WhatsApp API</strong><small>Meta Cloud API channel</small></span><Icon name="chevron" size={17}/></Link>
+                        <Link href="/settings/business" onClick={onClose} className={`mobile-sidebar-link mobile-tone-5 ${url.startsWith('/settings/business') ? 'active' : ''}`}><span className="mobile-sidebar-link-icon"><Icon name="spark" size={19}/></span><span className="mobile-sidebar-link-copy"><strong>Business Config</strong><small>Pipeline dan workflow aktif</small></span><Icon name="chevron" size={17}/></Link>
+                    </>}
+</nav>
 
                 <div className="mobile-sidebar-footer">
                     <button type="button" className="mobile-sidebar-logout" onClick={onLogout}>
@@ -272,6 +279,10 @@ export default function AppLayout({ children, title, subtitle, action }) {
                                 }}
                                 url={url}
                             />
+                            <NavLink item={{ href: '/products', label: 'Product Catalog', icon: 'briefcase', match: (u) => u.startsWith('/products') }} url={url}/>
+                            <NavLink item={{ href: '/campaigns', label: 'WA Campaign', icon: 'whatsapp', match: (u) => u.startsWith('/campaigns') }} url={url}/>
+                            <NavLink item={{ href: '/settings/whatsapp', label: 'WhatsApp API', icon: 'whatsapp', match: (u) => u.startsWith('/settings/whatsapp') }} url={url}/>
+                            <NavLink item={{ href: '/settings/business', label: 'Business Config', icon: 'spark', match: (u) => u.startsWith('/settings/business') }} url={url}/>
                         </>
                     )}
                 </nav>
@@ -373,3 +384,4 @@ export default function AppLayout({ children, title, subtitle, action }) {
         </div>
     );
 }
+

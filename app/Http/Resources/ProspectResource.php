@@ -1,67 +1,14 @@
 <?php
-
 namespace App\Http\Resources;
-
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-
-class ProspectResource extends JsonResource
-{
-    public function toArray(Request $request): array
-    {
-        return [
-            'id' => $this->id,
-            'company_name' => $this->company_name,
-            'website' => $this->website,
-            'city' => $this->city,
-            'service' => $this->service,
-            'route' => $this->route,
-            'company_size' => $this->company_size,
-            'contact_name' => $this->contact_name,
-            'contact_position' => $this->contact_position,
-            'phone' => $this->phone,
-            'email' => $this->email,
-            'current_system' => $this->current_system,
-            'tracking_portal' => $this->tracking_portal,
-            'pain_hypothesis' => $this->pain_hypothesis,
-            'fit_score' => $this->fit_score,
-            'pain_score' => $this->pain_score,
-            'contact_score' => $this->contact_score,
-            'total_score' => $this->total_score,
-            'priority' => $this->priority,
-            'priority_label' => $this->priority_label,
-            'status' => $this->status,
-            'status_label' => $this->status_label,
-            'last_contact_at' => $this->last_contact_at?->toIso8601String(),
-            'next_follow_up_at' => $this->next_follow_up_at?->toIso8601String(),
-            'last_outbound_at' => $this->last_outbound_at?->toIso8601String(),
-            'last_customer_reply_at' => $this->last_customer_reply_at?->toIso8601String(),
-            'follow_up_snoozed_until' => $this->follow_up_snoozed_until?->toIso8601String(),
-            'follow_up_count' => (int) ($this->follow_up_count ?? 0),
-            'last_follow_up_message' => $this->last_follow_up_message,
-            'last_feedback_at' => $this->last_feedback_at?->toIso8601String(),
-            'last_feedback_status' => $this->last_feedback_status,
-            'last_feedback_note' => $this->last_feedback_note,
-            'source_name' => $this->source_name,
-            'source_url' => $this->source_url,
-            'notes' => $this->notes,
-            'estimated_deal_value' => (float) $this->estimated_deal_value,
-            'actual_deal_value' => $this->actual_deal_value !== null ? (float) $this->actual_deal_value : null,
-            'assigned_user' => $this->whenLoaded('assignedUser', fn () => $this->assignedUser ? [
-                'id' => $this->assignedUser->id,
-                'name' => $this->assignedUser->name,
-                'email' => $this->assignedUser->email,
-                'profile_initials' => $this->assignedUser->profile_initials,
-            ] : null),
-            'creator' => $this->whenLoaded('creator', fn () => $this->creator ? ['id'=>$this->creator->id,'name'=>$this->creator->name] : null),
-            'activities' => $this->whenLoaded('activities', fn () => $this->activities->map(fn ($activity) => [
-                'id'=>$activity->id,'type'=>$activity->type,'type_label'=>$activity->type_label ?? ($activity::TYPES[$activity->type] ?? $activity->type),
-                'title'=>$activity->title,'description'=>$activity->description,
-                'occurred_at'=>$activity->occurred_at?->toIso8601String(),
-                'user'=>$activity->user ? ['id'=>$activity->user->id,'name'=>$activity->user->name] : null,
-            ])),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
-        ];
-    }
+class ProspectResource extends JsonResource {
+    public function toArray(Request $request): array { return [
+        'id'=>$this->id,'company_name'=>$this->company_name,'website'=>$this->website,'city'=>$this->city,'service'=>$this->service,'route'=>$this->route,'company_size'=>$this->company_size,'contact_name'=>$this->contact_name,'contact_position'=>$this->contact_position,'phone'=>$this->phone,'phone_normalized'=>$this->phone_normalized,'whatsapp_status'=>$this->whatsapp_status,'whatsapp_verified_at'=>$this->whatsapp_verified_at?->toIso8601String(),'whatsapp_opt_in_at'=>$this->whatsapp_opt_in_at?->toIso8601String(),'whatsapp_opt_out_at'=>$this->whatsapp_opt_out_at?->toIso8601String(),'email'=>$this->email,'current_system'=>$this->current_system,'tracking_portal'=>$this->tracking_portal,'pain_hypothesis'=>$this->pain_hypothesis,'fit_score'=>$this->fit_score,'pain_score'=>$this->pain_score,'contact_score'=>$this->contact_score,'total_score'=>$this->total_score,'priority'=>$this->priority,'priority_label'=>$this->priority_label,'status'=>$this->status,'status_label'=>$this->status_label,'last_contact_at'=>$this->last_contact_at?->toIso8601String(),'next_follow_up_at'=>$this->next_follow_up_at?->toIso8601String(),'last_outbound_at'=>$this->last_outbound_at?->toIso8601String(),'last_customer_reply_at'=>$this->last_customer_reply_at?->toIso8601String(),'follow_up_snoozed_until'=>$this->follow_up_snoozed_until?->toIso8601String(),'follow_up_count'=>(int)($this->follow_up_count??0),'last_follow_up_message'=>$this->last_follow_up_message,'last_feedback_at'=>$this->last_feedback_at?->toIso8601String(),'last_feedback_status'=>$this->last_feedback_status,'last_feedback_note'=>$this->last_feedback_note,'source_name'=>$this->source_name,'source_url'=>$this->source_url,'notes'=>$this->notes,'estimated_deal_value'=>(float)$this->estimated_deal_value,'actual_deal_value'=>$this->actual_deal_value!==null?(float)$this->actual_deal_value:null,
+        'assigned_user'=>$this->whenLoaded('assignedUser',fn()=>$this->assignedUser?['id'=>$this->assignedUser->id,'name'=>$this->assignedUser->name,'email'=>$this->assignedUser->email,'profile_initials'=>$this->assignedUser->profile_initials]:null),
+        'creator'=>$this->whenLoaded('creator',fn()=>$this->creator?['id'=>$this->creator->id,'name'=>$this->creator->name]:null),
+        'products'=>$this->whenLoaded('products',fn()=>$this->products->map(fn($p)=>['id'=>$p->id,'sku'=>$p->sku,'name'=>$p->name,'variant'=>$p->variant,'price'=>$p->price,'image_url'=>$p->image_url,'is_primary'=>(bool)$p->pivot?->is_primary])->values()),
+        'activities'=>$this->whenLoaded('activities',fn()=>$this->activities->map(fn($a)=>['id'=>$a->id,'type'=>$a->type,'type_label'=>$a->type_label??($a::TYPES[$a->type]??$a->type),'title'=>$a->title,'description'=>$a->description,'occurred_at'=>$a->occurred_at?->toIso8601String(),'user'=>$a->user?['id'=>$a->user->id,'name'=>$a->user->name]:null])),
+        'created_at'=>$this->created_at?->toIso8601String(),'updated_at'=>$this->updated_at?->toIso8601String(),
+    ]; }
 }

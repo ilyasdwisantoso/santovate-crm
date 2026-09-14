@@ -4,6 +4,7 @@ import Icon from '../../Components/Icon';
 import LandingNav from './components/LandingNav';
 import LandingFooter from './components/LandingFooter';
 import HeroSection from './components/HeroSection';
+import WhatsAppFloating from '../../Components/WhatsAppFloating';
 
 const benefits = [
     {
@@ -84,10 +85,6 @@ const testimonials = [
 ];
 
 const faqs = [
-    {
-        q: 'Apakah Santovate CRM bisa digunakan bisnis selain Santovate?',
-        a: 'Ya. Santovate CRM dirancang dari workflow penjualan B2B yang dapat disesuaikan untuk logistics, software house, agency, distributor, consulting, property, dan bisnis dengan tim sales atau Account Executive.',
-    },
     {
         q: 'Apakah CRM ini nyaman digunakan dari HP?',
         a: 'Ya. Dashboard, prospek, follow-up, pipeline, target, profile, dan navigasi utama dibuat responsive untuk penggunaan desktop maupun mobile.',
@@ -333,7 +330,7 @@ export default function Home() {
     const user = auth?.user;
     const [faqOpen, setFaqOpen] = useState(0);
 
-    const ctaHref = user ? '/dashboard' : '/login';
+    const ctaHref = user ? '/dashboard' : '/business-configurations';
     const ctaText = user ? 'Open Dashboard' : 'Request Demo';
 
     const logos = useMemo(() => ['B2B SALES', 'LOGISTICS', 'SOFTWARE', 'AGENCY', 'DISTRIBUTOR', 'CONSULTING'], []);
@@ -636,10 +633,12 @@ export default function Home() {
                 </section>
             </main>
 
+            <WhatsAppFloating/>
             <LandingFooter/>
         </div>
     );
 }
+
 
 
 
