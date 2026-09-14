@@ -107,7 +107,7 @@ function MobileSidebar({ user, url, notifications, onClose, onNotifications, onL
                         <span className="brand-mark sm">S</span>
                         <div>
                             <strong>Santovate</strong>
-                            <small>CRM Account Executive</small>
+                            <small>{organization?.business_configuration?.name || 'CRM Account Executive'}</small>
                         </div>
                     </div>
                     <button className="mobile-sidebar-close" onClick={onClose} aria-label="Tutup menu">
@@ -223,9 +223,17 @@ function MobileSidebar({ user, url, notifications, onClose, onNotifications, onL
 
 export default function AppLayout({ children, title, subtitle, action }) {
     const page = usePage();
-    const { auth, notifications } = page.props;
+    const { auth, notifications, organization } = page.props;
     const url = page.url;
     const user = auth.user;
+    const businessTheme = organization?.business_configuration?.theme || null;
+    const themeStyle = businessTheme ? {
+        '--business-primary': businessTheme.primary || '#10382b',
+        '--business-secondary': businessTheme.secondary || '#1d5a45',
+        '--business-accent': businessTheme.accent || '#9bc653',
+        '--business-soft': businessTheme.soft || '#eef7df',
+        '--business-surface': businessTheme.surface || '#f8faf9',
+    } : undefined;
 
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
@@ -233,13 +241,13 @@ export default function AppLayout({ children, title, subtitle, action }) {
     const logout = () => router.post('/logout');
 
     return (
-        <div className="app-shell">
+        <div className={`app-shell ${businessTheme ? 'business-themed' : ''}`} style={themeStyle}>
             <aside className="sidebar">
                 <div className="brand">
                     <span className="brand-mark">S</span>
                     <div>
                         <strong>Santovate</strong>
-                        <small>CRM Account Executive</small>
+                        <small>{organization?.business_configuration?.name || 'CRM Account Executive'}</small>
                     </div>
                 </div>
 
@@ -384,6 +392,5 @@ export default function AppLayout({ children, title, subtitle, action }) {
         </div>
     );
 }
-
 
 

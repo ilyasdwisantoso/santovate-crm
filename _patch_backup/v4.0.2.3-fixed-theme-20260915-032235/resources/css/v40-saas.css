@@ -47,9 +47,34 @@
     padding-bottom:28px!important;
 }
 
-/* Admin & sales workspace theme is intentionally fixed to the original Santovate CRM theme.
-   Business-configuration colors are used only on configuration/pricing selection UI,
-   never to recolor the authenticated sidebar, buttons, or mobile navigation. */
+/* Runtime business theme from AppLayout CSS variables. */
+.app-shell{
+    --business-primary:var(--brand);
+    --business-secondary:var(--brand-2);
+    --business-accent:var(--lime);
+    --business-soft:var(--lime-soft);
+    --business-surface:var(--surface-2);
+}
+.app-shell.business-themed .sidebar{
+    background:linear-gradient(180deg,var(--business-primary) 0%,color-mix(in srgb,var(--business-primary) 78%,#111827 22%) 100%)!important;
+}
+.app-shell.business-themed .brand-mark{
+    background:linear-gradient(145deg,var(--business-accent),var(--business-secondary))!important;
+    color:#fff!important;
+}
+.app-shell.business-themed .side-link.active{
+    background:color-mix(in srgb,var(--business-accent) 18%,transparent)!important;
+    color:#fff!important;
+}
+.app-shell.business-themed .side-link.active svg{color:var(--business-accent)!important}
+.app-shell.business-themed .btn-primary{
+    background:var(--business-primary)!important;
+    border-color:var(--business-primary)!important;
+}
+.app-shell.business-themed .eyebrow{color:var(--business-primary)}
+.app-shell.business-themed .bottom-link.active .bottom-icon-wrap{
+    box-shadow:0 8px 18px color-mix(in srgb,var(--business-primary) 24%,transparent);
+}
 
 /* Public pricing selector with configuration-specific colors. */
 .sv-pricing-config-selector{

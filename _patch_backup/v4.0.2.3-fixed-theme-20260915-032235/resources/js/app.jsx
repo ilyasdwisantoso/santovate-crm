@@ -32,4 +32,3 @@ createInertiaApp({
 
 
 
-
