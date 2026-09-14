@@ -8,6 +8,7 @@ import '../css/v32-hero-mobile-elegant.css';
 import '../css/v33-mobile-nav-workflow.css';
 import '../css/v34-full-nav-color-bottom.css';
 import '../css/v40-saas.css';
+import '../css/v4022-v34-landing-restore.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
@@ -22,6 +23,8 @@ createInertiaApp({
     },
     progress: { color: '#4f6eff', showSpinner: false },
 });
+
+
 
 
 
