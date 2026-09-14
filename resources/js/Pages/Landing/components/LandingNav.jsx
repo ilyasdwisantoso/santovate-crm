@@ -3,11 +3,11 @@ import { useState } from 'react';
 import Icon from '../../../Components/Icon';
 
 const navItems = [
-    { href: '#benefits', label: 'Benefits' },
     { href: '#features', label: 'Features' },
     { href: '#industries', label: 'Industries' },
+    { href: '#workflow', label: 'Solutions' },
     { href: '#pricing', label: 'Pricing' },
-    { href: '#faq', label: 'FAQ' },
+    { href: '#faq', label: 'Resources' },
 ];
 
 export default function LandingNav() {
@@ -16,58 +16,50 @@ export default function LandingNav() {
     const [open, setOpen] = useState(false);
 
     return (
-        <header className="landing-nav-shell">
-            <div className="landing-container landing-nav">
-                <a className="landing-brand" href="#top" aria-label="Santovate CRM Home">
-                    <span className="landing-brand-mark">S</span>
-                    <span>
-                        <strong>Santovate</strong>
-                        <small>CRM</small>
-                    </span>
+        <header className="fl-nav-shell">
+            <div className="fl-container fl-nav">
+                <a href="#top" className="fl-brand" aria-label="Santovate CRM">
+                    <span className="fl-brand-symbol">S</span>
+                    <strong>Santovate</strong>
                 </a>
 
-                <nav className="landing-nav-links" aria-label="Navigasi landing page">
-                    {navItems.map((item) => (
-                        <a key={item.href} href={item.href}>{item.label}</a>
-                    ))}
+                <nav className="fl-nav-links" aria-label="Landing page navigation">
+                    {navItems.map((item) => <a href={item.href} key={item.href}>{item.label}</a>)}
                 </nav>
 
-                <div className="landing-nav-actions">
-                    <Link className="landing-login-link" href={user ? '/dashboard' : '/login'}>
-                        {user ? 'Buka Dashboard' : 'Login'}
+                <div className="fl-nav-actions">
+                    <Link href={user ? '/dashboard' : '/login'} className="fl-nav-login">
+                        {user ? 'Dashboard' : 'Log in'}
                     </Link>
-                    <a className="landing-btn landing-btn-primary landing-btn-nav" href="#pricing">
-                        Request Demo
-                        <Icon name="chevron" size={16}/>
+                    <a href="#pricing" className="fl-nav-cta">
+                        Request Demo <Icon name="chevron" size={15}/>
                     </a>
                 </div>
 
                 <button
                     type="button"
-                    className={`landing-menu-toggle ${open ? 'is-open' : ''}`}
-                    onClick={() => setOpen(!open)}
-                    aria-expanded={open}
+                    className="fl-nav-toggle"
                     aria-label="Buka menu"
+                    aria-expanded={open}
+                    onClick={() => setOpen(!open)}
                 >
-                    <Icon name={open ? 'close' : 'menu'} size={22}/>
+                    <Icon name={open ? 'close' : 'menu'} size={20}/>
                 </button>
             </div>
 
-            {open && (
-                <div className="landing-mobile-menu">
-                    <div className="landing-container">
-                        {navItems.map((item) => (
-                            <a key={item.href} href={item.href} onClick={() => setOpen(false)}>{item.label}</a>
-                        ))}
-                        <Link href={user ? '/dashboard' : '/login'} onClick={() => setOpen(false)}>
-                            {user ? 'Buka Dashboard' : 'Login ke CRM'}
-                        </Link>
-                        <a className="landing-btn landing-btn-primary" href="#pricing" onClick={() => setOpen(false)}>
-                            Request Demo
+            <div className={`fl-mobile-nav ${open ? 'open' : ''}`}>
+                <div className="fl-container">
+                    {navItems.map((item) => (
+                        <a href={item.href} key={item.href} onClick={() => setOpen(false)}>
+                            {item.label}<Icon name="chevron" size={16}/>
                         </a>
-                    </div>
+                    ))}
+                    <Link href={user ? '/dashboard' : '/login'} onClick={() => setOpen(false)}>
+                        {user ? 'Open Dashboard' : 'Log in'}<Icon name="chevron" size={16}/>
+                    </Link>
+                    <a href="#pricing" className="fl-nav-cta mobile" onClick={() => setOpen(false)}>Request Demo</a>
                 </div>
-            )}
+            </div>
         </header>
     );
 }
