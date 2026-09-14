@@ -38,21 +38,18 @@ const industries = [
         title: 'Logistics & Freight',
         copy: 'Kelola prospek, quotation follow-up, account ownership, dan relationship B2B dalam satu alur.',
         tag: 'Logistics',
-        image: '/images/landing/industry-logistics.webp',
     },
     {
         n: '02',
         title: 'Software & Agency',
         copy: 'Dari discovery sampai proposal, negotiation, dan project won tanpa kehilangan konteks komunikasi.',
         tag: 'Services',
-        image: '/images/landing/industry-services.webp',
     },
     {
         n: '03',
         title: 'Distributor & B2B Sales',
         copy: 'Atur account list, quotation, territory, follow-up, dan peluang repeat order secara terpusat.',
         tag: 'B2B',
-        image: '/images/landing/industry-b2b.webp',
     },
 ];
 
@@ -494,12 +491,11 @@ export default function Home() {
                             {industries.map((item, idx) => (
                                 <article key={item.title}>
                                     <div className={`fl-industry-art art-${idx + 1}`}>
-                                        <img
-                                            src={item.image}
-                                            alt={`${item.title} CRM workflow preview`}
-                                            loading="lazy"
-                                            decoding="async"
-                                        />
+                                        <span className="fl-industry-tag">{item.tag}</span>
+                                        <div className="fl-industry-ui">
+                                            <i/><i/><i/>
+                                            <b>{item.n}</b>
+                                        </div>
                                     </div>
                                     <span className="fl-industry-num">/ {item.n}</span>
                                     <h3>{item.title}</h3>
@@ -640,6 +636,5 @@ export default function Home() {
         </div>
     );
 }
-
 
 

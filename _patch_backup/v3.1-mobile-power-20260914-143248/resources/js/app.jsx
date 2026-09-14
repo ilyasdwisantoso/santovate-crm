@@ -3,7 +3,6 @@ import '../css/v24-mobile.css';
 import '../css/landing.css';
 import '../css/v25-mobile-menu-fix.css';
 import '../css/landing-v30-helvetica.css';
-import '../css/v31-mobile-power.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
@@ -16,7 +15,6 @@ createInertiaApp({
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);
     },
-    progress: { color: '#4f6eff', showSpinner: false },
+    progress: { color: '#79b63c', showSpinner: false },
 });
-
 
