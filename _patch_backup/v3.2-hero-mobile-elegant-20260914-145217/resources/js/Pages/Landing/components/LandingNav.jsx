@@ -1,10 +1,13 @@
-﻿import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../../../Components/Icon';
 
 const navItems = [
     { href: '#features', label: 'Features' },
     { href: '#industries', label: 'Industries' },
+    { href: '#workflow', label: 'Solutions' },
+    { href: '#pricing', label: 'Pricing' },
+    { href: '#faq', label: 'Resources' },
 ];
 
 export default function LandingNav() {
@@ -60,4 +63,3 @@ export default function LandingNav() {
         </header>
     );
 }
-
