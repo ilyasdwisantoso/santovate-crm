@@ -230,7 +230,7 @@ function PipelineMockup() {
                         <div className="fl-kanban-title"><span><i className={`dot d${colIndex + 1}`}/>{title}</span><b>{count}</b></div>
                         {cards.map(([name,value,avatar], idx) => (
                             <div className="fl-deal-card" key={name}>
-                                <div><Avatar label={avatar} tone={['blue','orange','lime','violet'][colIndex]}/><i>•••</i></div>
+                                <div><Avatar label={avatar} tone={['blue','orange','lime','violet'][colIndex]}/><i>â€¢â€¢â€¢</i></div>
                                 <strong>{name}</strong>
                                 <small>{value}</small>
                                 <em>{idx === 0 ? 'Follow-up today' : 'Active opportunity'}</em>
@@ -249,7 +249,7 @@ function FollowupMockup() {
             <div className="fl-followup-left">
                 <div className="fl-mock-head"><span>Follow-up workspace</span><b>24</b></div>
                 {[
-                    ['Atlas Cargo','Need feedback · H-3','AC','violet'],
+                    ['Atlas Cargo','Need feedback Â· H-3','AC','violet'],
                     ['Prima Niaga','Customer replied','PN','lime'],
                     ['Lumina Tech','Scheduled today','LT','orange'],
                     ['Nova Freight','Need reply','NF','blue'],
@@ -264,7 +264,7 @@ function FollowupMockup() {
             <div className="fl-composer">
                 <div className="fl-composer-person">
                     <Avatar label="AC" tone="violet"/>
-                    <span><strong>Atlas Cargo</strong><small>Prospect · Logistics</small></span>
+                    <span><strong>Atlas Cargo</strong><small>Prospect Â· Logistics</small></span>
                     <em>Review first</em>
                 </div>
                 <div className="fl-message-bubble">Halo Bapak/Ibu, saya ingin follow-up terkait kebutuhan pengiriman yang sempat kita bahas sebelumnya.</div>
@@ -337,7 +337,7 @@ export default function Home() {
 
     return (
         <div className="fl-page" id="top">
-            <Head title="Santovate CRM — B2B Sales Workspace"/>
+            <Head title="Santovate CRM â€” B2B Sales Workspace"/>
             <LandingNav/>
 
             <main>
@@ -512,7 +512,7 @@ export default function Home() {
                         <SectionLabel>Testimonials</SectionLabel>
                         <div className="fl-section-heading split">
                             <h2>Built Around The Way<br/>B2B Teams Actually Sell</h2>
-                            <p>Fokus pada clarity, velocity, dan consistency—tiga hal yang menentukan apakah pipeline bergerak atau hanya menjadi data.</p>
+                            <p>Fokus pada clarity, velocity, dan consistencyâ€”tiga hal yang menentukan apakah pipeline bergerak atau hanya menjadi data.</p>
                         </div>
                         <div className="fl-testimonial-grid">
                             {testimonials.map((item, idx) => (
@@ -598,7 +598,7 @@ export default function Home() {
                     <div className="fl-container fl-faq-grid">
                         <div className="fl-faq-intro">
                             <SectionLabel>FAQ</SectionLabel>
-                            <h2>Everything You Need<br/>to Know—Upfront</h2>
+                            <h2>Everything You Need<br/>to Knowâ€”Upfront</h2>
                             <p>Pertanyaan paling umum sebelum tim mulai menggunakan atau mengimplementasikan Santovate CRM.</p>
                             <Link href={ctaHref} className="fl-btn secondary">Request Demo <Icon name="chevron" size={17}/></Link>
                         </div>
@@ -636,5 +636,4 @@ export default function Home() {
         </div>
     );
 }
-
 

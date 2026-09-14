@@ -1,7 +1,8 @@
+import { Link } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 import Icon from '../../../Components/Icon';
 import HeroDashboardMockup from './HeroDashboardMockup';
-import '../../../../css/landing-hero-v29.css';
+import '../../../../css/landing-hero-v28.css';
 
 const trustPeople = [
     { initials: 'AE', tone: 'blue' },
@@ -16,70 +17,80 @@ const heroBenefits = [
     { icon: 'target', title: 'Predictable', subtitle: 'Revenue' },
 ];
 
-export default function HeroSection() {
+export default function HeroSection({ user }) {
     const heroRef = useRef(null);
     const productRef = useRef(null);
 
     useEffect(() => {
-        const heroElement = heroRef.current;
-        if (!heroElement) return undefined;
+        const hero = heroRef.current;
+        if (!hero) return undefined;
 
         const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        if (reduceMotion) {
+            hero.classList.add('svhero-ready', 'svhero-reduced-motion');
+            return undefined;
+        }
+
         const frame = window.requestAnimationFrame(() => {
-            heroElement.classList.add('svhero-ready');
-            if (reduceMotion) heroElement.classList.add('svhero-reduced-motion');
+            hero.classList.add('svhero-ready');
         });
 
         return () => window.cancelAnimationFrame(frame);
     }, []);
 
     useEffect(() => {
-        const heroElement = heroRef.current;
-        const productElement = productRef.current;
-        if (!heroElement || !productElement) return undefined;
+        const hero = heroRef.current;
+        const product = productRef.current;
+        if (!hero || !product) return undefined;
 
         const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
         if (reduceMotion) return undefined;
 
-        let rafId = null;
+        let scheduled = false;
+        let pointerX = 0;
+        let pointerY = 0;
 
-        const updateTilt = (event) => {
-            if (window.innerWidth < 1024) return;
-
-            const rect = heroElement.getBoundingClientRect();
-            const x = ((event.clientX - rect.left) / rect.width) - 0.5;
-            const y = ((event.clientY - rect.top) / rect.height) - 0.5;
-
-            if (rafId) window.cancelAnimationFrame(rafId);
-
-            rafId = window.requestAnimationFrame(() => {
-                productElement.style.setProperty('--svhero-rx', `${(-y * 1.65).toFixed(2)}deg`);
-                productElement.style.setProperty('--svhero-ry', `${(x * 2.35).toFixed(2)}deg`);
-                productElement.style.setProperty('--svhero-tx', `${(x * 5).toFixed(1)}px`);
-                productElement.style.setProperty('--svhero-ty', `${(y * 4).toFixed(1)}px`);
-            });
+        const paint = () => {
+            product.style.setProperty('--svhero-rx', `${(-pointerY * 2.15).toFixed(2)}deg`);
+            product.style.setProperty('--svhero-ry', `${(pointerX * 3.1).toFixed(2)}deg`);
+            product.style.setProperty('--svhero-tx', `${(pointerX * 7).toFixed(1)}px`);
+            product.style.setProperty('--svhero-ty', `${(pointerY * 5).toFixed(1)}px`);
+            scheduled = false;
         };
 
-        const resetTilt = () => {
-            if (rafId) window.cancelAnimationFrame(rafId);
-            productElement.style.setProperty('--svhero-rx', '0deg');
-            productElement.style.setProperty('--svhero-ry', '0deg');
-            productElement.style.setProperty('--svhero-tx', '0px');
-            productElement.style.setProperty('--svhero-ty', '0px');
+        const onPointerMove = (event) => {
+            if (window.innerWidth < 900) return;
+
+            const rect = hero.getBoundingClientRect();
+            pointerX = ((event.clientX - rect.left) / rect.width) - 0.5;
+            pointerY = ((event.clientY - rect.top) / rect.height) - 0.5;
+
+            if (!scheduled) {
+                scheduled = true;
+                window.requestAnimationFrame(paint);
+            }
         };
 
-        heroElement.addEventListener('pointermove', updateTilt);
-        heroElement.addEventListener('pointerleave', resetTilt);
+        const onPointerLeave = () => {
+            pointerX = 0;
+            pointerY = 0;
+            product.style.setProperty('--svhero-rx', '0deg');
+            product.style.setProperty('--svhero-ry', '0deg');
+            product.style.setProperty('--svhero-tx', '0px');
+            product.style.setProperty('--svhero-ty', '0px');
+        };
+
+        hero.addEventListener('pointermove', onPointerMove);
+        hero.addEventListener('pointerleave', onPointerLeave);
 
         return () => {
-            if (rafId) window.cancelAnimationFrame(rafId);
-            heroElement.removeEventListener('pointermove', updateTilt);
-            heroElement.removeEventListener('pointerleave', resetTilt);
+            hero.removeEventListener('pointermove', onPointerMove);
+            hero.removeEventListener('pointerleave', onPointerLeave);
         };
     }, []);
 
     return (
-        <section ref={heroRef} className="svhero svhero-v29" aria-labelledby="svhero-title">
+        <section ref={heroRef} className="svhero" aria-labelledby="svhero-title">
             <div className="svhero-bg" aria-hidden="true">
                 <div className="svhero-rock rock-a"/>
                 <div className="svhero-rock rock-b"/>
@@ -103,10 +114,10 @@ export default function HeroSection() {
                         <span>SMART SALES · STRONGER RELATIONSHIPS · REAL GROWTH</span>
                     </div>
 
-                    <h1 id="svhero-title" aria-label="B2B Sales CRM That Drives Real Revenue">
-                        <span className="svhero-line line-1"><span>B2B Sales CRM</span></span>
-                        <span className="svhero-line line-2"><span>That Drives</span></span>
-                        <span className="svhero-line line-3 accent"><span>Real Revenue</span></span>
+                    <h1 id="svhero-title" className="svhero-enter enter-3">
+                        B2B Sales CRM
+                        <span>That Drives</span>
+                        <em>Real Revenue</em>
                     </h1>
 
                     <p className="svhero-description svhero-enter enter-4">
@@ -115,18 +126,18 @@ export default function HeroSection() {
 
                     <div className="svhero-actions svhero-enter enter-5">
                         <a href="#pricing" className="svhero-btn primary">
-                            <span>Request Demo</span>
-                            <span className="svhero-btn-arrow" aria-hidden="true">→</span>
+                            Request Demo
+                            <span className="svhero-btn-arrow">→</span>
                         </a>
 
                         <a href="#features" className="svhero-btn secondary">
-                            <span className="svhero-play" aria-hidden="true">▶</span>
-                            <span>Explore Features</span>
+                            <span className="svhero-play">▶</span>
+                            Explore Features
                         </a>
                     </div>
 
                     <div className="svhero-proof svhero-enter enter-6">
-                        <div className="svhero-avatar-stack" aria-hidden="true">
+                        <div className="svhero-avatar-stack">
                             {trustPeople.map((person) => (
                                 <span
                                     key={person.initials}
@@ -139,7 +150,7 @@ export default function HeroSection() {
                         </div>
 
                         <div className="svhero-stars" aria-label="Rated 4.8 out of 5">
-                            ★★★★★
+                            <span>★★★★★</span>
                         </div>
 
                         <strong>4.8/5</strong>
@@ -150,7 +161,7 @@ export default function HeroSection() {
                         {heroBenefits.map((item) => (
                             <div className="svhero-benefit" key={item.title}>
                                 <span className="svhero-benefit-icon">
-                                    <Icon name={item.icon} size={19}/>
+                                    <Icon name={item.icon} size={18}/>
                                 </span>
                                 <span>
                                     <strong>{item.title}</strong>
@@ -174,7 +185,7 @@ export default function HeroSection() {
                             <strong>TechCorp Indonesia</strong>
                             <em>Set up discovery call</em>
                         </span>
-                        <time>2m</time>
+                        <time>2m ago</time>
                     </article>
 
                     <article className="svhero-float-card deal-won">
@@ -184,10 +195,15 @@ export default function HeroSection() {
                         <span>
                             <small>Deal Moved to Won</small>
                             <strong>BluePeak Solutions</strong>
-                            <em>Rp28M · Annual Contract</em>
+                            <em>Rp28.000.000 · Annual Contract</em>
                         </span>
-                        <time>12m</time>
+                        <time>12m ago</time>
                     </article>
+
+                    <div className="svhero-script" aria-hidden="true">
+                        Relationships
+                        <span>Build Revenue</span>
+                    </div>
                 </div>
             </div>
 

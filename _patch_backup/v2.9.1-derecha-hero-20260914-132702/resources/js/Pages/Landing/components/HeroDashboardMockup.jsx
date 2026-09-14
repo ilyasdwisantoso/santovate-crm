@@ -6,7 +6,7 @@ const kpis = [
         tone: 'blue',
         label: 'Prospects',
         value: '1,248',
-        delta: '+12%',
+        delta: '↑ 12%',
         note: 'New this month',
     },
     {
@@ -14,7 +14,7 @@ const kpis = [
         tone: 'rose',
         label: 'Follow-up Queue',
         value: '320',
-        delta: '+8%',
+        delta: '↑ 8%',
         note: 'Pending follow-ups',
     },
     {
@@ -22,7 +22,7 @@ const kpis = [
         tone: 'blue',
         label: 'Pipeline Value',
         value: 'Rp480M',
-        delta: '+24%',
+        delta: '↑ 24%',
         note: 'Across 36 deals',
     },
     {
@@ -30,7 +30,7 @@ const kpis = [
         tone: 'amber',
         label: 'Deals Won',
         value: '87',
-        delta: '+35%',
+        delta: '↑ 35%',
         note: 'This quarter',
     },
 ];
@@ -56,7 +56,7 @@ const navigation = [
 
 export default function HeroDashboardMockup() {
     return (
-        <div className="svdash" aria-label="Santovate CRM dashboard preview">
+        <div className="svdash">
             <aside className="svdash-sidebar">
                 <div className="svdash-brand">
                     <span>S</span>
@@ -64,7 +64,7 @@ export default function HeroDashboardMockup() {
                     <small>CRM</small>
                 </div>
 
-                <nav className="svdash-nav" aria-label="Dashboard preview navigation">
+                <nav className="svdash-nav" aria-label="Dashboard preview">
                     {navigation.map(([icon, label], index) => (
                         <span key={label} className={index === 0 ? 'active' : ''}>
                             <Icon name={icon} size={15}/>
@@ -82,7 +82,7 @@ export default function HeroDashboardMockup() {
             <main className="svdash-main">
                 <header className="svdash-topbar">
                     <div className="svdash-search">
-                        <Icon name="search" size={13}/>
+                        <span>⌕</span>
                         <small>Search prospects, companies, or deals...</small>
                     </div>
 
@@ -108,7 +108,7 @@ export default function HeroDashboardMockup() {
 
                     <div className="svdash-date">
                         <Icon name="calendar" size={14}/>
-                        <span>Sep 14, 2026</span>
+                        <span>May 25, 2026</span>
                     </div>
                 </div>
 
@@ -138,7 +138,7 @@ export default function HeroDashboardMockup() {
                     <article className="svdash-pipeline-card">
                         <header>
                             <strong>Sales Pipeline</strong>
-                            <button type="button">This Quarter <span>⌄</span></button>
+                            <button type="button">This Quarter⌄</button>
                         </header>
 
                         <div className="svdash-chart-layout">
@@ -162,7 +162,7 @@ export default function HeroDashboardMockup() {
                                             className={`svdash-bar tone-${stage.tone}`}
                                             style={{
                                                 '--bar-height': `${stage.height}%`,
-                                                '--bar-delay': `${320 + index * 90}ms`,
+                                                '--bar-delay': `${260 + index * 90}ms`,
                                             }}
                                         />
                                         <small>{stage.label}</small>
@@ -185,7 +185,9 @@ export default function HeroDashboardMockup() {
                         </div>
 
                         <div className="svdash-progress-row">
-                            <div className="svdash-progress"><i/></div>
+                            <div className="svdash-progress">
+                                <i/>
+                            </div>
                             <strong>80%</strong>
                         </div>
 

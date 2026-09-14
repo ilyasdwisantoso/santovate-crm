@@ -15,10 +15,7 @@ const paths = {
     calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></>,
     phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.92z"/>,
     mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></>,
-    whatsapp: <>
-        <path d="M20.4 11.7a8.4 8.4 0 0 1-8.5 8.3 8.8 8.8 0 0 1-3.7-.8L3.4 21l1.5-4.6a8.4 8.4 0 1 1 15.5-4.7Z"/>
-        <path d="M8.2 8.1c.2-.4.4-.5.7-.5h.5c.3 0 .4.1.5.4l.8 1.7c.1.3.1.5-.1.7l-.6.7c-.2.2-.2.4-.1.6.5 1 1.3 1.8 2.3 2.3.2.1.4.1.6-.1l.8-.9c.2-.2.4-.3.7-.2l1.8.8c.3.1.4.3.4.6 0 .7-.3 1.4-.9 1.8-.6.5-1.4.7-2.2.6-1.6-.2-3.4-1.1-4.9-2.6-1.4-1.4-2.2-3-2.5-4.5-.1-.5 0-1 .2-1.4Z"/>
-    </>,
+    whatsapp: <><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 8.8 8.8 0 0 1-3.8-.9L3 21l1.7-5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 8.5c.5 3 2 4.5 5 5"/></>,
     external: <><path d="M14 3h7v7M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></>,
     edit: <><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></>,
     trash: <><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6"/></>,
@@ -35,20 +32,5 @@ const paths = {
 };
 
 export default function Icon({ name, size = 20, className = '' }) {
-    return (
-        <svg
-            className={className}
-            width={size}
-            height={size}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-        >
-            {paths[name] ?? paths.more}
-        </svg>
-    );
+    return <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name] ?? paths.more}</svg>;
 }

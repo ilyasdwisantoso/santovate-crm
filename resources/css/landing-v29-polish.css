@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+
+/* =========================================================
+   Santovate CRM v2.9 — landing-wide typography/CSS polish
+   Visual direction: modern editorial grotesk inspired by
+   Derecha's large, clean, minimal type system.
+   ========================================================= */
+
+.fl-page{
+    --fl-font:'Manrope',Arial,sans-serif;
+    font-family:var(--fl-font)!important;
+}
+
+.fl-page button,
+.fl-page input,
+.fl-page textarea,
+.fl-page select{
+    font-family:var(--fl-font)!important;
+}
+
+/* Navbar remains clean and restrained */
+.fl-brand strong{
+    font-family:var(--fl-font)!important;
+    font-weight:600!important;
+    letter-spacing:-.04em!important;
+}
+
+.fl-nav-links a,
+.fl-nav-login,
+.fl-nav-cta{
+    font-family:var(--fl-font)!important;
+    font-weight:500!important;
+}
+
+/* Derecha-like editorial heading proportions */
+.fl-section-heading h2,
+.fl-why-copy h2,
+.fl-integration-copy h2,
+.fl-faq-intro h2,
+.fl-final-inner h2{
+    font-family:var(--fl-font)!important;
+    font-size:clamp(56px,5.25vw,78px)!important;
+    line-height:.96!important;
+    letter-spacing:-.062em!important;
+    font-weight:500!important;
+    text-wrap:balance;
+}
+
+.fl-feature-copy h3{
+    font-family:var(--fl-font)!important;
+    font-size:clamp(48px,4.5vw,68px)!important;
+    line-height:.98!important;
+    letter-spacing:-.06em!important;
+    font-weight:500!important;
+    text-wrap:balance;
+}
+
+.fl-benefit-feature h3{
+    font-family:var(--fl-font)!important;
+    font-size:clamp(32px,2.8vw,42px)!important;
+    line-height:1.02!important;
+    letter-spacing:-.05em!important;
+    font-weight:500!important;
+}
+
+.fl-benefit-item h3,
+.fl-industry-grid h3,
+.fl-pricing-grid h3{
+    font-family:var(--fl-font)!important;
+    letter-spacing:-.045em!important;
+    font-weight:550!important;
+}
+
+/* Body becomes more premium and readable */
+.fl-section-heading p,
+.fl-feature-copy p,
+.fl-integration-copy>p,
+.fl-faq-intro>p{
+    font-family:var(--fl-font)!important;
+    font-size:16px!important;
+    line-height:1.68!important;
+    color:#666b62!important;
+}
+
+.fl-feature-copy{
+    max-width:520px!important;
+}
+
+.fl-feature-number,
+.fl-industry-num,
+.fl-test-number,
+.fl-section-label{
+    font-family:var(--fl-font)!important;
+    letter-spacing:.01em!important;
+}
+
+/* Repair pipeline-card icon row and any residual layout overflow */
+.fl-feature-row{
+    overflow:visible!important;
+}
+
+.fl-mockup-canvas{
+    min-width:0!important;
+}
+
+.fl-kanban-column,
+.fl-deal-card{
+    min-width:0!important;
+}
+
+.fl-deal-card>div{
+    min-width:0!important;
+}
+
+.fl-deal-card>div>i{
+    flex:0 0 auto;
+    color:#9da199!important;
+    font-family:Arial,sans-serif!important;
+    font-size:8px!important;
+    font-style:normal!important;
+    letter-spacing:1px!important;
+}
+
+.fl-deal-card>strong,
+.fl-deal-card>small,
+.fl-deal-card>em{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* Workflow icons: make icon geometry crisp */
+.fl-integration-icon>span{
+    width:66px!important;
+    height:66px!important;
+    border-radius:17px!important;
+    color:#171915!important;
+}
+
+.fl-integration-icon svg{
+    width:24px!important;
+    height:24px!important;
+    stroke-width:1.7!important;
+}
+
+.fl-integration-icon b{
+    font-family:var(--fl-font)!important;
+    font-size:8px!important;
+    font-weight:600!important;
+}
+
+/* specifically improve follow-up / WhatsApp node */
+.fl-integration-icon:nth-of-type(2)>span{
+    border-color:#d5d8d0!important;
+    background:#fff!important;
+    color:#11130f!important;
+}
+
+/* Card UI typography */
+.fl-mock-head>span,
+.fl-card-head b,
+.fl-report-head strong,
+.fl-pricing-grid strong,
+.fl-test-person b{
+    font-family:var(--fl-font)!important;
+}
+
+/* Fix visual spacing around oversized sections */
+.fl-feature-row{
+    gap:clamp(44px,6vw,90px)!important;
+    padding-block:clamp(64px,7vw,92px)!important;
+}
+
+.fl-integration-grid{
+    gap:clamp(56px,7vw,100px)!important;
+}
+
+.fl-integration-copy{
+    max-width:590px!important;
+}
+
+/* pricing + FAQ keep hierarchy coherent */
+.fl-faq-list button>span{
+    font-family:var(--fl-font)!important;
+    font-size:17px!important;
+    font-weight:500!important;
+    letter-spacing:-.035em!important;
+}
+
+.fl-pricing-grid h3{
+    font-size:30px!important;
+}
+
+/* Do not let legacy mojibake-looking overflow look like a font issue */
+.fl-message-row,
+.fl-composer,
+.fl-deal-card,
+.fl-followup-mock,
+.fl-pipeline-mock{
+    font-family:var(--fl-font)!important;
+}
+
+/* Responsive typography */
+@media(max-width:1100px){
+    .fl-section-heading h2,
+    .fl-why-copy h2,
+    .fl-integration-copy h2,
+    .fl-faq-intro h2{
+        font-size:clamp(50px,7vw,66px)!important;
+    }
+
+    .fl-feature-copy h3{
+        font-size:clamp(44px,6vw,60px)!important;
+    }
+}
+
+@media(max-width:560px){
+    .fl-section-heading h2,
+    .fl-why-copy h2,
+    .fl-integration-copy h2,
+    .fl-faq-intro h2{
+        font-size:clamp(38px,11vw,50px)!important;
+        line-height:.98!important;
+    }
+
+    .fl-feature-copy h3{
+        font-size:clamp(36px,10vw,48px)!important;
+    }
+
+    .fl-section-heading p,
+    .fl-feature-copy p,
+    .fl-integration-copy>p,
+    .fl-faq-intro>p{
+        font-size:14px!important;
+    }
+}
