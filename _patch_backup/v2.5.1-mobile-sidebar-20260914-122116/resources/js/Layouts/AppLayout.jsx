@@ -87,140 +87,13 @@ function NotificationCenter({ notifications, onClose }) {
     );
 }
 
-function MobileSidebar({ user, url, notifications, onClose, onNotifications, onLogout }) {
-    const menu = [
-        ...nav,
-        {
-            href: '/profile',
-            label: 'Profile',
-            icon: 'users',
-            description: 'Update data akun dan Account Executive',
-            match: (u) => u.startsWith('/profile'),
-        },
-    ];
-
-    return (
-        <div className="mobile-sidebar-backdrop" onClick={onClose}>
-            <aside className="mobile-sidebar-drawer" onClick={(e) => e.stopPropagation()}>
-                <div className="mobile-sidebar-head">
-                    <div className="mobile-sidebar-brand">
-                        <span className="brand-mark sm">S</span>
-                        <div>
-                            <strong>Santovate</strong>
-                            <small>CRM Account Executive</small>
-                        </div>
-                    </div>
-                    <button className="mobile-sidebar-close" onClick={onClose} aria-label="Tutup menu">
-                        <Icon name="close" size={20}/>
-                    </button>
-                </div>
-
-                <div className="mobile-sidebar-user">
-                    <Avatar
-                        name={user.name}
-                        email={user.email}
-                        initialsText={user.profile_initials}
-                    />
-                    <div>
-                        <strong>{user.name}</strong>
-                        <small>{user.job_title || (user.is_admin ? 'Administrator' : 'Account Executive')}</small>
-                    </div>
-                </div>
-
-                <nav className="mobile-sidebar-nav">
-                    <p className="mobile-sidebar-label">Workspace</p>
-                    {menu.map((item, index) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={onClose}
-                            className={`mobile-sidebar-link mobile-tone-${(index % 5) + 1} ${item.match(url) ? 'active' : ''}`}
-                        >
-                            <span className="mobile-sidebar-link-icon">
-                                <Icon name={item.icon} size={19}/>
-                            </span>
-                            <span className="mobile-sidebar-link-copy">
-                                <strong>{item.label}</strong>
-                                {item.description && <small>{item.description}</small>}
-                            </span>
-                            <Icon name="chevron" size={17}/>
-                        </Link>
-                    ))}
-
-                    {user.is_admin && (
-                        <>
-                            <p className="mobile-sidebar-label">Data & Team</p>
-                            <Link href="/imports" onClick={onClose} className={`mobile-sidebar-link mobile-tone-2 ${url.startsWith('/imports') ? 'active' : ''}`}>
-                                <span className="mobile-sidebar-link-icon"><Icon name="upload" size={19}/></span>
-                                <span className="mobile-sidebar-link-copy">
-                                    <strong>Import Data</strong>
-                                    <small>Upload dan assign database prospek</small>
-                                </span>
-                                <Icon name="chevron" size={17}/>
-                            </Link>
-                            <Link href="/admin/users" onClick={onClose} className={`mobile-sidebar-link mobile-tone-4 ${url.startsWith('/admin/users') ? 'active' : ''}`}>
-                                <span className="mobile-sidebar-link-icon"><Icon name="users" size={19}/></span>
-                                <span className="mobile-sidebar-link-copy">
-                                    <strong>Tim Account Executive</strong>
-                                    <small>Kelola user dan assignment AE</small>
-                                </span>
-                                <Icon name="chevron" size={17}/>
-                            </Link>
-                        </>
-                    )}
-
-                    <p className="mobile-sidebar-label">Account</p>
-                    <button
-                        type="button"
-                        className="mobile-sidebar-link mobile-tone-3"
-                        onClick={() => {
-                            onClose();
-                            onNotifications();
-                        }}
-                    >
-                        <span className="mobile-sidebar-link-icon"><Icon name="bell" size={19}/></span>
-                        <span className="mobile-sidebar-link-copy">
-                            <strong>Notifikasi</strong>
-                            <small>{notifications?.unread_count || 0} notifikasi belum dibaca</small>
-                        </span>
-                        {(notifications?.unread_count || 0) > 0 && (
-                            <span className="mobile-sidebar-badge">
-                                {notifications.unread_count > 9 ? '9+' : notifications.unread_count}
-                            </span>
-                        )}
-                    </button>
-
-                    <Link href="/" onClick={onClose} className="mobile-sidebar-link mobile-tone-5">
-                        <span className="mobile-sidebar-link-icon"><Icon name="home" size={19}/></span>
-                        <span className="mobile-sidebar-link-copy">
-                            <strong>Landing Page</strong>
-                            <small>Kembali ke halaman utama Santovate CRM</small>
-                        </span>
-                        <Icon name="chevron" size={17}/>
-                    </Link>
-                </nav>
-
-                <div className="mobile-sidebar-footer">
-                    <button type="button" className="mobile-sidebar-logout" onClick={onLogout}>
-                        <span><Icon name="logout" size={19}/></span>
-                        <div>
-                            <strong>Keluar</strong>
-                            <small>Akhiri sesi CRM</small>
-                        </div>
-                    </button>
-                </div>
-            </aside>
-        </div>
-    );
-}
-
 export default function AppLayout({ children, title, subtitle, action }) {
     const page = usePage();
     const { auth, notifications } = page.props;
     const url = page.url;
     const user = auth.user;
 
-    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+    const [moreOpen, setMoreOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
 
     const logout = () => router.post('/logout');
@@ -297,14 +170,6 @@ export default function AppLayout({ children, title, subtitle, action }) {
             <main className="main-area">
                 <header className="topbar">
                     <div className="mobile-brand">
-                        <button
-                            type="button"
-                            className="mobile-menu-trigger"
-                            onClick={() => setMobileSidebarOpen(true)}
-                            aria-label="Buka menu"
-                        >
-                            <Icon name="menu" size={20}/>
-                        </button>
                         <span className="brand-mark sm">S</span>
                         <strong>Santovate</strong>
                     </div>
@@ -343,32 +208,103 @@ export default function AppLayout({ children, title, subtitle, action }) {
                 </div>
             </main>
 
-            <nav
-                className={`bottom-nav ${mobileSidebarOpen ? 'is-hidden' : ''}`}
-                aria-label="Navigasi utama mobile"
-            >
+            <nav className="bottom-nav" aria-label="Navigasi utama mobile">
                 {nav
                     .filter((item) => ['/dashboard', '/prospects', '/follow-ups', '/pipeline'].includes(item.href))
                     .map((item) => <NavLink key={item.href} item={item} url={url} mobile/>)}
 
                 <button
-                    className={`bottom-link ${mobileSidebarOpen ? 'active' : ''}`}
-                    onClick={() => setMobileSidebarOpen(true)}
+                    className={`bottom-link ${moreOpen ? 'active' : ''}`}
+                    onClick={() => setMoreOpen(true)}
                 >
                     <span className="bottom-icon-wrap"><Icon name="more" size={21}/></span>
                     <span>Lainnya</span>
                 </button>
             </nav>
 
-            {mobileSidebarOpen && (
-                <MobileSidebar
-                    user={user}
-                    url={url}
-                    notifications={notifications}
-                    onClose={() => setMobileSidebarOpen(false)}
-                    onNotifications={() => setNotificationOpen(true)}
-                    onLogout={logout}
-                />
+            {moreOpen && (
+                <div className="sheet-backdrop" onClick={() => setMoreOpen(false)}>
+                    <section className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
+                        <div className="sheet-handle"/>
+                        <div className="sheet-head">
+                            <div className="sheet-user-head">
+                                <Avatar
+                                    name={user.name}
+                                    email={user.email}
+                                    initialsText={user.profile_initials}
+                                    size="sm"
+                                />
+                                <div>
+                                    <strong>{user.name}</strong>
+                                    <small>{user.job_title || (user.is_admin ? 'Administrator' : 'Account Executive')}</small>
+                                </div>
+                            </div>
+                            <button className="icon-button" onClick={() => setMoreOpen(false)}>
+                                <Icon name="close" size={20}/>
+                            </button>
+                        </div>
+
+                        <div className="sheet-menu">
+                            <Link href="/profile" onClick={() => setMoreOpen(false)}>
+                                <span className="sheet-menu-icon"><Icon name="users" size={19}/></span>
+                                <div>
+                                    <strong>Profile</strong>
+                                    <small>Update nama, inisial, jabatan, WhatsApp, dan password</small>
+                                </div>
+                                <Icon name="chevron" size={18}/>
+                            </Link>
+
+                            <Link href="/targets" onClick={() => setMoreOpen(false)}>
+                                <span className="sheet-menu-icon"><Icon name="target" size={19}/></span>
+                                <div>
+                                    <strong>Target AE</strong>
+                                    <small>Target dan performance Account Executive</small>
+                                </div>
+                                <Icon name="chevron" size={18}/>
+                            </Link>
+
+                            {user.is_admin && (
+                                <Link href="/imports" onClick={() => setMoreOpen(false)}>
+                                    <span className="sheet-menu-icon"><Icon name="upload" size={19}/></span>
+                                    <div>
+                                        <strong>Import Data</strong>
+                                        <small>Upload dan assign database prospek ke Account Executive</small>
+                                    </div>
+                                    <Icon name="chevron" size={18}/>
+                                </Link>
+                            )}
+
+                            {user.is_admin && (
+                                <Link href="/admin/users" onClick={() => setMoreOpen(false)}>
+                                    <span className="sheet-menu-icon"><Icon name="users" size={19}/></span>
+                                    <div>
+                                        <strong>Tim Account Executive</strong>
+                                        <small>Kelola akun dan assignment Account Executive</small>
+                                    </div>
+                                    <Icon name="chevron" size={18}/>
+                                </Link>
+                            )}
+
+                            <button onClick={() => { setMoreOpen(false); setNotificationOpen(true); }}>
+                                <span className="sheet-menu-icon"><Icon name="bell" size={19}/></span>
+                                <div>
+                                    <strong>Notifikasi</strong>
+                                    <small>{notifications?.unread_count || 0} notifikasi belum dibaca</small>
+                                </div>
+                                <Icon name="chevron" size={18}/>
+                            </button>
+
+                            <button onClick={logout}>
+                                <span className="sheet-menu-icon danger"><Icon name="logout" size={19}/></span>
+                                <div>
+                                    <strong>Keluar</strong>
+                                    <small>Akhiri sesi CRM</small>
+                                </div>
+                                <Icon name="chevron" size={18}/>
+                            </button>
+                        </div>
+                    </section>
+                </div>
             )}
         </div>
     );
