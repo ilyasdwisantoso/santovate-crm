@@ -2,7 +2,6 @@ import '../css/app.css';
 import '../css/v24-mobile.css';
 import '../css/landing.css';
 import '../css/v25-mobile-menu-fix.css';
-import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 
