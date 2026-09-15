@@ -66,6 +66,7 @@ class DemoAccountSeeder extends Seeder
             ['email'=>'admin@santovate.com','name'=>'Santovate Admin','password'=>'Santovate123!','role'=>'admin','config'=>'software-agency','platform'=>true],
             ['email'=>'sales@santovate.com','name'=>'Santovate Sales','password'=>'Sales123!','role'=>'sales','config'=>'software-agency','platform'=>false],
             ['email'=>'ahmadmazkur@santovate.com','name'=>'Ahmad Mazkur','password'=>'Mazkur!@#','role'=>'sales','config'=>'software-agency','platform'=>false],
+            ['email'=>'randi@santovate.com','name'=>'Randi','password'=>'randisantovate!','role'=>'sales','config'=>'software-agency','platform'=>false],
             ['email'=>'demo.logistics@santovate.com','name'=>'Demo Logistics Admin','password'=>'DemoLogistics123!','role'=>'admin','config'=>'logistics-freight','platform'=>false],
             ['email'=>'demo.logistics.sales@santovate.com','name'=>'Demo Logistics Sales','password'=>'DemoLogisticsSales123!','role'=>'sales','config'=>'logistics-freight','platform'=>false],
             ['email'=>'demo.distributor@santovate.com','name'=>'Demo Distributor Admin','password'=>'DemoDistributor123!','role'=>'admin','config'=>'distributor-b2b','platform'=>false],
