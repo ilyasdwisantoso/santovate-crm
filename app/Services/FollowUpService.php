@@ -102,8 +102,19 @@ class FollowUpService
                 'meta_language'=>$t->meta_language,'meta_status'=>$t->meta_status,'meta_category'=>$t->meta_category,'body_parameters'=>$t->body_parameters ?? [],
             ])->values()->all(),
             'noReplyDays'=>$this->noReplyDays($user),'leadAgeDays'=>$this->leadAgeDays($user),
-            'whatsappApiReady'=>(bool)$user->organization?->whatsappChannel?->ready(),
+            'whatsappApiReady'=>$this->whatsappApiReady($user),
         ];
+    }
+
+
+    private function whatsappApiReady(User $user): bool
+    {
+        try {
+            return (bool)$user->organization?->whatsappChannel?->ready();
+        } catch (\Throwable $e) {
+            report($e);
+            return false;
+        }
     }
 
     public function renderTemplate(FollowUpTemplate $template, Prospect $prospect, User $user): string

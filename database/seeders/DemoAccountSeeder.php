@@ -19,9 +19,9 @@ class DemoAccountSeeder extends Seeder
 
         $workspaces = [
             'software-agency' => ['slug'=>'demo-software-agency','name'=>'Demo Software & Agency','plan'=>'growth'],
-            'logistics-freight' => ['slug'=>'demo-logistics-freight','name'=>'Demo Logistics & Freight','plan'=>'starter'],
-            'distributor-b2b' => ['slug'=>'demo-distributor-b2b','name'=>'Demo Distributor & B2B','plan'=>'starter'],
-            'parfum-retail' => ['slug'=>'demo-parfum-retail','name'=>'Demo Parfum & Retail','plan'=>'starter'],
+            'logistics-freight' => ['slug'=>'demo-logistics-freight','name'=>'Demo Logistics & Freight','plan'=>'growth'],
+            'distributor-b2b' => ['slug'=>'demo-distributor-b2b','name'=>'Demo Distributor & B2B','plan'=>'growth'],
+            'parfum-retail' => ['slug'=>'demo-parfum-retail','name'=>'Demo Parfum & Retail','plan'=>'growth'],
         ];
 
         $organizations = [];
@@ -63,12 +63,15 @@ class DemoAccountSeeder extends Seeder
         // Requested demo accounts. Running this seeder resets password, role,
         // active status and workspace assignment without deleting historical rows.
         $accounts = [
-            ['email'=>'admin@santovate.com','name'=>'Santovate Admin','password'=>'Santovate123!','role'=>'admin','config'=>'software-agency'],
-            ['email'=>'sales@santovate.com','name'=>'Santovate Sales','password'=>'Sales123!','role'=>'sales','config'=>'software-agency'],
-            ['email'=>'ahmadmazkur@santovate.com','name'=>'Ahmad Mazkur','password'=>'Mazkur!@#','role'=>'sales','config'=>'software-agency'],
-            ['email'=>'demo.logistics@santovate.com','name'=>'Demo Logistics Admin','password'=>'DemoLogistics123!','role'=>'admin','config'=>'logistics-freight'],
-            ['email'=>'demo.distributor@santovate.com','name'=>'Demo Distributor Admin','password'=>'DemoDistributor123!','role'=>'admin','config'=>'distributor-b2b'],
-            ['email'=>'demo.parfum@santovate.com','name'=>'Demo Parfum Admin','password'=>'DemoParfum123!','role'=>'admin','config'=>'parfum-retail'],
+            ['email'=>'admin@santovate.com','name'=>'Santovate Admin','password'=>'Santovate123!','role'=>'admin','config'=>'software-agency','platform'=>true],
+            ['email'=>'sales@santovate.com','name'=>'Santovate Sales','password'=>'Sales123!','role'=>'sales','config'=>'software-agency','platform'=>false],
+            ['email'=>'ahmadmazkur@santovate.com','name'=>'Ahmad Mazkur','password'=>'Mazkur!@#','role'=>'sales','config'=>'software-agency','platform'=>false],
+            ['email'=>'demo.logistics@santovate.com','name'=>'Demo Logistics Admin','password'=>'DemoLogistics123!','role'=>'admin','config'=>'logistics-freight','platform'=>false],
+            ['email'=>'demo.logistics.sales@santovate.com','name'=>'Demo Logistics Sales','password'=>'DemoLogisticsSales123!','role'=>'sales','config'=>'logistics-freight','platform'=>false],
+            ['email'=>'demo.distributor@santovate.com','name'=>'Demo Distributor Admin','password'=>'DemoDistributor123!','role'=>'admin','config'=>'distributor-b2b','platform'=>false],
+            ['email'=>'demo.distributor.sales@santovate.com','name'=>'Demo Distributor Sales','password'=>'DemoDistributorSales123!','role'=>'sales','config'=>'distributor-b2b','platform'=>false],
+            ['email'=>'demo.parfum@santovate.com','name'=>'Demo Parfum Admin','password'=>'DemoParfum123!','role'=>'admin','config'=>'parfum-retail','platform'=>false],
+            ['email'=>'demo.parfum.sales@santovate.com','name'=>'Demo Parfum Sales','password'=>'DemoParfumSales123!','role'=>'sales','config'=>'parfum-retail','platform'=>false],
         ];
 
         foreach ($accounts as $account) {
@@ -81,6 +84,7 @@ class DemoAccountSeeder extends Seeder
                     'password'=>$account['password'],
                     'role'=>$account['role'],
                     'is_active'=>true,
+                    'is_platform_admin'=>(bool)($account['platform'] ?? false),
                 ]
             );
         }

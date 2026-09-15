@@ -61,7 +61,7 @@ class HandleInertiaRequests extends Middleware
             'auth'=>['user'=>$user ? [
                 'id'=>$user->id,'name'=>$user->name,'email'=>$user->email,'phone'=>$user->phone,
                 'job_title'=>$user->job_title,'department'=>$user->department,'profile_initials'=>$user->profile_initials,
-                'whatsapp_signature'=>$user->whatsapp_signature,'role'=>$user->role,'is_admin'=>$user->isAdmin(),
+                'whatsapp_signature'=>$user->whatsapp_signature,'role'=>$user->role,'is_admin'=>$user->isAdmin(),'is_platform_admin'=>$user->isPlatformAdmin(),
             ] : null],
             'organization'=>$organization,
             'subscription'=>$subscription,

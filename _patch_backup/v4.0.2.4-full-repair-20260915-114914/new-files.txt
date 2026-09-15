@@ -1,0 +1,7 @@
+app\Http\Controllers\Admin\ClientOnboardingController.php
+app\Http\Middleware\EnsurePlatformAdmin.php
+database\migrations\2026_09_15_001100_repair_campaign_schema_and_platform_admin.php
+public\apple-touch-icon.png
+public\favicon.ico
+public\favicon.svg
+resources\js\Pages\Admin\Clients\Index.jsx

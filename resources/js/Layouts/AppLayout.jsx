@@ -283,6 +283,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
                             <NavLink item={{ href: '/campaigns', label: 'WA Campaign', icon: 'whatsapp', match: (u) => u.startsWith('/campaigns') }} url={url}/>
                             <NavLink item={{ href: '/settings/whatsapp', label: 'WhatsApp API', icon: 'whatsapp', match: (u) => u.startsWith('/settings/whatsapp') }} url={url}/>
                             <NavLink item={{ href: '/settings/business', label: 'Business Config', icon: 'spark', match: (u) => u.startsWith('/settings/business') }} url={url}/>
+                            {user.is_platform_admin && <NavLink item={{ href: '/admin/clients', label: 'Client Onboarding', icon: 'users', match: (u) => u.startsWith('/admin/clients') }} url={url}/>}
                         </>
                     )}
                 </nav>
@@ -299,6 +300,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
                             <small>{user.job_title || (user.is_admin ? 'Administrator' : 'Account Executive')}</small>
                         </div>
                     </Link>
+                        {user.is_platform_admin && <Link href="/admin/clients" onClick={onClose} className={`mobile-sidebar-link mobile-tone-1 ${url.startsWith('/admin/clients') ? 'active' : ''}`}><span className="mobile-sidebar-link-icon"><Icon name="users" size={19}/></span><span className="mobile-sidebar-link-copy"><strong>Client Onboarding</strong><small>Aktifkan workspace client berbayar</small></span><Icon name="chevron" size={17}/></Link>}
                     <button className="icon-button ghost" onClick={logout} title="Keluar">
                         <Icon name="logout" size={18}/>
                     </button>
@@ -384,6 +386,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
         </div>
     );
 }
+
 
 
 

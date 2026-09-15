@@ -555,7 +555,7 @@ export default function Home() {
                         <SectionLabel>Pricing</SectionLabel>
                         <div className="fl-section-heading center">
                             <h2>Simple Plans That<br/>Grow With Your Team</h2>
-                            <p>Harga implementasi menyesuaikan jumlah user, scope workflow, kebutuhan integrasi, dan tingkat customization.</p>
+                            <p>Pilih paket sesuai ukuran tim dan kebutuhan operasional. Harga diberikan setelah scope dan konfigurasi bisnis dikonfirmasi.</p>
                         </div>
 
                         <div className="fl-pricing-grid">
@@ -563,7 +563,7 @@ export default function Home() {
                                 <span className="fl-plan-tag">Small Team</span>
                                 <h3>Starter</h3>
                                 <p>Untuk tim yang ingin beralih dari spreadsheet ke workflow sales yang lebih terstruktur.</p>
-                                <div className="fl-price"><strong>Custom</strong><small>implementation</small></div>
+                                <div className="fl-plan-note"><strong>Core CRM</strong><small>1 user Â· essential sales workflow</small></div>
                                 <Link href={ctaHref} className="fl-btn secondary full">Request Demo</Link>
                                 <div className="fl-plan-list">
                                     {['Lead database','Pipeline','Follow-up queue','WhatsApp template','Mobile responsive'].map(x => <span key={x}><i><Icon name="check" size={13}/></i>{x}</span>)}
@@ -574,7 +574,7 @@ export default function Home() {
                                 <span className="fl-plan-tag">Most Popular</span>
                                 <h3>Growth</h3>
                                 <p>Untuk tim Account Executive yang membutuhkan assignment, target, reporting, dan kontrol follow-up.</p>
-                                <div className="fl-price"><strong>Custom</strong><small>per business</small></div>
+                                <div className="fl-plan-note"><strong>Sales Automation</strong><small>team workflow Â· reporting Â· automation</small></div>
                                 <Link href={ctaHref} className="fl-btn primary full">Talk to Santovate</Link>
                                 <div className="fl-plan-list">
                                     {['Everything in Starter','Import & assignment','AE targets','Performance dashboard','Admin team management'].map(x => <span key={x}><i><Icon name="check" size={13}/></i>{x}</span>)}
@@ -583,12 +583,12 @@ export default function Home() {
 
                             <article>
                                 <span className="fl-plan-tag">Business Fit</span>
-                                <h3>Custom</h3>
-                                <p>Untuk perusahaan yang membutuhkan workflow, field, deployment, atau integrasi khusus.</p>
-                                <div className="fl-price"><strong>Tailored</strong><small>scope</small></div>
-                                <Link href={ctaHref} className="fl-btn secondary full">Discuss Scope</Link>
+                                <h3>Scale</h3>
+                                <p>Untuk tim yang membutuhkan kapasitas lebih besar, advanced workflow, data migration, dan integration scope.</p>
+                                <div className="fl-plan-note"><strong>Advanced Operations</strong><small>larger team Â· advanced configuration</small></div>
+                                <Link href={ctaHref} className="fl-btn secondary full">Explore Scale</Link>
                                 <div className="fl-plan-list">
-                                    {['Everything in Growth','Custom workflow','Industry configuration','Data migration','Integration scope'].map(x => <span key={x}><i><Icon name="check" size={13}/></i>{x}</span>)}
+                                    {['Everything in Growth','Advanced workflow','Industry configuration','Data migration','Integration scope'].map(x => <span key={x}><i><Icon name="check" size={13}/></i>{x}</span>)}
                                 </div>
                             </article>
                         </div>
@@ -638,6 +638,8 @@ export default function Home() {
         </div>
     );
 }
+
+
 
 
 

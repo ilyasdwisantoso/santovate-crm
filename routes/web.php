@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Admin\BusinessSettingsController;
+use App\Http\Controllers\Admin\ClientOnboardingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WhatsAppSettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\WhatsAppSendController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 Route::get('/',fn()=>Inertia::render('Landing/Home'))->name('home');
+Route::get('/pricing',[PublicController::class,'plans'])->name('pricing.index');
 Route::get('/plans',[PublicController::class,'plans'])->name('plans.index');
 Route::get('/business-configurations',[PublicController::class,'configurations'])->name('business-configurations.index');
 Route::get('/terms',fn()=>app(PublicController::class)->legal('terms'))->name('terms');
@@ -51,6 +53,7 @@ Route::middleware('auth')->group(function(){
             Route::resource('products',ProductController::class)->only(['index','store','update','destroy']);
             Route::get('/campaigns',[CampaignController::class,'index'])->name('campaigns.index');Route::post('/campaigns',[CampaignController::class,'store'])->name('campaigns.store');Route::post('/campaigns/{campaign}/send',[CampaignController::class,'send'])->name('campaigns.send');
             Route::get('/settings/business',[BusinessSettingsController::class,'index'])->name('settings.business');Route::get('/settings/whatsapp',[WhatsAppSettingsController::class,'edit'])->name('settings.whatsapp');Route::put('/settings/whatsapp',[WhatsAppSettingsController::class,'update'])->name('settings.whatsapp.update');
+            Route::middleware('platform.admin')->group(function(){Route::get('/admin/clients',[ClientOnboardingController::class,'index'])->name('admin.clients.index');Route::post('/admin/clients',[ClientOnboardingController::class,'store'])->name('admin.clients.store');});
             Route::prefix('admin')->name('admin.')->group(function(){Route::resource('users',UserController::class)->except(['show','destroy']);});
         });
     });

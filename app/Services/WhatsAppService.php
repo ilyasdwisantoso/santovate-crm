@@ -63,8 +63,12 @@ class WhatsAppService
             'status'=>'sent','to_phone'=>$phone,'provider_message_id'=>$messageId,'body'=>$body,'media_url'=>$template->image_url,
             'provider_payload'=>$data,'sent_at'=>now(),
         ]);
+        // API acceptance means the message was accepted by Meta, not that the
+        // destination number has been verified. VALID is assigned only after a
+        // delivered/read status or a real inbound message from the customer.
         $prospect->update([
-            'phone_normalized'=>$phone,'whatsapp_status'=>'valid','whatsapp_id'=>$phone,'whatsapp_verified_at'=>now(),
+            'phone_normalized'=>$phone,
+            'whatsapp_last_error'=>null,
             'last_outbound_at'=>now(),'last_contact_at'=>now(),'contacted_at'=>$prospect->contacted_at ?: now(),
             'follow_up_snoozed_until'=>null,'follow_up_count'=>(int)$prospect->follow_up_count+1,'last_follow_up_message'=>$body,
         ]);

@@ -39,7 +39,14 @@ class WhatsAppWebhookController extends Controller {
         if ($new==='failed' && !$message->failed_at) $changes['failed_at']=now();
         $changes['status']=$new ?: $message->status; $message->update($changes);
         if ($message->prospect_id) {
-            $p=Prospect::find($message->prospect_id); if ($p) $p->update($new==='failed' ? ['whatsapp_status'=>'failed','whatsapp_last_error'=>json_encode($status['errors'] ?? [])] : ['whatsapp_status'=>'valid','whatsapp_verified_at'=>now()]);
+            $p=Prospect::find($message->prospect_id);
+            if ($p) {
+                if ($new==='failed') {
+                    $p->update(['whatsapp_status'=>'failed','whatsapp_last_error'=>json_encode($status['errors'] ?? [])]);
+                } elseif (in_array($new,['delivered','read'],true)) {
+                    $p->update(['whatsapp_status'=>'valid','whatsapp_verified_at'=>now(),'whatsapp_last_error'=>null]);
+                }
+            }
         }
         if ($message->campaign_recipient_id) {
             $r=WhatsAppCampaignRecipient::find($message->campaign_recipient_id); if (!$r) return; $campaign=$r->campaign;

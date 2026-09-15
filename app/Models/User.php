@@ -13,7 +13,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'organization_id','name','email','password','role','is_active','last_login_at',
+        'organization_id','name','email','password','role','is_active','is_platform_admin','last_login_at',
         'phone','job_title','department','profile_initials','whatsapp_signature','bio',
     ];
 
@@ -22,7 +22,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at'=>'datetime','password'=>'hashed','is_active'=>'boolean','last_login_at'=>'datetime',
+            'email_verified_at'=>'datetime','password'=>'hashed','is_active'=>'boolean','is_platform_admin'=>'boolean','last_login_at'=>'datetime',
         ];
     }
 
@@ -31,4 +31,5 @@ class User extends Authenticatable
     public function createdProspects(): HasMany { return $this->hasMany(Prospect::class, 'created_by'); }
     public function salesTargets(): HasMany { return $this->hasMany(SalesTarget::class); }
     public function isAdmin(): bool { return $this->role === 'admin'; }
+    public function isPlatformAdmin(): bool { return $this->is_platform_admin === true; }
 }

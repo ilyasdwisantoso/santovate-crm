@@ -1,23 +1,19 @@
 import { Link, usePage } from '@inertiajs/react';
 import PublicShell from './PublicShell';
 
-const rupiah = (value) => `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
-
-export default function BusinessConfigurations({ configurations, plans }) {
+export default function BusinessConfigurations({ configurations = [] }) {
     const selectedPlan = new URLSearchParams(usePage().url.split('?')[1] || '').get('plan') || 'starter';
-    const starter = plans?.find((plan) => plan.key === 'starter') || plans?.[0];
 
     return <PublicShell title="Demo Konfigurasi Bisnis">
         <section className="sv-public-hero">
             <span>/ BUSINESS CONFIGURATION</span>
             <h1>Satu CRM core.<br/><em>Empat karakter bisnis.</em></h1>
-            <p>Setiap konfigurasi mempunyai warna, pipeline, terminology, follow-up rule dan harga berbeda.</p>
+            <p>Setiap konfigurasi mempunyai pipeline, terminology dan follow-up rule yang disesuaikan dengan proses penjualannya. Tema dashboard Admin dan Sales tetap konsisten Santovate.</p>
         </section>
 
         <section className="sv-config-grid sv-config-grid-v402">
             {configurations.map((config) => {
                 const theme = config.theme || {};
-                const starterTotal = Number(starter?.monthly_price || 0) + Number(config.monthly_addon_price || 0);
                 return <article
                     key={config.id}
                     style={{
@@ -31,7 +27,7 @@ export default function BusinessConfigurations({ configurations, plans }) {
                     <div className="sv-config-colorbar"/>
                     <div className="sv-config-head">
                         <span>{config.industry}</span>
-                        <strong>Mulai {rupiah(starterTotal)}/bln</strong>
+                        <strong>Demo workflow</strong>
                     </div>
                     <h2>{config.name}</h2>
                     <p>{config.description}</p>
@@ -45,11 +41,11 @@ export default function BusinessConfigurations({ configurations, plans }) {
                     {config.demo_products?.length > 0 && <div className="sv-demo-products">
                         {config.demo_products.map((product) => <span key={product.sku}>
                             <b>{product.name}</b>
-                            <small>{product.variant} · {rupiah(product.price)}</small>
+                            <small>{product.variant}</small>
                         </span>)}
                     </div>}
-                    <Link className="btn btn-primary" href={`/plans?config=${config.key}&plan=${selectedPlan}`}>
-                        Lihat Harga {config.name}
+                    <Link className="btn btn-primary" href={`/pricing?config=${config.key}&plan=${selectedPlan}`}>
+                        Lihat Paket {config.name}
                     </Link>
                 </article>;
             })}
