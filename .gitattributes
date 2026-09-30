@@ -1,0 +1,6 @@
+# Keep deployment shell scripts LF-only on every platform.
+*.sh text eol=lf
+scripts/deploy/*.sh text eol=lf
+
+# PowerShell scripts are intended for Windows PowerShell / PowerShell.
+*.ps1 text eol=crlf

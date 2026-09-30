@@ -32,8 +32,16 @@ function Run-Native([string]$Label, [scriptblock]$Command) {
     if ($code -ne 0) { throw "$Label gagal (exit code $code)." }
 }
 
-function Shell-Quote([string]$Value) {
-    return "'" + ($Value -replace "'", "'\"'\"'") + "'"
+# Deployment arguments are intentionally restricted to shell-safe characters.
+# This avoids nested Bash quote escaping that is fragile in Windows PowerShell 5.1.
+function Safe-RemoteArg([string]$Value) {
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        throw "Remote argument kosong."
+    }
+    if ($Value -notmatch '^[A-Za-z0-9_./:@+=-]+$') {
+        throw "Remote argument memiliki karakter yang tidak didukung: $Value"
+    }
+    return $Value
 }
 
 Require-Command "git"
@@ -60,7 +68,6 @@ if ($currentBranch -ne $Branch) {
     throw "Branch aktif '$currentBranch', tetapi deployment memakai '$Branch'."
 }
 
-# Refuse secrets/generated artifacts if they are tracked.
 $tracked = @(& git ls-files)
 $dangerousTracked = @($tracked | Where-Object {
     $_ -eq '.env' -or
@@ -139,36 +146,39 @@ if ([string]::IsNullOrWhiteSpace($IdentityFile) -and (Test-Path -LiteralPath $de
 $scpArgs = @('-P', "$SshPort")
 $sshArgs = @('-p', "$SshPort")
 if (-not [string]::IsNullOrWhiteSpace($IdentityFile)) {
-    $scpArgs += @('-i', $IdentityFile)
-    $sshArgs += @('-i', $IdentityFile)
+    $scpArgs += @('-i', $IdentityFile, '-o', 'BatchMode=yes', '-o', 'IdentitiesOnly=yes')
+    $sshArgs += @('-i', $IdentityFile, '-o', 'BatchMode=yes', '-o', 'IdentitiesOnly=yes')
 }
 
 $remoteArtifact = "/home/$SshUser/santovate-build-$stamp.tar.gz"
 $remoteTarget = "$SshUser@$SshHost`:$remoteArtifact"
 
 Write-Host "`n[7/7 Upload verified build]" -ForegroundColor Cyan
-& scp @scpArgs $artifact $remoteTarget
+scp @scpArgs $artifact $remoteTarget
 if ($LASTEXITCODE -ne 0) { throw "SCP gagal (exit code $LASTEXITCODE)." }
 
-$bootstrapDir = "storage/app/deploy/bootstrap-current-build"
+$rp = Safe-RemoteArg $RemoteProjectPath
+$br = Safe-RemoteArg $Branch
+$pb = Safe-RemoteArg $PhpBinary
+$cb = Safe-RemoteArg $ComposerBinary
+$bu = Safe-RemoteArg $BaseUrl
+$ra = Safe-RemoteArg $remoteArtifact
+$bootstrapDir = Safe-RemoteArg "storage/app/deploy/bootstrap-current-build"
+
 $remoteCommand = @(
-    'cd ' + (Shell-Quote $RemoteProjectPath),
-    'mkdir -p storage/app/deploy',
-    'rm -rf ' + (Shell-Quote $bootstrapDir),
-    'if [ -d public/build ]; then cp -a public/build ' + (Shell-Quote $bootstrapDir) + '; fi',
-    'git fetch origin ' + (Shell-Quote $Branch),
-    'git pull --ff-only origin ' + (Shell-Quote $Branch),
-    'if [ ! -d public/build ] && [ -d ' + (Shell-Quote $bootstrapDir) + ' ]; then cp -a ' + (Shell-Quote $bootstrapDir) + ' public/build; fi',
-    'SANTOVATE_COMPOSER_BIN=' + (Shell-Quote $ComposerBinary) + ' bash scripts/deploy/deploy-production.sh ' +
-        (Shell-Quote $remoteArtifact) + ' ' +
-        (Shell-Quote $Branch) + ' ' +
-        (Shell-Quote $PhpBinary) + ' ' +
-        (Shell-Quote $BaseUrl),
-    'rm -rf ' + (Shell-Quote $bootstrapDir)
+    "cd $rp",
+    "mkdir -p storage/app/deploy",
+    "rm -rf $bootstrapDir",
+    "if [ -d public/build ]; then cp -a public/build $bootstrapDir; fi",
+    "git fetch origin $br",
+    "git pull --ff-only origin $br",
+    "if [ -d $bootstrapDir ]; then rm -rf public/build; cp -a $bootstrapDir public/build; fi",
+    "SANTOVATE_COMPOSER_BIN=$cb bash scripts/deploy/deploy-production.sh $ra $br $pb $bu",
+    "rm -rf $bootstrapDir"
 ) -join ' && '
 
 Write-Host "`n[REMOTE DEPLOY]" -ForegroundColor Cyan
-& ssh @sshArgs "$SshUser@$SshHost" $remoteCommand
+ssh @sshArgs "$SshUser@$SshHost" $remoteCommand
 if ($LASTEXITCODE -ne 0) { throw "Remote deployment gagal (exit code $LASTEXITCODE)." }
 
 Remove-Item -LiteralPath $artifact -Force -ErrorAction SilentlyContinue
