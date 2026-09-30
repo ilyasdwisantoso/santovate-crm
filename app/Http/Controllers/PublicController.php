@@ -9,6 +9,14 @@ use Inertia\Response;
 
 class PublicController extends Controller
 {
+    public function home(): Response
+    {
+        return Inertia::render('Landing/Home', [
+            'plans'=>SubscriptionPlan::where('is_active', true)->orderBy('sort_order')->get(),
+            'configurations'=>BusinessConfiguration::where('is_active', true)->orderBy('sort_order')->get(),
+        ]);
+    }
+
     public function plans(): Response
     {
         return Inertia::render('Public/Plans', [

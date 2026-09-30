@@ -1,4 +1,4 @@
-﻿import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import Icon from '../../Components/Icon';
 import LandingNav from './components/LandingNav';
@@ -325,7 +325,15 @@ function SectionLabel({ children }) {
     return <div className="fl-section-label">/ {children}</div>;
 }
 
-export default function Home() {
+function formatPublicPrice(value) {
+    return `Rp${Number(value || 0).toLocaleString('id-ID')}`;
+}
+
+function publicFeatureLabel(feature) {
+    return String(feature || '').replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export default function Home({ plans = [], configurations = [] }) {
     const { auth } = usePage().props;
     const user = auth?.user;
     const [faqOpen, setFaqOpen] = useState(0);
@@ -554,47 +562,26 @@ export default function Home() {
                     <div className="fl-container">
                         <SectionLabel>Pricing</SectionLabel>
                         <div className="fl-section-heading center">
-                            <h2>Simple Plans That<br/>Grow With Your Team</h2>
-                            <p>Pilih paket sesuai ukuran tim dan kebutuhan operasional. Harga diberikan setelah scope dan konfigurasi bisnis dikonfirmasi.</p>
+                            <h2>Transparent Pricing.<br/>Built to Scale With Your Team.</h2>
+                            <p>Subscription mempunyai harga tetap. Tambahkan Business Configuration sesuai workflow industri. Custom extension dan integration dibuat sebagai quotation project terpisah setelah discovery.</p>
                         </div>
 
-                        <div className="fl-pricing-grid">
-                            <article>
-                                <span className="fl-plan-tag">Small Team</span>
-                                <h3>Starter</h3>
-                                <p>Untuk tim yang ingin beralih dari spreadsheet ke workflow sales yang lebih terstruktur.</p>
-                                <div className="fl-plan-note"><strong>Core CRM</strong><small>1 user Â· essential sales workflow</small></div>
-                                <Link href={ctaHref} className="fl-btn secondary full">Request Demo</Link>
-                                <div className="fl-plan-list">
-                                    {['Lead database','Pipeline','Follow-up queue','WhatsApp template','Mobile responsive'].map(x => <span key={x}><i><Icon name="check" size={13}/></i>{x}</span>)}
-                                </div>
-                            </article>
-
-                            <article className="popular">
-                                <span className="fl-plan-tag">Most Popular</span>
-                                <h3>Growth</h3>
-                                <p>Untuk tim Account Executive yang membutuhkan assignment, target, reporting, dan kontrol follow-up.</p>
-                                <div className="fl-plan-note"><strong>Sales Automation</strong><small>team workflow Â· reporting Â· automation</small></div>
-                                <Link href={ctaHref} className="fl-btn primary full">Talk to Santovate</Link>
-                                <div className="fl-plan-list">
-                                    {['Everything in Starter','Import & assignment','AE targets','Performance dashboard','Admin team management'].map(x => <span key={x}><i><Icon name="check" size={13}/></i>{x}</span>)}
-                                </div>
-                            </article>
-
-                            <article>
-                                <span className="fl-plan-tag">Business Fit</span>
-                                <h3>Scale</h3>
-                                <p>Untuk tim yang membutuhkan kapasitas lebih besar, advanced workflow, data migration, dan integration scope.</p>
-                                <div className="fl-plan-note"><strong>Advanced Operations</strong><small>larger team Â· advanced configuration</small></div>
-                                <Link href={ctaHref} className="fl-btn secondary full">Explore Scale</Link>
-                                <div className="fl-plan-list">
-                                    {['Everything in Growth','Advanced workflow','Industry configuration','Data migration','Integration scope'].map(x => <span key={x}><i><Icon name="check" size={13}/></i>{x}</span>)}
-                                </div>
-                            </article>
+                        <div className="fl-pricing-grid fl-pricing-live-grid">
+                            {plans.map((plan) => <article className={plan.key === 'growth' ? 'popular' : ''} key={plan.id}>
+                                <span className="fl-plan-tag">{plan.key === 'growth' ? 'Most Popular' : plan.key === 'starter' ? 'Small Team' : 'Advanced'}</span>
+                                <h3>{plan.name}</h3>
+                                <p>{plan.description}</p>
+                                <div className="fl-live-price"><strong>{formatPublicPrice(plan.monthly_price)}</strong><span>/ bulan</span></div>
+                                <small className="fl-live-annual">{formatPublicPrice(plan.annual_price)} / tahun</small>
+                                <div className="fl-live-plan-meta"><span>{plan.user_limit} user</span><span>{Number(plan.prospect_limit || 0).toLocaleString('id-ID')} prospect</span></div>
+                                <Link href={`/pricing?plan=${plan.key}`} className={`fl-btn ${plan.key === 'growth' ? 'primary' : 'secondary'} full`}>Lihat detail harga</Link>
+                                <div className="fl-plan-list">{(plan.features || []).slice(0,6).map((feature)=><span key={feature}><i><Icon name="check" size={13}/></i>{publicFeatureLabel(feature)}</span>)}</div>
+                            </article>)}
                         </div>
+
+                        <div className="fl-live-price-note"><div><strong>Butuh extension di luar subscription?</strong><span>Create Order, Shipment Tracking, Customer Portal, API/Aggregator, custom workflow, dan extension lain ditentukan melalui discovery & quotation terpisah.</span></div><Link href="/pricing">Lihat subscription + configuration <Icon name="chevron" size={15}/></Link></div>
                     </div>
                 </section>
-
                 <section className="fl-section fl-faq" id="faq">
                     <div className="fl-container fl-faq-grid">
                         <div className="fl-faq-intro">

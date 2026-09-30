@@ -1,22 +1,20 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Icon from '../../Components/Icon';
+import { Badge, EmptyState } from '../../Components/Ui';
 import { money, dateTime } from '../../Utils/format';
 
 export default function Index({ opportunities, filters, stages, statuses }) {
     const change=(key,value)=>router.get('/opportunities',{...filters,[key]:value},{preserveState:true,replace:true});
-    return <AppLayout title="Opportunities" subtitle="Discovery, kebutuhan, probability, dan peluang komersial per client." action={<Link href="/opportunities/create" className="btn btn-primary"><Icon name="plus" size={17}/>Opportunity</Link>}>
+    return <AppLayout title="Opportunities" subtitle="Peluang komersial setelah kebutuhan client mulai jelas." action={<Link href="/opportunities/create" className="btn btn-primary"><Icon name="plus" size={17}/>Opportunity</Link>}>
         <Head title="Opportunities"/>
-        <section className="panel commercial-toolbar">
-            <input value={filters.q||''} onChange={e=>change('q',e.target.value)} placeholder="Cari opportunity / perusahaan..."/>
-            <select value={filters.stage||''} onChange={e=>change('stage',e.target.value)}><option value="">Semua stage</option>{Object.entries(stages).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select>
-            <select value={filters.status||''} onChange={e=>change('status',e.target.value)}><option value="">Semua status</option>{Object.entries(statuses).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select>
-        </section>
-        <section className="panel no-pad">
-            <div className="clean-table-wrap"><table className="clean-table"><thead><tr><th>Opportunity</th><th>Stage</th><th>Probability</th><th>Expected Value</th><th>Next Action</th><th>Owner</th><th/></tr></thead><tbody>
-                {opportunities.data.map(o=><tr key={o.id}><td><strong>{o.name}</strong><small className="cell-sub">{o.prospect?.company_name||'—'}</small></td><td><span className="badge badge-info">{o.stage_label}</span></td><td>{o.probability}%</td><td>{money(o.expected_value)}</td><td><strong>{o.next_action||'—'}</strong><small className="cell-sub">{o.next_follow_up_at?dateTime(o.next_follow_up_at):'Belum dijadwalkan'}</small></td><td>{o.owner?.name||'Belum diassign'}</td><td><Link className="icon-button" href={`/opportunities/${o.id}`}><Icon name="chevron" size={17}/></Link></td></tr>)}
-                {!opportunities.data.length&&<tr><td colSpan="7"><div className="empty-state"><h3>Belum ada opportunity</h3><p>Buat opportunity setelah prospek lolos discovery awal.</p></div></td></tr>}
-            </tbody></table></div>
+        <section className="sv-context-banner"><span className="sv-context-icon"><Icon name="target" size={19}/></span><div><strong>Apa itu Opportunity?</strong><p>Buat setelah Prospek punya kebutuhan nyata, nilai estimasi dan next step. Satu client dapat memiliki beberapa opportunity untuk project/upsell berbeda.</p></div><Link href="/sales-guide">Buka Panduan <Icon name="chevron" size={14}/></Link></section>
+        <section className="panel commercial-toolbar sv-toolbar-modern"><div className="search-box"><Icon name="search" size={17}/><input value={filters.q||''} onChange={e=>change('q',e.target.value)} placeholder="Cari opportunity / perusahaan..."/></div><select value={filters.stage||''} onChange={e=>change('stage',e.target.value)}><option value="">Semua stage</option>{Object.entries(stages).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select><select value={filters.status||''} onChange={e=>change('status',e.target.value)}><option value="">Semua status</option>{Object.entries(statuses).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></section>
+        <section className="panel no-pad sv-data-panel">
+            {opportunities.data.length?<>
+                <div className="clean-table-wrap desktop-only"><table className="clean-table sv-data-table"><thead><tr><th>Opportunity</th><th>Solution</th><th>Stage</th><th>Probability</th><th>Expected</th><th>Next Action</th><th>Owner</th><th/></tr></thead><tbody>{opportunities.data.map(o=><tr key={o.id}><td><Link href={`/opportunities/${o.id}`} className="sv-primary-cell"><strong>{o.name}</strong><small>{o.prospect?.company_name||'—'}</small></Link></td><td><div className="sv-chip-row">{(o.solutions||[]).slice(0,2).map(s=><span className="sv-mini-chip" key={s.id}>{s.name}</span>)}{(o.solutions||[]).length>2&&<span className="sv-mini-chip">+{o.solutions.length-2}</span>}{!(o.solutions||[]).length&&<span className="muted">Belum dipilih</span>}</div></td><td><Badge tone="info">{o.stage_label}</Badge></td><td><strong>{o.probability}%</strong></td><td><strong>{money(o.expected_value)}</strong></td><td><div className="stacked-cell"><strong>{o.next_action||'Belum ada'}</strong><small>{o.next_follow_up_at?dateTime(o.next_follow_up_at):'Belum dijadwalkan'}</small></div></td><td>{o.owner?.name||'Belum diassign'}</td><td><Link className="icon-button" href={`/opportunities/${o.id}`}><Icon name="chevron" size={17}/></Link></td></tr>)}</tbody></table></div>
+                <div className="sv-mobile-data-list mobile-only">{opportunities.data.map(o=><Link href={`/opportunities/${o.id}`} className="sv-mobile-data-card" key={o.id}><div className="sv-mobile-card-head"><div><small>{o.prospect?.company_name||'Client'}</small><strong>{o.name}</strong></div><Badge tone="info">{o.stage_label}</Badge></div><div className="sv-mobile-card-metrics"><span><small>Expected</small><strong>{money(o.expected_value)}</strong></span><span><small>Probability</small><strong>{o.probability}%</strong></span></div><div className="sv-mobile-card-row"><span>Next</span><strong>{o.next_action||'Belum ada'}</strong></div><div className="sv-chip-row">{(o.solutions||[]).slice(0,3).map(s=><span className="sv-mini-chip" key={s.id}>{s.name}</span>)}</div></Link>)}</div>
+            </>:<EmptyState icon="target" title="Belum ada opportunity" description="Buat setelah discovery awal menemukan kebutuhan atau project yang nyata." action={<Link className="btn btn-primary" href="/opportunities/create">Buat Opportunity</Link>}/>} 
         </section>
     </AppLayout>;
 }

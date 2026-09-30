@@ -5,18 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Opportunity extends Model
 {
     public const STAGES = [
-        'qualification'=>'Qualification',
-        'discovery'=>'Discovery',
-        'solution'=>'Solution Fit',
-        'proposal'=>'Proposal',
-        'negotiation'=>'Negotiation',
-        'won'=>'Won',
-        'lost'=>'Lost',
+        'qualification'=>'Qualification','discovery'=>'Discovery','solution'=>'Solution Fit',
+        'proposal'=>'Proposal','negotiation'=>'Negotiation','won'=>'Won','lost'=>'Lost',
     ];
     public const STATUSES = ['open'=>'Open','won'=>'Won','lost'=>'Lost'];
     public const URGENCIES = ['low'=>'Low','medium'=>'Medium','high'=>'High'];
@@ -42,6 +38,11 @@ class Opportunity extends Model
     public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
     public function quotations(): HasMany { return $this->hasMany(Quotation::class); }
     public function deals(): HasMany { return $this->hasMany(Deal::class); }
+    public function solutionItems(): BelongsToMany
+    {
+        return $this->belongsToMany(SolutionCatalogItem::class, 'opportunity_solution_item')
+            ->withPivot(['quantity','notes'])->withTimestamps();
+    }
 
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {

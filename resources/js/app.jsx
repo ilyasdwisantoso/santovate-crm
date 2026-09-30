@@ -12,6 +12,8 @@ import '../css/v40-saas.css';
 import '../css/v4022-v34-landing-restore.css';
 import '../css/typography-motion-v4.css';
 import '../css/finance-batch3.css';
+import '../css/premium-design-system.css';
+import '../css/public-pricing-v1.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
@@ -24,5 +26,5 @@ createInertiaApp({
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);
     },
-    progress: { color: '#4f6eff', showSpinner: false },
+    progress: { color: '#5365ee', showSpinner: false },
 });

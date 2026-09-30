@@ -26,11 +26,12 @@ use App\Http\Controllers\ProspectController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SalesTargetController;
+use App\Http\Controllers\SalesGuideController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\WhatsAppSendController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-Route::get('/',fn()=>Inertia::render('Landing/Home'))->name('home');
+Route::get('/',[PublicController::class,'home'])->name('home');
 Route::get('/pricing',[PublicController::class,'plans'])->name('pricing.index');
 Route::get('/plans',[PublicController::class,'plans'])->name('plans.index');
 Route::get('/business-configurations',[PublicController::class,'configurations'])->name('business-configurations.index');
@@ -51,6 +52,7 @@ Route::middleware('auth')->group(function(){
     Route::middleware('subscription.active')->group(function(){
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');Route::patch('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::get('/dashboard',DashboardController::class)->name('dashboard');
+        Route::get('/sales-guide',[SalesGuideController::class,'index'])->name('sales-guide.index');
         Route::get('/prospects/check-duplicates',[ProspectController::class,'checkDuplicates'])->name('prospects.duplicates');
         Route::patch('/prospects/{prospect}/status',[ProspectController::class,'updateStatus'])->name('prospects.status');Route::resource('prospects',ProspectController::class);Route::post('/prospects/{prospect}/activities',[ActivityController::class,'store'])->name('prospects.activities.store');
         Route::resource('opportunities',OpportunityController::class);
@@ -92,6 +94,8 @@ Route::middleware('auth')->group(function(){
         Route::get('/targets',[SalesTargetController::class,'index'])->name('targets.index');
         Route::post('/notifications/{notification}/read',[NotificationController::class,'read'])->name('notifications.read');Route::post('/notifications/read-all',[NotificationController::class,'readAll'])->name('notifications.read-all');
         Route::middleware('role:admin')->group(function(){
+            Route::post('/sales-guide/solutions',[SalesGuideController::class,'store'])->name('sales-guide.solutions.store');
+            Route::put('/sales-guide/solutions/{solution}',[SalesGuideController::class,'update'])->name('sales-guide.solutions.update');
             Route::put('/targets/{user}',[SalesTargetController::class,'update'])->name('targets.update');Route::put('/follow-up-templates/{template}',[FollowUpTemplateController::class,'update'])->name('follow-up-templates.update');
             Route::get('/imports',[ImportController::class,'index'])->name('imports.index');Route::get('/imports/template',[ImportController::class,'template'])->name('imports.template');Route::get('/imports/sample',[ImportController::class,'sample'])->name('imports.sample');Route::post('/imports/preview',[ImportController::class,'preview'])->name('imports.preview');Route::post('/imports/commit',[ImportController::class,'commit'])->name('imports.commit');Route::get('/imports/{batch}',[ImportController::class,'show'])->name('imports.show');
             Route::resource('products',ProductController::class)->only(['index','store','update','destroy']);
