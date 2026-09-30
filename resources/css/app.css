@@ -71,266 +71,305 @@
 @media(max-width:900px){.commercial-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.commercial-split{grid-template-columns:1fr}.schedule-row{grid-template-columns:1fr 1fr}.schedule-row .icon-button{grid-column:2}.document-upload{grid-template-columns:1fr 1fr}.document-upload .btn{grid-column:1/-1}.commercial-detail-grid{grid-template-columns:1fr}.commercial-detail-grid .span-2{grid-column:auto}}
 @media(max-width:700px){.commercial-toolbar{flex-direction:column;align-items:stretch}.commercial-toolbar input,.commercial-toolbar select{width:100%;min-width:0}.commercial-hero{align-items:flex-start;flex-direction:column}.commercial-hero>div:last-child{text-align:left}.commercial-metrics{grid-template-columns:1fr 1fr}.quote-print-page{padding:20px}.quote-print-page header{flex-direction:column}.quote-print-page header>div:last-child{text-align:left}.quote-print-terms{grid-template-columns:1fr}}
 
-
-/* =============================================================
-   Santovate CRM - Modern Typography Refresh
-   Goals: softer hierarchy, better readability, less rigid weights,
-   system-native variable font stack, no external font dependency.
-   ============================================================= */
+/* === SANTOVATE TYPOGRAPHY V3 START === */
+/*
+   Santovate CRM - Premium Typography System V3
+   Intent:
+   - cleaner SaaS hierarchy
+   - remove the tiny 7.5-10px feeling from operational screens
+   - use bundled Inter Variable for UI and Manrope Variable for display
+   - keep density efficient without looking cramped
+*/
 :root{
-  --font-ui:"Segoe UI Variable Text","SF Pro Text","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --font-display:"Segoe UI Variable Display","SF Pro Display","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --type-body:14.5px;
-  --type-caption:11px;
-  --type-label:11.5px;
-  --type-control:12.5px;
-  --type-nav:13px;
-  --type-card-title:16px;
-  --type-page-title:28px;
-  --type-metric:27px;
+  --font-ui:"Inter Variable","Inter","Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-display:"Manrope Variable","Manrope","Inter Variable","Inter","Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+  --type-micro:11px;
+  --type-caption:11.5px;
+  --type-label:12px;
+  --type-body-sm:12.5px;
+  --type-control:13px;
+  --type-body:14px;
+  --type-nav:13.5px;
+  --type-section:17px;
+  --type-page:29px;
+  --type-metric:29px;
 }
 
 html{
   font-family:var(--font-ui);
-  font-size:var(--type-body);
-  line-height:1.5;
-  letter-spacing:-.005em;
+  font-size:15px;
+  line-height:1.52;
+  letter-spacing:-.008em;
+  font-optical-sizing:auto;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   text-rendering:optimizeLegibility;
 }
 body,button,input,select,textarea{font-family:var(--font-ui)}
-body{font-weight:400}
-button,input,select,textarea{letter-spacing:-.003em}
+body{font-weight:420}
+button,input,select,textarea{letter-spacing:-.008em}
+strong,b{font-weight:650}
 
 /* Display hierarchy */
 .page-heading h1,
-.login-story h1,
-.login-card h2,
-.commercial-hero h2,
-.prospect-hero h2,
-.import-hero-v2 h2{
-  font-family:var(--font-display);
-}
-.page-heading h1{
-  font-size:var(--type-page-title);
-  line-height:1.12;
-  letter-spacing:-.035em;
-  font-weight:700;
-}
-.page-heading p{
-  font-size:13px;
-  line-height:1.55;
-  margin-top:5px;
-  font-weight:400;
-}
-
-/* Brand + navigation */
-.brand strong{font-size:16px;font-weight:700;letter-spacing:-.02em}
-.brand small,.login-brand small{font-size:10.5px;line-height:1.35;letter-spacing:.015em}
-.nav-label{
-  font-size:10px;
-  letter-spacing:.11em;
-  font-weight:700;
-}
-.side-link{
-  min-height:44px;
-  height:auto;
-  padding:10px 12px;
-  font-size:var(--type-nav);
-  line-height:1.25;
-  font-weight:600;
-  letter-spacing:-.012em;
-}
-.sidebar-user-copy strong{font-size:12.5px;font-weight:650;letter-spacing:-.015em}
-.sidebar-user-copy small{font-size:10.5px;line-height:1.35}
-.mobile-brand strong{font-size:14px;font-weight:700}
-
-/* Panels and section headers */
 .panel-head h3,
 .section-head h3,
-.empty-state h3{
+.empty-state h3,
+.commercial-hero h2,
+.prospect-hero h2,
+.import-hero-v2 h2,
+.login-story h1,
+.login-card h2,
+.metric-card strong,
+.followup-summary-card strong,
+.commercial-metrics>.panel strong,
+.quote-summary .quote-summary-total strong{
   font-family:var(--font-display);
-  font-weight:680;
-  letter-spacing:-.025em;
+  font-optical-sizing:auto;
 }
-.panel-head h3{font-size:17px;line-height:1.25}
-.section-head h3{font-size:16px;line-height:1.25}
-.section-head p{font-size:11.5px;line-height:1.55;margin-top:5px}
-.eyebrow{
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:.105em;
-  line-height:1.3;
-}
-.count-bubble{font-size:11px;font-weight:700}
 
-/* Buttons */
+.page-heading h1{
+  margin:0;
+  font-size:var(--type-page);
+  line-height:1.12;
+  letter-spacing:-.042em;
+  font-weight:690;
+}
+.page-heading p{
+  margin:6px 0 0;
+  font-size:13px;
+  line-height:1.58;
+  color:var(--muted);
+  font-weight:420;
+}
+
+/* Brand and navigation */
+.brand strong{font-family:var(--font-display);font-size:16.5px;font-weight:700;letter-spacing:-.03em}
+.brand small,.login-brand small{font-size:11px;line-height:1.4;letter-spacing:.01em}
+.nav-label{font-size:10.5px;line-height:1.25;letter-spacing:.115em;font-weight:700}
+.side-link{
+  min-height:44px;height:auto;padding:10px 12px;
+  font-size:var(--type-nav);line-height:1.25;font-weight:560;letter-spacing:-.015em;
+}
+.side-link.active{font-weight:650}
+.sidebar-user-copy strong{font-size:12.5px;font-weight:620;letter-spacing:-.015em}
+.sidebar-user-copy small{font-size:11px;line-height:1.35}
+.mobile-brand strong{font-family:var(--font-display);font-size:14.5px;font-weight:690}
+
+/* Section and panel hierarchy */
+.panel-head h3{font-size:17.5px;line-height:1.28;font-weight:670;letter-spacing:-.028em}
+.section-head h3{font-size:16.5px;line-height:1.3;font-weight:660;letter-spacing:-.025em}
+.section-head p,.panel-head p{font-size:12px;line-height:1.55}
+.eyebrow{font-size:10.5px;line-height:1.25;font-weight:720;letter-spacing:.105em}
+.count-bubble{font-size:11px;font-weight:680}
+.muted{line-height:1.5}
+
+/* Buttons / actionable controls */
 .btn{
   min-height:40px;
-  font-size:12px;
-  line-height:1.2;
-  font-weight:650;
-  letter-spacing:-.008em;
+  padding-left:15px;padding-right:15px;
+  font-size:12.5px;line-height:1.15;font-weight:620;letter-spacing:-.012em;
 }
-.btn-lg{min-height:46px;font-size:13px}
-.text-link{font-size:11.5px;font-weight:650}
+.btn-lg{min-height:46px;font-size:13.5px;font-weight:640}
+.btn-sm{min-height:34px;font-size:11.5px}
+.text-link{font-size:12px;font-weight:620;letter-spacing:-.01em}
+.icon-button{font-size:12px}
 
-/* Dashboard metrics */
-.metric-card{min-height:112px;padding:17px 16px;gap:13px}
-.metric-card span{
-  font-size:11px;
-  line-height:1.3;
-  font-weight:600;
-  letter-spacing:-.01em;
-}
+/* Generic badges / metadata */
+.badge{font-size:10.5px;line-height:1.2;font-weight:660;letter-spacing:-.005em}
+.score-pill{font-size:11.5px;font-weight:680}
+.avatar-md{font-size:10.5px}.avatar-sm{font-size:10px}
+.flash{font-size:12px;font-weight:560;line-height:1.45}
+.empty-state p,.mini-empty{font-size:12px;line-height:1.6}
+
+/* Dashboard */
+.metric-card{min-height:118px;padding:18px 17px;gap:13px}
+.metric-card span{font-size:11.5px;line-height:1.32;font-weight:560;letter-spacing:-.012em}
 .metric-card strong{
-  font-family:var(--font-display);
-  font-size:var(--type-metric);
-  line-height:1.05;
-  letter-spacing:-.045em;
-  font-weight:720;
-  margin:6px 0 5px;
+  margin:7px 0 5px;
+  font-size:var(--type-metric);line-height:1.02;font-weight:690;letter-spacing:-.048em;
 }
-.metric-card small{
-  font-size:10.5px;
-  line-height:1.45;
-  font-weight:400;
-}
-.score-ring span,.score-ring.lg span{font-size:11.5px;font-weight:700}
-.target-line-copy span,.target-line-copy strong{font-size:10.5px}
+.metric-card small{font-size:11px;line-height:1.48;font-weight:420}
+.score-ring span,.score-ring.lg span{font-size:11.5px;font-weight:650}
+.target-line-copy span,.target-line-copy strong{font-size:11px;line-height:1.35}
 .target-line-copy strong{font-weight:650}
-.target-footer{font-size:10.5px;line-height:1.45}
-.team-performance-copy strong{font-size:12px;font-weight:650}
-.team-performance-copy span,.team-performance-row>b{font-size:10.5px}
-.funnel-item span{font-size:10px;line-height:1.3}
-.funnel-item>div{font-size:12px;font-weight:700}
+.target-footer{font-size:11px;line-height:1.48}
+.team-performance-copy strong{font-size:12.5px;font-weight:640}
+.team-performance-copy span,.team-performance-row>b{font-size:11px;line-height:1.38}
+.funnel-item span{font-size:11px;line-height:1.35}
+.funnel-item>div{font-size:12.5px;font-weight:650}
 
-/* Tables */
+/* Tables - readable but still compact */
 .clean-table th,.prospect-table th{
-  font-size:10px;
-  line-height:1.25;
-  letter-spacing:.06em;
-  font-weight:700;
-  padding:11px 13px;
+  padding:12px 13px;
+  font-size:10.5px;line-height:1.3;font-weight:700;letter-spacing:.055em;
 }
-.clean-table td,.prospect-table td{
-  font-size:12px;
-  line-height:1.45;
-  padding:13px;
-}
-.company-cell strong{font-size:12.5px;line-height:1.3;font-weight:650}
-.company-cell small{font-size:10.5px;line-height:1.35;margin-top:3px}
-.stacked-cell strong{font-size:12px;font-weight:650}
-.stacked-cell small{font-size:10px;line-height:1.35}
-.cell-sub{font-size:10px;line-height:1.35}
-.table-footer{font-size:11px}
+.clean-table td,.prospect-table td{padding:13px;font-size:12.5px;line-height:1.48}
+.company-cell strong{font-size:13px;line-height:1.35;font-weight:630}
+.company-cell small{font-size:11px;line-height:1.4;margin-top:3px}
+.stacked-cell strong{font-size:12.5px;line-height:1.35;font-weight:620}
+.stacked-cell small,.cell-sub{font-size:11px;line-height:1.38}
+.user-cell>div strong{font-size:12.5px;font-weight:630}
+.user-cell>div span,.user-cell>span{font-size:11px;line-height:1.35}
+.table-footer{font-size:11.5px}
+.pagination a,.pagination span{font-size:11.5px;font-weight:580}
 
-/* Forms */
-.field>span,.activity-row label>span{
-  font-size:11px;
-  line-height:1.3;
-  font-weight:650;
-  color:#44554c;
+/* Filters and forms */
+.filters select,.period-bar select,.search-box input,
+.commercial-toolbar input,.commercial-toolbar select{
+  font-size:13px;line-height:1.4;
+}
+.filter-check{font-size:11.5px}
+.field>span,.activity-row label>span,.commit-form label>span{
   margin-bottom:7px;
+  font-size:11.5px;line-height:1.3;font-weight:620;letter-spacing:-.006em;
+  color:#42544a;
 }
 .field input,.field select,.field textarea,
-.activity-form input,.activity-form select,.activity-form textarea,
-.commit-form select{
-  font-size:12.5px;
-  line-height:1.45;
+.activity-form input,.activity-form select,.activity-form textarea,.commit-form select,
+.schedule-row input,.schedule-row select,.document-upload input,.document-upload select{
+  font-size:13px;line-height:1.45;
 }
-.field input,.field select,.activity-form input,.activity-form select,.commit-form select{height:42px}
+.field input,.field select,.activity-form input,.activity-form select,.commit-form select{height:43px}
 .field textarea,.activity-form textarea{padding:11px 12px}
-.field-error,.field-hint{font-size:10.5px;line-height:1.4;margin-top:5px}
-.check-line span{font-size:11.5px!important;line-height:1.4;font-weight:500!important}
+.field-error,.field-hint{font-size:11px;line-height:1.42;margin-top:5px}
+.form-save-note{font-size:11px;line-height:1.45}
+.toggle b{font-size:11.5px}
+.check-line span{font-size:11.5px!important;line-height:1.42;font-weight:520!important}
 
-/* Badges and supporting text */
-.badge{font-size:10px;font-weight:700;letter-spacing:-.002em}
-.score-pill{font-size:11px;font-weight:700}
-.empty-state p,.mini-empty{font-size:11.5px;line-height:1.6}
-.followup-item strong{font-size:12px;font-weight:650}
-.followup-item span{font-size:10.5px;line-height:1.4}
+/* Prospect detail / scoring */
+.section-number{font-size:11px;font-weight:700}
+.score-summary>div span{font-size:11px}
+.priority-large{font-size:11.5px;font-weight:650}
+.score-picker strong{font-size:12px}.score-picker small{font-size:11px}
+.score-options button{font-size:11.5px}
+.score-legend{font-size:11px;line-height:1.45}
+.prospect-hero p{font-size:12.5px;line-height:1.55}
+.hero-score strong small{font-size:11px}.hero-score>span{font-size:10.5px}
+.detail-info-grid span{font-size:10.5px;font-weight:650;letter-spacing:.045em}
+.detail-info-grid strong{font-size:12.5px;line-height:1.45;font-weight:620}
+.timeline-top strong{font-size:12px;font-weight:630}.timeline-top time{font-size:10.5px}
+.timeline-item p{font-size:12px;line-height:1.52}.timeline-item small{font-size:10.5px;line-height:1.4}
+.contact-card strong{font-size:12.5px;font-weight:630}.contact-card span{font-size:11px;line-height:1.4}
+.quick-action span{font-size:10.5px}
+.followup-box span{font-size:10.5px}.followup-box strong{font-size:12px;font-weight:630}
+.source-box>span,.notes-box>span{font-size:10.5px;font-weight:650;letter-spacing:.045em}
+.source-box strong{font-size:12px}.source-box a{font-size:11px}.notes-box p{font-size:11.5px;line-height:1.55}
 
-/* Commercial / Batch 2 pages */
-.commercial-toolbar input,.commercial-toolbar select{font-size:12.5px}
-.commercial-hero h2{
-  font-size:26px;
-  line-height:1.15;
-  letter-spacing:-.035em;
-  font-weight:700;
-}
-.commercial-hero p{font-size:12.5px;line-height:1.55}
+/* Pipeline / kanban / target */
+.pipeline-summary span{font-size:10.5px}.pipeline-summary p{font-size:11.5px;line-height:1.5}
+.kanban-column>header strong{font-size:12px;font-weight:650}
+.kanban-column>header b,.kanban-column>header small{font-size:10.5px}
+.kanban-card>p{font-size:11.5px;line-height:1.48}
+.kanban-value span{font-size:10.5px}.kanban-value strong{font-size:12px;font-weight:640}
+.kanban-owner>span,.kanban-owner select{font-size:10.5px}.kanban-empty{font-size:11px}
+.target-explainer p{font-size:11.5px;line-height:1.55}
+.weight-chips span{font-size:10.5px}.period-bar strong{font-size:11.5px}
+.target-metric span{font-size:11px}.target-metric strong{font-size:12px;font-weight:650}.target-metric small{font-size:10.5px}
+.workload-strip>div span{font-size:10.5px}.workload-strip>div strong{font-size:12px;font-weight:640}
+
+/* Import screens */
+.modal-head p{font-size:11.5px;line-height:1.45}
+.import-hero-v2 p{font-size:12.5px;line-height:1.55}
+.step-chip{font-size:10.5px;font-weight:680}
+.upload-zone p{font-size:11.5px;line-height:1.5}
+.number-list>li>span{font-size:10.5px}.number-list strong{font-size:12px}.number-list p{font-size:11.5px;line-height:1.5}
+.admin-note p{font-size:11.5px;line-height:1.5}
+.import-stat-grid span{font-size:10.5px}.preview-toolbar p{font-size:11.5px}
+.import-result-card p,.error-list strong,.error-list p,.alert,.sheet-head small{font-size:11.5px;line-height:1.45}
+.sheet-menu strong{font-size:12px}.sheet-menu small{font-size:11px}.bottom-link{font-size:10.5px}
+
+/* Assignment / notifications */
+.notification-trigger>span{font-size:10px}
+.notification-head small,.notification-head button{font-size:11px}
+.notification-item strong{font-size:12px;font-weight:630}
+.notification-item small{font-size:11px;line-height:1.4}.notification-item em{font-size:10.5px}
+.notification-empty strong{font-size:12px}.notification-empty small{font-size:11px}
+.assignment-head p{font-size:11.5px;line-height:1.5}
+.assignment-mode-card strong,.assignment-config-title strong{font-size:12px;font-weight:630}
+.assignment-mode-card small,.assignment-config-title small{font-size:11px;line-height:1.4}
+.assignment-config-title>span{font-size:11px}
+.sales-check-card strong{font-size:12px;font-weight:630}.sales-check-card small{font-size:10.5px}
+.assignment-summary-strip span{font-size:10.5px}.assignment-empty{font-size:11px}
+.distribution-panel .panel-head p{font-size:11.5px}
+.distribution-card>div strong{font-size:12px;font-weight:630}.distribution-card>div small{font-size:10.5px}
+.distribution-card>span:last-child{font-family:var(--font-display);font-size:20px;font-weight:700}
+.distribution-card>span:last-child small{font-size:10px}.import-filter-banner strong{font-size:12px}.import-filter-banner small{font-size:10.5px}
+
+/* Follow-up module */
+.followup-summary-card small{font-size:11px;font-weight:600}
+.followup-summary-card strong{font-size:27px;letter-spacing:-.04em;font-weight:690}
+.followup-summary-card p{font-size:10.5px;line-height:1.45}
+.followup-tabs button{font-size:11.5px;font-weight:620}.followup-tabs button b{font-size:10px}
+.followup-tab-copy h3{font-family:var(--font-display);font-size:16px;font-weight:660;letter-spacing:-.02em}
+.followup-tab-copy p{font-size:11.5px;line-height:1.5}
+.followup-age strong{font-size:11.5px}.followup-age small{font-size:10.5px}
+.composer-recipient span{font-size:10.5px}.composer-recipient strong{font-size:12px}
+.composer-confirmation strong{font-size:12px}.composer-confirmation small{font-size:10.5px;line-height:1.45}
+.followup-template-panel .panel-head p{font-size:11.5px}
+.template-type{font-size:10px;font-weight:650}.template-card h4{font-size:13px}.template-card p{font-size:11px;line-height:1.52}
+.template-variables{font-size:10.5px}.template-variables code{font-size:10px}
+.followup-mobile-info small{font-size:10px}.followup-mobile-info strong{font-size:11.5px}
+
+/* Commercial foundation */
+.commercial-hero h2{font-size:27px;line-height:1.16;letter-spacing:-.04em;font-weight:690}
+.commercial-hero p{font-size:12.5px;line-height:1.56}
 .commercial-hero>div:last-child small,.commercial-hero>div:last-child span{font-size:10.5px}
-.commercial-hero>div:last-child strong{
-  font-family:var(--font-display);
-  font-size:27px;
-  letter-spacing:-.04em;
-  font-weight:720;
-}
-.commercial-detail-grid span{
-  font-size:10px;
-  font-weight:650;
-  letter-spacing:.055em;
-}
-.commercial-detail-grid p{font-size:12px;line-height:1.6}
-.commercial-list strong{font-size:12px;font-weight:650}
-.commercial-list small{font-size:10.5px;line-height:1.4}
-.commercial-list b{font-size:12.5px;font-weight:700}
-.commercial-split h4{font-size:13px;font-weight:650}
-.commercial-metrics>.panel span{font-size:10px;font-weight:650;letter-spacing:.055em}
-.commercial-metrics>.panel strong{
-  font-family:var(--font-display);
-  font-size:22px;
-  line-height:1.15;
-  font-weight:700;
-  letter-spacing:-.035em;
-}
-.quote-item-head strong{font-size:12px;font-weight:650}
-.quote-summary>div span{font-size:11.5px}
-.quote-summary>div strong{font-size:12.5px;font-weight:650}
-.quote-summary .quote-summary-total strong{font-size:18px;font-weight:720;letter-spacing:-.025em}
-.quote-summary p{font-size:10.5px;line-height:1.55}
-.quotation-totals>div{font-size:11.5px}
-.quotation-totals .grand{font-size:14px;font-weight:650}
-.schedule-row input,.schedule-row select,.document-upload input,.document-upload select{font-size:11.5px}
-.activity-insights span{font-size:10.5px;line-height:1.4}
+.commercial-hero>div:last-child strong{font-family:var(--font-display);font-size:29px;font-weight:700;letter-spacing:-.045em}
+.commercial-detail-grid span{font-size:10.5px;font-weight:650;letter-spacing:.05em}
+.commercial-detail-grid p{font-size:12px;line-height:1.58}
+.commercial-list strong{font-size:12.5px;font-weight:630}.commercial-list small{font-size:10.5px;line-height:1.4}.commercial-list b{font-size:13px;font-weight:670}
+.commercial-split h4{font-family:var(--font-display);font-size:14px;font-weight:650}
+.commercial-metrics>.panel span{font-size:10.5px;font-weight:650;letter-spacing:.05em}
+.commercial-metrics>.panel strong{font-size:23px;line-height:1.12;font-weight:690;letter-spacing:-.038em}
+.quote-item-head strong{font-size:12.5px;font-weight:630}
+.quote-summary>div span{font-size:11.5px}.quote-summary>div strong{font-size:12.5px;font-weight:630}
+.quote-summary .quote-summary-total strong{font-size:19px;font-weight:700;letter-spacing:-.025em}
+.quote-summary p{font-size:11px;line-height:1.55}
+.quotation-totals>div{font-size:11.5px}.quotation-totals .grand{font-size:14px;font-weight:650}
+.activity-insights span{font-size:11px;line-height:1.45}
 
 /* Login */
-.login-story h1{
-  font-size:50px;
-  line-height:1.03;
-  letter-spacing:-.045em;
-  font-weight:700;
-}
-.login-story>p{font-size:15px;line-height:1.75;font-weight:400}
-.login-proof-grid strong{font-size:12px;font-weight:650}
-.login-proof-grid span{font-size:11px;line-height:1.55}
-.login-card h2{font-size:25px;font-weight:700;letter-spacing:-.035em}
+.login-story h1{font-size:52px;line-height:1.025;letter-spacing:-.052em;font-weight:680}
+.login-story>p{font-size:15px;line-height:1.75;font-weight:420}
+.login-proof-grid strong{font-size:12px;font-weight:640}.login-proof-grid span{font-size:11.5px;line-height:1.55}
+.login-foot{font-size:10.5px}
+.login-card h2{font-size:26px;line-height:1.16;font-weight:680;letter-spacing:-.04em}
 .login-card-head p{font-size:12.5px;line-height:1.55}
-.input-icon input{font-size:13px}
-.remember-row{font-size:11.5px}
-.security-note{font-size:10.5px}
+.input-icon input{font-size:13px}.remember-row{font-size:11.5px}.security-note{font-size:10.5px;line-height:1.45}
+.login-mobile-brand small{font-size:10.5px}
 
-/* Mobile: retain comfortable reading sizes without bloating layout */
+/* Quote print remains deliberately denser */
+.quote-print-page{font-family:var(--font-ui)}
+.quote-print-brand,.quote-print-page header h1,.quote-print-client h2{font-family:var(--font-display)}
+.quote-print-page header span,.quote-print-client span,.quote-print-terms span{font-size:10.5px}
+.quote-print-page header p,.quote-print-client p{font-size:11.5px}
+.quote-print-page th,.quote-print-page td{font-size:10.5px;line-height:1.45}
+.quote-print-summary>div,.quote-print-terms p{font-size:10.5px}.quote-print-page footer{font-size:9.5px}
+
+/* Responsive */
+@media(max-width:900px){
+  .page-heading h1{font-size:27px}
+  .commercial-hero h2{font-size:25px}
+}
 @media(max-width:700px){
-  html{font-size:14px}
-  .page-heading h1{font-size:23px;letter-spacing:-.03em}
+  html{font-size:14.5px}
+  .page-heading h1{font-size:24px;letter-spacing:-.035em}
   .page-heading p{font-size:12px}
-  .side-link{font-size:13px}
-  .metric-card span{font-size:10.5px}
-  .metric-card strong{font-size:23px}
-  .metric-card small{font-size:10px}
-  .clean-table td,.prospect-table td{font-size:11.5px}
-  .mobile-prospect-meta span{font-size:9.5px;letter-spacing:.04em}
-  .mobile-prospect-meta strong{font-size:11.5px;line-height:1.4}
-  .quick-action span{font-size:9.5px}
-  .login-card h2{font-size:23px}
+  .side-link{font-size:13.5px}
+  .metric-card span{font-size:11px}.metric-card strong{font-size:25px}.metric-card small{font-size:10.5px}
+  .clean-table td,.prospect-table td{font-size:12px}
+  .mobile-prospect-meta span{font-size:10.5px;letter-spacing:.035em}
+  .mobile-prospect-meta strong{font-size:12px;line-height:1.4}
+  .quick-action span{font-size:10px}
+  .followup-summary-card p{font-size:10px}
+  .followup-mobile-actions .btn{font-size:11px}
+  .login-card h2{font-size:24px}
+  .login-story h1{font-size:39px}
 }
-
 @media(max-width:430px){
-  .metric-card strong{font-size:22px}
-  .commercial-hero h2{font-size:23px}
+  .metric-card strong{font-size:24px}
+  .commercial-hero h2{font-size:24px}
+  .btn{font-size:12px}
 }
-
-
+/* === SANTOVATE TYPOGRAPHY V3 END === */
