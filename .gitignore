@@ -18,3 +18,13 @@ yarn-error.log
 /.vscode
 /storage/patch-backups
 /storage/logs/*.log
+# Santovate deployment automation
+/public/build
+/public/build-*
+/public/hot
+/_patch_backup/
+/Santovate-PUBLIC-BUILD-*.zip
+/Santovate-PUBLIC-BUILD-*.tar.gz
+/Santovate-CRM-*.zip
+/storage/app/deploy/
+/storage/logs/*.log

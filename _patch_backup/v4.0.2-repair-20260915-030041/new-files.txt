@@ -1,2 +1,0 @@
-database\migrations\2026_09_15_001000_add_business_theme_and_repair_subscription_dates.php
-database\seeders\DemoAccountSeeder.php
