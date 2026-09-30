@@ -90,7 +90,7 @@ function FollowUpMiniCard({ prospect }) {
     </Link>;
 }
 
-export default function Dashboard({ stats, pipeline, followUps, topProspects, salesPerformance, teamPerformance }) {
+export default function Dashboard({ stats, pipeline, followUps, topProspects, salesPerformance, teamPerformance, financeSummary }) {
     const { auth } = usePage().props;
     const user = auth.user;
     const firstName = user.name?.split(' ')[0] || user.name;
@@ -116,6 +116,15 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
             <MetricCard label="Quotation Value" value={`Rp${compactMoney(stats.quotation_value || 0)}`} helper="approved / sent / accepted" icon="briefcase" accent="violet" />
             <MetricCard label="Actual Deal" value={`Rp${compactMoney(stats.actual_deal_value || 0)}`} helper={`${stats.won_deals || 0} deal won`} icon="check" accent="green" />
             <MetricCard label="Conversion" value={`${stats.conversion_rate || 0}%`} helper="won / closed opportunities" icon="pipeline" accent="amber" />
+        </section>
+
+        <section className="metric-grid finance-metric-grid dashboard-finance-metrics">
+            <MetricCard label="Invoiced" value={`Rp${compactMoney(financeSummary?.invoiced || 0)}`} helper="commercial invoice issued" icon="briefcase" accent="blue" />
+            <MetricCard label="Paid by Client" value={`Rp${compactMoney(financeSummary?.paid_by_client || 0)}`} helper="net verified payment" icon="check" accent="green" />
+            <MetricCard label="Outstanding" value={`Rp${compactMoney(financeSummary?.outstanding || 0)}`} helper={`${financeSummary?.overdue_count || 0} invoice overdue`} icon="alert" accent="red" />
+            <MetricCard label="Potential Commission" value={`Rp${compactMoney(financeSummary?.potential_commission || 0)}`} helper="25% commissionable value" icon="target" accent="violet" />
+            <MetricCard label="Earned Commission" value={`Rp${compactMoney(financeSummary?.earned_commission || 0)}`} helper="from verified client payment" icon="target" accent="amber" />
+            <MetricCard label="Commission Paid" value={`Rp${compactMoney(financeSummary?.commission_paid || 0)}`} helper="recorded payout" icon="check" accent="green" />
         </section>
 
         <section className="dashboard-layout dashboard-layout-v24">

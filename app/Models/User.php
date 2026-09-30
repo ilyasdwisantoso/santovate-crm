@@ -30,6 +30,10 @@ class User extends Authenticatable
     public function assignedProspects(): HasMany { return $this->hasMany(Prospect::class, 'assigned_to'); }
     public function createdProspects(): HasMany { return $this->hasMany(Prospect::class, 'created_by'); }
     public function salesTargets(): HasMany { return $this->hasMany(SalesTarget::class); }
+    public function commissions(): HasMany { return $this->hasMany(SalesCommission::class); }
+
     public function isAdmin(): bool { return $this->role === 'admin'; }
+    public function isFinance(): bool { return $this->role === 'finance'; }
     public function isPlatformAdmin(): bool { return $this->is_platform_admin === true; }
+    public function canManageFinance(): bool { return $this->isAdmin() || $this->isFinance(); }
 }

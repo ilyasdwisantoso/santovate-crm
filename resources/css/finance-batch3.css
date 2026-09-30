@@ -1,0 +1,38 @@
+/* Santovate CRM Batch 3 - Finance, Payment, Commission */
+.finance-metric-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:14px}
+.finance-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.finance-toolbar input{flex:1;min-width:220px}
+.finance-toolbar select{min-width:170px}
+.finance-table td{vertical-align:middle}
+.finance-form-layout{max-width:1080px}
+.finance-total-preview{align-self:end;min-height:43px;border:1px solid var(--line);border-radius:11px;padding:8px 12px;background:var(--surface-2);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.finance-total-preview span{font-size:11px;color:var(--muted);font-weight:600}
+.finance-total-preview strong{font-size:15px}
+.finance-invoice-metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:14px}
+.finance-invoice-metrics>.panel{display:grid;gap:7px;min-height:105px}
+.finance-invoice-metrics>.panel>span{font-size:10.5px;color:var(--muted);font-weight:650;letter-spacing:.04em;text-transform:uppercase}
+.finance-invoice-metrics>.panel>strong{font-size:24px;letter-spacing:-.04em}
+.finance-detail-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.55fr);gap:14px}
+.finance-detail-main{display:grid;gap:14px}
+.finance-detail-side{min-width:0}
+.finance-payment-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.finance-helper{margin:-4px 0 16px;color:var(--muted);font-size:11.5px;line-height:1.55}
+.finance-ar-stack{display:grid;gap:10px;margin:18px 0}
+.finance-ar-stack>div{display:flex;justify-content:space-between;gap:12px;padding-bottom:9px;border-bottom:1px solid var(--line);font-size:11.5px}
+.finance-ar-stack>div strong{font-weight:680}
+.finance-ar-stack>.grand{padding:11px 12px;border:0;border-radius:12px;background:var(--surface-3);font-size:13px}
+.finance-detail-side .btn+.btn{margin-top:8px}
+.finance-commission-metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:14px}
+.alert-danger{background:var(--red-soft);border:1px solid #f2d4d7;color:#983e46;padding:11px 13px;border-radius:11px;margin:12px 0;font-size:11.5px}
+.finance-print-page{max-width:900px;margin:0 auto;padding:44px;background:#fff;color:#17211c;font-family:var(--font-santovate,var(--font-ui))}
+.finance-print-actions{display:flex;justify-content:flex-end;margin-bottom:24px}.finance-print-actions button{border:1px solid #dfe5e1;background:#fff;padding:9px 13px;border-radius:9px}
+.finance-print-page header{display:flex;justify-content:space-between;gap:24px;border-bottom:2px solid #17211c;padding-bottom:20px;margin-bottom:26px}.finance-print-page header>div:last-child{text-align:right}
+.finance-print-brand{display:block;font-size:20px;letter-spacing:-.03em}.finance-print-page header span{display:block;color:#69766f;font-size:10px;margin-top:4px;text-transform:uppercase;letter-spacing:.08em}.finance-print-page header h1{font-size:27px;margin:0;letter-spacing:-.04em}.finance-print-page header p{margin:5px 0 0;font-size:11px}
+.finance-print-client{display:grid;grid-template-columns:1.3fr .8fr .7fr;gap:24px;margin-bottom:25px}.finance-print-client span{display:block;color:#77837d;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.finance-print-client h2{margin:0 0 7px;font-size:18px}.finance-print-client p{font-size:11px;line-height:1.55;margin:4px 0}
+.finance-print-page table{width:100%;border-collapse:collapse}.finance-print-page th{text-align:left;border-bottom:1px solid #cfd8d3;padding:10px;font-size:9px;text-transform:uppercase;letter-spacing:.07em}.finance-print-page td{border-bottom:1px solid #e4e9e6;padding:12px 10px;font-size:11px}.finance-print-page td small{display:block;color:#6f7b74;margin-top:4px;white-space:pre-wrap}.finance-print-page th:last-child,.finance-print-page td:last-child{text-align:right}
+.finance-print-summary{margin:22px 0 0 auto;width:330px}.finance-print-summary>div{display:flex;justify-content:space-between;padding:6px 0;font-size:11px}.finance-print-summary .grand{border-top:2px solid #17211c;padding-top:10px;font-size:14px}
+.finance-print-terms{margin-top:28px;border-top:1px solid #dfe5e1;padding-top:18px}.finance-print-terms span{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#75827b}.finance-print-terms p{font-size:11px;white-space:pre-wrap;line-height:1.6}.finance-print-page footer{margin-top:36px;border-top:1px solid #e1e6e3;padding-top:12px;font-size:9.5px;color:#7b877f}
+@media print{body{background:#fff}.finance-print-actions{display:none}.finance-print-page{max-width:none;padding:0}.finance-print-page tr{page-break-inside:avoid}}
+@media(max-width:1100px){.finance-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.finance-detail-layout{grid-template-columns:1fr}.finance-detail-side .sticky-panel{position:static}.finance-payment-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.finance-metric-grid,.finance-invoice-metrics,.finance-commission-metrics{grid-template-columns:1fr 1fr}.finance-toolbar{flex-direction:column;align-items:stretch}.finance-toolbar input,.finance-toolbar select{width:100%;min-width:0}.finance-print-page{padding:20px}.finance-print-page header,.finance-print-client{grid-template-columns:1fr;display:grid}.finance-print-page header>div:last-child{text-align:left}.finance-print-summary{width:100%}}
+@media(max-width:430px){.finance-metric-grid,.finance-invoice-metrics,.finance-commission-metrics{grid-template-columns:1fr}}

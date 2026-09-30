@@ -47,7 +47,7 @@ class UserController extends Controller
 
         User::create($data);
 
-        return redirect()->route('admin.users.index')->with('success', 'Akun Account Executive berhasil dibuat.');
+        return redirect()->route('admin.users.index')->with('success', 'Akun user berhasil dibuat.');
     }
 
     public function edit(Request $request, User $user): Response
@@ -67,19 +67,14 @@ class UserController extends Controller
         $data = $request->validate([
             'name'=>['required','string','max:255'],
             'email'=>['required','email','max:255',Rule::unique('users','email')->ignore($user->id)],
-            'role'=>['required',Rule::in(['admin','sales'])],
+            'role'=>['required',Rule::in(['admin','sales','finance'])],
             'is_active'=>['nullable','boolean'],
             'password'=>['nullable','string','min:8','confirmed'],
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
-        if (empty($data['password'])) {
-            unset($data['password']);
-        }
+        if (empty($data['password'])) unset($data['password']);
 
-        // The platform-admin account is a control-plane credential. It may be
-        // edited by another platform admin, but must not be demoted/deactivated
-        // accidentally from the ordinary tenant-user form.
         if ($user->isPlatformAdmin()) {
             $data['role'] = 'admin';
             $data['is_active'] = true;
@@ -95,7 +90,7 @@ class UserController extends Controller
         return $request->validate([
             'name'=>['required','string','max:255'],
             'email'=>['required','email','max:255','unique:users,email'],
-            'role'=>['required',Rule::in(['admin','sales'])],
+            'role'=>['required',Rule::in(['admin','sales','finance'])],
             'password'=>['required','string','min:8','confirmed'],
             'is_active'=>['nullable','boolean'],
         ]);
@@ -104,9 +99,6 @@ class UserController extends Controller
     private function assertEditableUser(Request $request, User $user): void
     {
         abort_unless((int) $user->organization_id === (int) $request->user()->organization_id, 403);
-
-        if ($user->isPlatformAdmin()) {
-            abort_unless($request->user()->isPlatformAdmin(), 403);
-        }
+        if ($user->isPlatformAdmin()) abort_unless($request->user()->isPlatformAdmin(), 403);
     }
 }

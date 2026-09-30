@@ -16,6 +16,8 @@ class Organization extends Model
     public function prospects(): HasMany { return $this->hasMany(Prospect::class); }
     public function products(): HasMany { return $this->hasMany(Product::class); }
     public function subscriptions(): HasMany { return $this->hasMany(Subscription::class); }
+    public function commercialInvoices(): HasMany { return $this->hasMany(CommercialInvoice::class); }
+    public function salesCommissions(): HasMany { return $this->hasMany(SalesCommission::class); }
     public function whatsappChannel(): HasOne { return $this->hasOne(WhatsAppChannel::class); }
     public function activeSubscription(): ?Subscription
     {

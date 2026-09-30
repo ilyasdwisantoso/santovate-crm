@@ -1,4 +1,4 @@
-﻿import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../Components/Icon';
 import Flash from '../Components/Flash';
@@ -10,6 +10,7 @@ const nav = [
     { href: '/opportunities', label: 'Opportunities', icon: 'target', match: (u) => u.startsWith('/opportunities') },
     { href: '/quotations', label: 'Quotations', icon: 'briefcase', match: (u) => u.startsWith('/quotations') },
     { href: '/deals', label: 'Deals', icon: 'check', match: (u) => u.startsWith('/deals') },
+    { href: '/finance', label: 'Finance', icon: 'briefcase', match: (u) => u.startsWith('/finance') },
     { href: '/follow-ups', label: 'Follow Up', icon: 'whatsapp', match: (u) => u.startsWith('/follow-ups') },
     { href: '/pipeline', label: 'Pipeline', icon: 'pipeline', match: (u) => u.startsWith('/pipeline') },
     { href: '/targets', label: 'Target AE', icon: 'target', match: (u) => u.startsWith('/targets') },
@@ -126,7 +127,7 @@ function MobileSidebar({ user, url, notifications, open, onClose, onNotification
                     />
                     <div>
                         <strong>{user.name}</strong>
-                        <small>{user.job_title || (user.is_admin ? 'Administrator' : 'Account Executive')}</small>
+                        <small>{user.job_title || (user.is_admin ? 'Administrator' : user.is_finance ? 'Finance' : 'Account Executive')}</small>
                     </div>
                 </div>
 
@@ -164,8 +165,8 @@ function MobileSidebar({ user, url, notifications, open, onClose, onNotification
                             <Link href="/admin/users" onClick={onClose} className={`mobile-sidebar-link mobile-tone-4 ${url.startsWith('/admin/users') ? 'active' : ''}`}>
                                 <span className="mobile-sidebar-link-icon"><Icon name="users" size={19}/></span>
                                 <span className="mobile-sidebar-link-copy">
-                                    <strong>Tim Account Executive</strong>
-                                    <small>Kelola user dan assignment AE</small>
+                                    <strong>Tim & Access</strong>
+                                    <small>Kelola role, access, dan assignment</small>
                                 </span>
                                 <Icon name="chevron" size={17}/>
                             </Link>
@@ -287,7 +288,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
                             <NavLink
                                 item={{
                                     href: '/admin/users',
-                                    label: 'Tim Account Executive',
+                                    label: 'Tim & Access',
                                     icon: 'users',
                                     match: (u) => u.startsWith('/admin/users'),
                                 }}
@@ -311,7 +312,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
                         />
                         <div className="sidebar-user-copy">
                             <strong>{user.name}</strong>
-                            <small>{user.job_title || (user.is_admin ? 'Administrator' : 'Account Executive')}</small>
+                            <small>{user.job_title || (user.is_admin ? 'Administrator' : user.is_finance ? 'Finance' : 'Account Executive')}</small>
                         </div>
                     </Link>
                     <button className="icon-button ghost" onClick={logout} title="Keluar">

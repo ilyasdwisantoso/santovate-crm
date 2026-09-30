@@ -12,6 +12,11 @@ use App\Http\Controllers\FollowUpTemplateController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DealController;
+use App\Http\Controllers\CommercialPaymentResultController;
+use App\Http\Controllers\Finance\CommissionController as FinanceCommissionController;
+use App\Http\Controllers\Finance\FinanceController;
+use App\Http\Controllers\Finance\InvoiceController as FinanceInvoiceController;
+use App\Http\Controllers\Finance\PaymentController as FinancePaymentController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\OpportunityController;
 use App\Http\Controllers\PipelineController;
@@ -34,6 +39,7 @@ Route::get('/refund-policy',fn()=>app(PublicController::class)->legal('refund-po
 Route::get('/privacy-policy',fn()=>app(PublicController::class)->legal('privacy-policy'))->name('privacy-policy');
 Route::get('/faq',fn()=>app(PublicController::class)->legal('faq'))->name('faq.public');
 Route::get('/contact',fn()=>app(PublicController::class)->legal('contact'))->name('contact');
+Route::get('/payment-result/{reference}',CommercialPaymentResultController::class)->name('commercial-payment.result');
 Route::middleware('guest')->group(function(){Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');Route::post('/login',[AuthenticatedSessionController::class,'store'])->name('login.store');Route::get('/register',[RegistrationController::class,'create'])->name('register');Route::post('/register',[RegistrationController::class,'store'])->name('register.store');});
 Route::middleware('auth')->group(function(){
     Route::post('/logout',[AuthenticatedSessionController::class,'destroy'])->name('logout');
@@ -59,6 +65,28 @@ Route::middleware('auth')->group(function(){
         Route::get('/deals',[DealController::class,'index'])->name('deals.index');
         Route::get('/deals/{deal}',[DealController::class,'show'])->name('deals.show');
         Route::post('/deals/{deal}/documents',[DealController::class,'uploadDocument'])->name('deals.documents.store');
+
+        // Batch 3 - Finance, Payment, AR, Refund and Commission.
+        Route::get('/finance',[FinanceController::class,'index'])->name('finance.index');
+        Route::get('/finance/commissions',[FinanceCommissionController::class,'index'])->name('finance.commissions.index');
+
+        Route::middleware('role:admin,finance')->group(function(){
+            Route::get('/finance/invoices/create',[FinanceInvoiceController::class,'create'])->name('finance.invoices.create');
+            Route::post('/finance/invoices',[FinanceInvoiceController::class,'store'])->name('finance.invoices.store');
+            Route::post('/finance/invoices/{invoice}/issue',[FinanceInvoiceController::class,'issue'])->name('finance.invoices.issue');
+            Route::post('/finance/invoices/{invoice}/void',[FinanceInvoiceController::class,'void'])->name('finance.invoices.void');
+            Route::post('/finance/payments/{payment}/verify',[FinancePaymentController::class,'verify'])->name('finance.payments.verify');
+            Route::post('/finance/payments/{payment}/reject',[FinancePaymentController::class,'reject'])->name('finance.payments.reject');
+            Route::post('/finance/payments/{payment}/refund',[FinancePaymentController::class,'refund'])->name('finance.payments.refund');
+            Route::post('/finance/commissions/{commission}/approve',[FinanceCommissionController::class,'approve'])->name('finance.commissions.approve');
+            Route::post('/finance/commissions/{commission}/pay',[FinanceCommissionController::class,'pay'])->name('finance.commissions.pay');
+        });
+
+        Route::get('/finance/payments/{payment}/proof',[FinancePaymentController::class,'proof'])->name('finance.payments.proof');
+        Route::get('/finance/invoices/{invoice}/print',[FinanceInvoiceController::class,'print'])->name('finance.invoices.print');
+        Route::get('/finance/invoices/{invoice}',[FinanceInvoiceController::class,'show'])->name('finance.invoices.show');
+        Route::post('/finance/invoices/{invoice}/manual-payments',[FinanceInvoiceController::class,'storeManualPayment'])->name('finance.invoices.manual-payment');
+        Route::post('/finance/invoices/{invoice}/gateway-payments',[FinanceInvoiceController::class,'createGatewayPayment'])->name('finance.invoices.gateway-payment');
         Route::get('/pipeline',PipelineController::class)->name('pipeline');
         Route::get('/follow-ups',[FollowUpController::class,'index'])->name('follow-ups.index');Route::post('/follow-ups/{prospect}/customer-reply',[FollowUpController::class,'markCustomerReply'])->name('follow-ups.customer-reply');Route::post('/follow-ups/{prospect}/sent',[FollowUpController::class,'markSent'])->name('follow-ups.sent');Route::post('/follow-ups/{prospect}/feedback',[FollowUpController::class,'markFeedback'])->name('follow-ups.feedback');Route::post('/follow-ups/{prospect}/snooze',[FollowUpController::class,'snooze'])->name('follow-ups.snooze');Route::post('/follow-ups/{prospect}/cloud-send',[WhatsAppSendController::class,'store'])->name('follow-ups.cloud-send');
         Route::get('/targets',[SalesTargetController::class,'index'])->name('targets.index');
