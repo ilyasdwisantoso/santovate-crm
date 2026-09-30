@@ -1,4 +1,4 @@
-import { Link, router, usePage } from '@inertiajs/react';
+﻿import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../Components/Icon';
 import Flash from '../Components/Flash';
@@ -90,7 +90,7 @@ function NotificationCenter({ notifications, onClose }) {
     );
 }
 
-function MobileSidebar({ user, url, notifications, onClose, onNotifications, onLogout }) {
+function MobileSidebar({ user, url, notifications, open, onClose, onNotifications, onLogout }) {
     const menu = [
         ...nav,
         {
@@ -103,7 +103,7 @@ function MobileSidebar({ user, url, notifications, onClose, onNotifications, onL
     ];
 
     return (
-        <div className="mobile-sidebar-backdrop" onClick={onClose}>
+        <div className={`mobile-sidebar-backdrop ${open ? 'is-open' : ''}`} aria-hidden={!open} onClick={onClose}>
             <aside className="mobile-sidebar-drawer" onClick={(e) => e.stopPropagation()}>
                 <div className="mobile-sidebar-head">
                     <div className="mobile-sidebar-brand">
@@ -239,6 +239,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
     const { auth, notifications } = page.props;
     const url = page.url;
     const user = auth.user;
+    const routeKey = url.split('?')[0];
 
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
@@ -363,8 +364,10 @@ export default function AppLayout({ children, title, subtitle, action }) {
                 </header>
 
                 <div className="page-content">
-                    <Flash/>
-                    {children}
+                    <div key={routeKey} className="route-stage">
+                        <Flash/>
+                        {children}
+                    </div>
                 </div>
             </main>
 
@@ -385,19 +388,19 @@ export default function AppLayout({ children, title, subtitle, action }) {
                 </button>
             </nav>
 
-            {mobileSidebarOpen && (
-                <MobileSidebar
-                    user={user}
-                    url={url}
-                    notifications={notifications}
-                    onClose={() => setMobileSidebarOpen(false)}
-                    onNotifications={() => setNotificationOpen(true)}
-                    onLogout={logout}
-                />
-            )}
+            <MobileSidebar
+                user={user}
+                url={url}
+                notifications={notifications}
+                open={mobileSidebarOpen}
+                onClose={() => setMobileSidebarOpen(false)}
+                onNotifications={() => setNotificationOpen(true)}
+                onLogout={logout}
+            />
         </div>
     );
 }
+
 
 
 

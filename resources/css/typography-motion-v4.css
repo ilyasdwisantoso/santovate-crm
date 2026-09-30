@@ -1,0 +1,195 @@
+/* ==========================================================
+   Santovate CRM UI Polish V4
+   Free global typeface + smoother motion system
+   Loaded LAST so it wins against legacy landing overrides.
+   ========================================================== */
+
+:root{
+  --font-santovate:"Plus Jakarta Sans Variable","Plus Jakarta Sans","Segoe UI Variable","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-ui:var(--font-santovate);
+  --font-display:var(--font-santovate);
+  --sv-ease:cubic-bezier(.22,.72,.18,1);
+  --sv-ease-soft:cubic-bezier(.2,.65,.25,1);
+  --sv-fast:150ms;
+  --sv-normal:240ms;
+  --sv-slow:420ms;
+}
+
+html,body,#app,.app-shell,.sv-public-shell,.fl-page,.quote-print-page{
+  font-family:var(--font-santovate)!important;
+  font-optical-sizing:auto;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+body,button,input,select,textarea,a,label,table,th,td,
+h1,h2,h3,h4,h5,h6,p,span,strong,b,small{
+  font-family:var(--font-santovate);
+}
+.fl-page,.fl-page button,.fl-page input,.fl-page textarea,.fl-page select,
+.fl-nav,.fl-brand strong,.fl-nav-links a,.fl-nav-login,.fl-nav-cta,
+.sv-public-shell,.sv-public-shell button,.sv-public-shell input,.sv-public-shell select,
+.quote-print-page,.quote-print-page button{
+  font-family:var(--font-santovate)!important;
+}
+code,pre,kbd,samp{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace!important}
+
+/* Slight weight normalization for Plus Jakarta Sans. */
+body{font-weight:420}
+strong,b{font-weight:650}
+.page-heading h1,.panel-head h3,.section-head h3,.commercial-hero h2,
+.prospect-hero h2,.import-hero-v2 h2,.login-story h1,.login-card h2,
+.metric-card strong,.followup-summary-card strong,.commercial-metrics>.panel strong{
+  font-family:var(--font-santovate)!important;
+  font-weight:680;
+}
+
+/* Route transition: transform + opacity only, GPU-friendly. */
+.route-stage{
+  min-width:0;
+  transform:translate3d(0,0,0);
+  backface-visibility:hidden;
+}
+@media (prefers-reduced-motion:no-preference){
+  .route-stage{
+    animation:sv-route-in 280ms var(--sv-ease) both;
+  }
+  @keyframes sv-route-in{
+    from{opacity:.01;transform:translate3d(0,7px,0)}
+    to{opacity:1;transform:translate3d(0,0,0)}
+  }
+}
+
+/* Targeted transitions. Avoid transition:all because it can animate layout. */
+.btn,.icon-button,.side-link,.bottom-link,.notification-trigger,
+.mobile-menu-trigger,.mobile-sidebar-close,.mobile-sidebar-link,
+.mobile-sidebar-logout,.pagination a,.pagination span,.badge,
+.sv-config-choice,.sv-plan-grid-v402 article,.sv-config-grid-v402>article,
+.sv-admin-config-grid-v402>article,.fl-button,.fl-nav-cta,.fl-nav-login,
+.fl-nav-links a,.quick-action,.kanban-card,.template-card{
+  transition-property:transform,opacity,color,background-color,border-color,box-shadow;
+  transition-duration:var(--sv-normal);
+  transition-timing-function:var(--sv-ease-soft);
+}
+.btn:active,.icon-button:active,.mobile-sidebar-link:active,.bottom-link:active{
+  transform:translate3d(0,1px,0) scale(.985);
+}
+
+/* Mobile sidebar: keep it mounted so closing can animate smoothly. */
+.mobile-sidebar-backdrop{
+  display:none;
+}
+@media (max-width:768px){
+  .mobile-sidebar-backdrop{
+    display:block!important;
+    position:fixed!important;
+    inset:0!important;
+    z-index:220!important;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    background:rgba(10,25,19,.40)!important;
+    -webkit-backdrop-filter:blur(2px);
+    backdrop-filter:blur(2px);
+    transition:opacity 220ms var(--sv-ease-soft),visibility 0s linear 220ms!important;
+    animation:none!important;
+  }
+  .mobile-sidebar-backdrop.is-open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transition-delay:0s!important;
+  }
+  .mobile-sidebar-drawer{
+    transform:translate3d(-102%,0,0)!important;
+    opacity:.985;
+    animation:none!important;
+    transition:transform 320ms var(--sv-ease),opacity 220ms ease!important;
+    will-change:transform;
+    backface-visibility:hidden;
+    contain:paint;
+  }
+  .mobile-sidebar-backdrop.is-open .mobile-sidebar-drawer{
+    transform:translate3d(0,0,0)!important;
+    opacity:1;
+  }
+  .bottom-nav{
+    transform:translate3d(0,0,0);
+    transition:transform 280ms var(--sv-ease),opacity 200ms ease!important;
+    will-change:transform,opacity;
+  }
+  .bottom-nav.is-hidden{
+    transform:translate3d(0,calc(100% + 28px),0)!important;
+  }
+  .topbar{
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    background:rgba(255,255,255,.985)!important;
+  }
+}
+
+/* Popovers enter without layout animation. */
+@media (prefers-reduced-motion:no-preference){
+  .notification-popover{
+    transform-origin:top right;
+    animation:sv-popover-in 190ms var(--sv-ease) both;
+    will-change:transform,opacity;
+  }
+  @keyframes sv-popover-in{
+    from{opacity:0;transform:translate3d(0,-5px,0) scale(.985)}
+    to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  }
+}
+
+/* Landing reveal: smaller travel, no blur/filter animation. Filter animations are expensive. */
+.flow-motion-enabled .flow-reveal{
+  opacity:0;
+  filter:none!important;
+  will-change:transform,opacity!important;
+  backface-visibility:hidden;
+  transition:opacity 580ms var(--sv-ease) var(--flow-delay,0ms),transform 580ms var(--sv-ease) var(--flow-delay,0ms)!important;
+}
+.flow-motion-enabled .flow-reveal.reveal-up{transform:translate3d(0,22px,0)!important}
+.flow-motion-enabled .flow-reveal.reveal-left{transform:translate3d(-24px,0,0)!important}
+.flow-motion-enabled .flow-reveal.reveal-right{transform:translate3d(24px,0,0)!important}
+.flow-motion-enabled .flow-reveal.reveal-scale{transform:translate3d(0,14px,0) scale(.975)!important}
+.flow-motion-enabled .flow-reveal.is-visible{opacity:1!important;transform:translate3d(0,0,0) scale(1)!important;filter:none!important}
+.flow-load-piece{
+  transform:translate3d(0,18px,0);
+  will-change:transform,opacity;
+  backface-visibility:hidden;
+}
+.flow-load-product{
+  transform:translate3d(0,28px,0) scale(.985);
+  will-change:transform,opacity;
+  backface-visibility:hidden;
+}
+.fl-product-window{
+  backface-visibility:hidden;
+  will-change:transform;
+  transition:transform 100ms linear,box-shadow 260ms var(--sv-ease-soft)!important;
+}
+
+/* Reduce expensive blur on sticky chrome while scrolling. */
+.topbar{
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+}
+
+/* NProgress / Inertia progress polish. */
+#nprogress .bar{transition:transform 180ms linear!important}
+#nprogress .peg{box-shadow:0 0 10px rgba(16,56,43,.26),0 0 4px rgba(16,56,43,.18)!important}
+
+/* Respect accessibility and low-power preferences. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+  .flow-motion-enabled .flow-reveal,.route-stage,.mobile-sidebar-drawer{
+    opacity:1!important;
+    transform:none!important;
+  }
+}
