@@ -104,12 +104,16 @@ rm -f "$ARTIFACT"
 rm -rf "$NEXT_DIR" 2>/dev/null || true
 
 # Keep only 3 previous frontend builds.
-mapfile -t backups < <(ls -dt public/build-prev-* 2>/dev/null || true)
-if (( ${#backups[@]} > 3 )); then
-    for old in "${backups[@]:3}"; do
-        rm -rf "$old"
-    done
-fi
+# Avoid process substitution because Hostinger does not expose /dev/fd.
+backup_count=0
+
+for old in $(ls -dt public/build-prev-* 2>/dev/null || true); do
+    backup_count=$((backup_count + 1))
+
+    if (( backup_count > 3 )); then
+        rm -rf -- "$old"
+    fi
+done
 
 printf '\nDEPLOY_PRODUCTION_OK\n'
 printf 'Branch: %s\n' "$BRANCH"
