@@ -85,12 +85,6 @@ class DemoAccountSeeder extends Seeder
             $organizations[$configKey] = $organization->fresh();
         }
 
-        // Real Santovate staff must use the internal tenant so production data is
-        // never mixed with the Software & Agency demo workspace.
-        $organizations['internal'] = Organization::query()
-            ->where('slug', 'santovate-internal')
-            ->firstOrFail();
-
         /*
          * Demo / employee accounts.
          *
@@ -106,7 +100,7 @@ class DemoAccountSeeder extends Seeder
                 'name' => 'Santovate Admin',
                 'password' => 'Santovate123!',
                 'role' => 'admin',
-                'config' => 'internal',
+                'config' => 'software-agency',
                 'platform' => true,
             ],
             [
@@ -114,7 +108,7 @@ class DemoAccountSeeder extends Seeder
                 'name' => 'Santovate Sales',
                 'password' => 'Sales123!',
                 'role' => 'sales',
-                'config' => 'internal',
+                'config' => 'software-agency',
                 'platform' => false,
             ],
             [
@@ -122,7 +116,7 @@ class DemoAccountSeeder extends Seeder
                 'name' => 'Ahmad Mazkur',
                 'password' => 'Mazkur!@#',
                 'role' => 'sales',
-                'config' => 'internal',
+                'config' => 'software-agency',
                 'platform' => false,
             ],
             [
@@ -130,7 +124,7 @@ class DemoAccountSeeder extends Seeder
                 'name' => 'Randi',
                 'password' => 'Randisantovate123!',
                 'role' => 'sales',
-                'config' => 'internal',
+                'config' => 'software-agency',
                 'platform' => false,
             ],
             [
@@ -201,32 +195,32 @@ class DemoAccountSeeder extends Seeder
 
         /*
          * Repair hanya untuk tenant reference yang NULL.
-         * Data lama/legacy masuk ke tenant internal Santovate, bukan demo tenant.
-         * Organization yang sudah terisi tetap tidak diubah.
+         *
+         * Data organization yang sudah ada tidak diubah.
          */
-        $internalOrg = $organizations['internal'];
+        $softwareOrg = $organizations['software-agency'];
 
         User::whereNull('organization_id')
             ->update([
-                'organization_id' => $internalOrg->id,
+                'organization_id' => $softwareOrg->id,
             ]);
 
         DB::table('prospects')
             ->whereNull('organization_id')
             ->update([
-                'organization_id' => $internalOrg->id,
+                'organization_id' => $softwareOrg->id,
             ]);
 
         DB::table('import_batches')
             ->whereNull('organization_id')
             ->update([
-                'organization_id' => $internalOrg->id,
+                'organization_id' => $softwareOrg->id,
             ]);
 
         DB::table('sales_targets')
             ->whereNull('organization_id')
             ->update([
-                'organization_id' => $internalOrg->id,
+                'organization_id' => $softwareOrg->id,
             ]);
 
         /*

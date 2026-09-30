@@ -39,7 +39,7 @@ class WhatsAppWebhookController extends Controller {
         if ($new==='failed' && !$message->failed_at) $changes['failed_at']=now();
         $changes['status']=$new ?: $message->status; $message->update($changes);
         if ($message->prospect_id) {
-            $p=Prospect::where('organization_id',$orgId)->find($message->prospect_id);
+            $p=Prospect::find($message->prospect_id);
             if ($p) {
                 if ($new==='failed') {
                     $p->update(['whatsapp_status'=>'failed','whatsapp_last_error'=>json_encode($status['errors'] ?? [])]);
@@ -49,12 +49,7 @@ class WhatsAppWebhookController extends Controller {
             }
         }
         if ($message->campaign_recipient_id) {
-            $r=WhatsAppCampaignRecipient::query()
-                ->whereKey($message->campaign_recipient_id)
-                ->whereHas('campaign', fn($q)=>$q->where('organization_id',$orgId))
-                ->first();
-            if (!$r) return;
-            $campaign=$r->campaign;
+            $r=WhatsAppCampaignRecipient::find($message->campaign_recipient_id); if (!$r) return; $campaign=$r->campaign;
             if ($new==='delivered' && !$r->delivered_at) { $r->update(['status'=>'delivered','delivered_at'=>now()]); $campaign->increment('delivered_count'); }
             if ($new==='read' && !$r->read_at) { $r->update(['status'=>'read','read_at'=>now()]); $campaign->increment('read_count'); }
             if ($new==='failed' && $r->status!=='failed') { $r->update(['status'=>'failed','error'=>json_encode($status['errors'] ?? [])]); $campaign->increment('failed_count'); }
@@ -65,14 +60,9 @@ class WhatsAppWebhookController extends Controller {
         $p=Prospect::where('organization_id',$orgId)->where('phone_normalized',$from)->first();
         if (!$p) return;
         $body=data_get($message,'text.body') ?? data_get($message,'button.text') ?? '[Pesan WhatsApp]';
-        $providerMessageId=$message['id'] ?? null;
-        if (!$providerMessageId) return;
-        WhatsAppMessage::updateOrCreate(
-            ['provider_message_id'=>$providerMessageId],
-            [
-                'organization_id'=>$orgId,'prospect_id'=>$p->id,'direction'=>'inbound','type'=>$message['type'] ?? 'text','status'=>'received','from_phone'=>$from,'body'=>$body,'provider_payload'=>$message,
-            ]
-        );
+        WhatsAppMessage::updateOrCreate(['provider_message_id'=>$message['id'] ?? null],[
+            'organization_id'=>$orgId,'prospect_id'=>$p->id,'direction'=>'inbound','type'=>$message['type'] ?? 'text','status'=>'received','from_phone'=>$from,'body'=>$body,'provider_payload'=>$message,
+        ]);
         $now=now(); $p->update(['whatsapp_status'=>'valid','whatsapp_id'=>$message['from'] ?? $from,'whatsapp_verified_at'=>$now,'last_customer_reply_at'=>$now,'last_contact_at'=>$now,'replied_at'=>$p->replied_at ?: $now,'follow_up_snoozed_until'=>null]);
         ProspectActivity::create(['prospect_id'=>$p->id,'user_id'=>null,'type'=>'customer_reply','title'=>'Balasan WhatsApp diterima otomatis','description'=>$body,'occurred_at'=>$now]);
         if (in_array($p->status,['baru','diriset','dihubungi'],true)) {

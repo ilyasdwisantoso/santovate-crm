@@ -1,4 +1,4 @@
-import { Link, router, usePage } from '@inertiajs/react';
+﻿import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../Components/Icon';
 import Flash from '../Components/Flash';
@@ -166,16 +166,6 @@ function MobileSidebar({ user, url, notifications, onClose, onNotifications, onL
                                 </span>
                                 <Icon name="chevron" size={17}/>
                             </Link>
-                            {user.is_platform_admin && (
-                                <Link href="/admin/clients" onClick={onClose} className={`mobile-sidebar-link mobile-tone-1 ${url.startsWith('/admin/clients') ? 'active' : ''}`}>
-                                    <span className="mobile-sidebar-link-icon"><Icon name="users" size={19}/></span>
-                                    <span className="mobile-sidebar-link-copy">
-                                        <strong>Client Onboarding</strong>
-                                        <small>Aktifkan workspace client berbayar</small>
-                                    </span>
-                                    <Icon name="chevron" size={17}/>
-                                </Link>
-                            )}
                         </>
                     )}
 
@@ -310,6 +300,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
                             <small>{user.job_title || (user.is_admin ? 'Administrator' : 'Account Executive')}</small>
                         </div>
                     </Link>
+                        {user.is_platform_admin && <Link href="/admin/clients" onClick={onClose} className={`mobile-sidebar-link mobile-tone-1 ${url.startsWith('/admin/clients') ? 'active' : ''}`}><span className="mobile-sidebar-link-icon"><Icon name="users" size={19}/></span><span className="mobile-sidebar-link-copy"><strong>Client Onboarding</strong><small>Aktifkan workspace client berbayar</small></span><Icon name="chevron" size={17}/></Link>}
                     <button className="icon-button ghost" onClick={logout} title="Keluar">
                         <Icon name="logout" size={18}/>
                     </button>

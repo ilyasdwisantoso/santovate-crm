@@ -14,13 +14,11 @@ class SalesPerformanceService
         $start = CarbonImmutable::create($year, $month, 1, 0, 0, 0, config('app.timezone'))->startOfMonth();
         $end = $start->endOfMonth();
         $target = SalesTarget::firstOrCreate(
-            ['organization_id' => $user->organization_id, 'user_id' => $user->id, 'year' => $year, 'month' => $month],
+            ['user_id' => $user->id, 'year' => $year, 'month' => $month],
             ['target_contacted' => 20, 'target_meetings' => 8, 'target_proposals' => 4, 'target_deals' => 1, 'target_revenue' => 15000000]
         );
 
-        $owned = Prospect::query()
-            ->where('organization_id', $user->organization_id)
-            ->where('assigned_to', $user->id);
+        $owned = Prospect::query()->where('assigned_to', $user->id);
         $actual = [
             'contacted' => (clone $owned)->whereBetween('contacted_at', [$start, $end])->count(),
             'meetings' => (clone $owned)->whereBetween('meeting_at', [$start, $end])->count(),

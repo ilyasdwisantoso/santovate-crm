@@ -8,15 +8,11 @@ use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Services\BusinessConfigurationService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
-use RuntimeException;
 
 class SaasFoundationSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->assertSchemaReady();
-
         // Minimum paid plan: 1 user = Rp250.000/month.
         // Final price still differs by business configuration via add-on pricing.
         $plans = [
@@ -97,78 +93,29 @@ class SaasFoundationSeeder extends Seeder
             BusinessConfiguration::updateOrCreate(['key'=>$key], $config + ['is_active'=>true]);
         }
 
-        // Santovate's own employees must live in a real internal tenant, not in a
-        // demo tenant. Keep the workspace stable across repeated seeding and upgrades.
-        $internal = Organization::query()->firstOrCreate(
-            ['slug'=>'santovate-internal'],
-            [
-                'name'=>'Santovate Internal',
-                'status'=>'active',
-                'settings'=>['internal'=>true,'demo'=>false],
-            ]
-        );
+        // Preserve the existing workspace/data if it already exists. This avoids
+        // destructive resets on Hostinger while still making the old workspace valid.
+        $legacy = Organization::query()->where('slug', 'santovate-internal')->first();
+        if ($legacy) {
+            $plan = SubscriptionPlan::where('key', 'scale')->firstOrFail();
+            $config = BusinessConfiguration::where('key', 'software-agency')->firstOrFail();
 
-        $internalSettings = is_array($internal->settings) ? $internal->settings : [];
-        $internal->update([
-            'status'=>'active',
-            'settings'=>array_merge($internalSettings, ['internal'=>true,'demo'=>false]),
-        ]);
-
-        $plan = SubscriptionPlan::where('key', 'scale')->firstOrFail();
-        $config = BusinessConfiguration::where('key', 'software-agency')->firstOrFail();
-
-        Subscription::updateOrCreate(
-            ['organization_id'=>$internal->id, 'status'=>'active'],
-            [
-                'subscription_plan_id'=>$plan->id,
-                'business_configuration_id'=>$config->id,
-                'billing_cycle'=>'annual',
-                'base_amount'=>0,
-                'configuration_amount'=>0,
-                'total_amount'=>0,
-                'starts_at'=>now(),
-                'ends_at'=>now()->addYears(20),
-                'activated_at'=>now(),
-                'cancelled_at'=>null,
-            ]
-        );
-
-        app(BusinessConfigurationService::class)->activate($internal->fresh(), $config);
-    }
-
-
-    private function assertSchemaReady(): void
-    {
-        $requirements = [
-            'users'=>['organization_id','is_platform_admin','is_active','role'],
-            'prospects'=>['organization_id'],
-            'follow_up_templates'=>['organization_id','business_configuration_id'],
-            'import_batches'=>['organization_id'],
-            'sales_targets'=>['organization_id'],
-            'subscription_plans'=>['key','monthly_price','annual_price'],
-            'business_configurations'=>['key','theme'],
-            'organizations'=>['slug','business_configuration_id','settings'],
-            'subscriptions'=>['organization_id','subscription_plan_id','business_configuration_id','starts_at','ends_at','activated_at','cancelled_at'],
-            'products'=>['organization_id','sku'],
-        ];
-
-        $missing = [];
-        foreach ($requirements as $table => $columns) {
-            if (!Schema::hasTable($table)) {
-                $missing[] = $table;
-                continue;
-            }
-            foreach ($columns as $column) {
-                if (!Schema::hasColumn($table, $column)) {
-                    $missing[] = $table.'.'.$column;
-                }
-            }
-        }
-
-        if ($missing) {
-            throw new RuntimeException(
-                'Schema Santovate belum siap ('.implode(', ', $missing).'). Jalankan "php artisan migrate" terlebih dahulu; jangan gunakan migrate:fresh pada database yang sudah berisi data.'
+            Subscription::updateOrCreate(
+                ['organization_id'=>$legacy->id, 'status'=>'active'],
+                [
+                    'subscription_plan_id'=>$plan->id,
+                    'business_configuration_id'=>$config->id,
+                    'billing_cycle'=>'annual',
+                    'base_amount'=>0,
+                    'configuration_amount'=>0,
+                    'total_amount'=>0,
+                    'starts_at'=>now(),
+                    'ends_at'=>now()->addYears(20),
+                    'activated_at'=>now(),
+                ]
             );
+
+            app(BusinessConfigurationService::class)->activate($legacy, $config);
         }
     }
 
