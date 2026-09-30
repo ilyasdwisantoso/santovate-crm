@@ -23,17 +23,17 @@ class SaasFoundationSeeder extends Seeder
             [
                 'key'=>'starter','name'=>'Starter','description'=>'Untuk owner / 1 Account Executive yang baru membangun pipeline.',
                 'monthly_price'=>250000,'annual_price'=>2500000,'user_limit'=>1,'prospect_limit'=>1500,
-                'features'=>['crm','pipeline','followup','products','opportunities','quotations','deals'],'sort_order'=>1,
+                'features'=>['crm','pipeline','followup','products'],'sort_order'=>1,
             ],
             [
                 'key'=>'growth','name'=>'Growth','description'=>'Untuk tim sales kecil yang membutuhkan automation, import, target dan WhatsApp API.',
                 'monthly_price'=>650000,'annual_price'=>6500000,'user_limit'=>5,'prospect_limit'=>7500,
-                'features'=>['crm','pipeline','followup','products','opportunities','quotations','deals','whatsapp_api','campaigns','imports','targets'],'sort_order'=>2,
+                'features'=>['crm','pipeline','followup','products','whatsapp_api','campaigns','imports','targets'],'sort_order'=>2,
             ],
             [
                 'key'=>'scale','name'=>'Scale','description'=>'Untuk operasi sales yang lebih besar dengan advanced configuration.',
                 'monthly_price'=>1250000,'annual_price'=>12500000,'user_limit'=>15,'prospect_limit'=>30000,
-                'features'=>['crm','pipeline','followup','products','opportunities','quotations','deals','whatsapp_api','campaigns','imports','targets','advanced_config'],'sort_order'=>3,
+                'features'=>['crm','pipeline','followup','products','whatsapp_api','campaigns','imports','targets','advanced_config'],'sort_order'=>3,
             ],
         ];
 

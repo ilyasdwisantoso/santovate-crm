@@ -111,13 +111,6 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
             <MetricCard label="Nilai Pipeline" value={`Rp${compactMoney(stats.pipeline_value)}`} helper="estimasi potensi open pipeline" icon="target" accent="violet" />
         </section>
 
-        <section className="metric-grid commercial-metrics dashboard-commercial-metrics">
-            <MetricCard label="Open Opportunity" value={`Rp${compactMoney(stats.opportunity_value || 0)}`} helper="expected value opportunity aktif" icon="target" accent="blue" />
-            <MetricCard label="Quotation Value" value={`Rp${compactMoney(stats.quotation_value || 0)}`} helper="approved / sent / accepted" icon="briefcase" accent="violet" />
-            <MetricCard label="Actual Deal" value={`Rp${compactMoney(stats.actual_deal_value || 0)}`} helper={`${stats.won_deals || 0} deal won`} icon="check" accent="green" />
-            <MetricCard label="Conversion" value={`${stats.conversion_rate || 0}%`} helper="won / closed opportunities" icon="pipeline" accent="amber" />
-        </section>
-
         <section className="dashboard-layout dashboard-layout-v24">
             <div className="dashboard-main">
                 {!user.is_admin && <PerformanceCard performance={salesPerformance} />}

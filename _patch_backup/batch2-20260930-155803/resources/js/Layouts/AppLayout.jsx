@@ -7,9 +7,6 @@ import { Avatar } from '../Components/Ui';
 const nav = [
     { href: '/dashboard', label: 'Dashboard', icon: 'home', match: (u) => u.startsWith('/dashboard') },
     { href: '/prospects', label: 'Prospek', icon: 'building', match: (u) => u.startsWith('/prospects') },
-    { href: '/opportunities', label: 'Opportunities', icon: 'target', match: (u) => u.startsWith('/opportunities') },
-    { href: '/quotations', label: 'Quotations', icon: 'briefcase', match: (u) => u.startsWith('/quotations') },
-    { href: '/deals', label: 'Deals', icon: 'check', match: (u) => u.startsWith('/deals') },
     { href: '/follow-ups', label: 'Follow Up', icon: 'whatsapp', match: (u) => u.startsWith('/follow-ups') },
     { href: '/pipeline', label: 'Pipeline', icon: 'pipeline', match: (u) => u.startsWith('/pipeline') },
     { href: '/targets', label: 'Target AE', icon: 'target', match: (u) => u.startsWith('/targets') },

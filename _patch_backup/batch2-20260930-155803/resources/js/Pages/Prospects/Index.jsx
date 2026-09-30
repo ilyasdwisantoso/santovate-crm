@@ -10,11 +10,11 @@ function Pagination({ links=[] }) {
     return <div className="pagination">{links.map((link,i)=>link.url?<Link key={i} href={link.url} preserveScroll className={link.active?'active':''} dangerouslySetInnerHTML={{__html:link.label}}/>:<span key={i} className="disabled" dangerouslySetInnerHTML={{__html:link.label}}/>)}</div>;
 }
 
-export default function Index({ prospects, filters, statuses, qualificationStatuses, priorities, salesUsers }) {
+export default function Index({ prospects, filters, statuses, priorities, salesUsers }) {
     const { auth }=usePage().props;
-    const [form,setForm]=useState({q:filters.q||'',priority:filters.priority||'',status:filters.status||'',qualification_status:filters.qualification_status||'',assigned_to:filters.assigned_to||'',followup:filters.followup||'',import_batch:filters.import_batch||''});
+    const [form,setForm]=useState({q:filters.q||'',priority:filters.priority||'',status:filters.status||'',assigned_to:filters.assigned_to||'',followup:filters.followup||'',import_batch:filters.import_batch||''});
     const apply=(e)=>{e?.preventDefault(); const params=Object.fromEntries(Object.entries(form).filter(([,v])=>v!=='')); router.get('/prospects',params,{preserveState:true,replace:true});};
-    const reset=()=>{setForm({q:'',priority:'',status:'',qualification_status:'',assigned_to:'',followup:'',import_batch:''}); router.get('/prospects');};
+    const reset=()=>{setForm({q:'',priority:'',status:'',assigned_to:'',followup:'',import_batch:''}); router.get('/prospects');};
     const actions=<div className="action-group">{auth.user.is_admin&&<Link href="/imports" className="btn btn-secondary hide-mobile"><Icon name="upload" size={17}/>Import Data</Link>}<Link href="/prospects/create" className="btn btn-primary"><Icon name="plus" size={17}/>Tambah Prospek</Link></div>;
 
     return <AppLayout title="Prospek" subtitle="Database perusahaan, prioritas, PIC, dan tindakan berikutnya dalam satu tempat." action={actions}>
@@ -25,7 +25,6 @@ export default function Index({ prospects, filters, statuses, qualificationStatu
                 <div className="search-box"><Icon name="search" size={18}/><input value={form.q} onChange={(e)=>setForm({...form,q:e.target.value})} placeholder="Cari perusahaan, kota, PIC, layanan..."/></div>
                 <select value={form.priority} onChange={(e)=>setForm({...form,priority:e.target.value})}><option value="">Semua prioritas</option>{Object.entries(priorities).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select>
                 <select value={form.status} onChange={(e)=>setForm({...form,status:e.target.value})}><option value="">Semua status</option>{Object.entries(statuses).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select>
-                <select value={form.qualification_status} onChange={(e)=>setForm({...form,qualification_status:e.target.value})}><option value="">Semua qualification</option>{Object.entries(qualificationStatuses||{}).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select>
                 {auth.user.is_admin&&<select value={form.assigned_to} onChange={(e)=>setForm({...form,assigned_to:e.target.value})}><option value="">Semua Account Executive</option><option value="unassigned">Belum ditugaskan</option>{salesUsers.map((u)=><option key={u.id} value={u.id}>{u.name}</option>)}</select>}
                 <label className="filter-check"><input type="checkbox" checked={form.followup==='due'} onChange={(e)=>setForm({...form,followup:e.target.checked?'due':''})}/><span>Follow-up jatuh tempo</span></label>
                 <button className="btn btn-dark" type="submit"><Icon name="filter" size={16}/>Terapkan</button>

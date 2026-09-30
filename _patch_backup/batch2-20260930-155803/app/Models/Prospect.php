@@ -26,12 +26,12 @@ class Prospect extends Model
 
     protected $fillable = [
         'organization_id','company_key','company_name','website','city','service','route','company_size','contact_name',
-        'contact_position','decision_maker_name','decision_maker_position','phone','phone_normalized','whatsapp_status','whatsapp_id','whatsapp_verified_at','whatsapp_opt_in_at',
+        'contact_position','phone','phone_normalized','whatsapp_status','whatsapp_id','whatsapp_verified_at','whatsapp_opt_in_at',
         'whatsapp_opt_out_at','whatsapp_last_error','email','current_system','tracking_portal','pain_hypothesis','fit_score',
-        'pain_score','contact_score','total_score','priority','status','qualification_status','last_contact_at','next_follow_up_at','last_outbound_at',
+        'pain_score','contact_score','total_score','priority','status','last_contact_at','next_follow_up_at','last_outbound_at',
         'last_customer_reply_at','follow_up_snoozed_until','follow_up_count','last_follow_up_message','last_feedback_at',
         'last_feedback_status','last_feedback_note','contacted_at','replied_at','meeting_at','demo_at','proposal_at',
-        'negotiation_at','deal_at','closed_at','source_name','source_url','notes','estimated_deal_value','estimated_budget','expected_timeline','target_go_live','urgency','probability','next_action','actual_deal_value',
+        'negotiation_at','deal_at','closed_at','source_name','source_url','notes','estimated_deal_value','actual_deal_value',
         'assigned_to','created_by','import_batch_id',
     ];
 
@@ -43,7 +43,7 @@ class Prospect extends Model
             'whatsapp_verified_at'=>'datetime','whatsapp_opt_in_at'=>'datetime','whatsapp_opt_out_at'=>'datetime',
             'contacted_at'=>'datetime','replied_at'=>'datetime','meeting_at'=>'datetime','demo_at'=>'datetime','proposal_at'=>'datetime',
             'negotiation_at'=>'datetime','deal_at'=>'datetime','closed_at'=>'datetime','fit_score'=>'integer','pain_score'=>'integer',
-            'contact_score'=>'integer','total_score'=>'integer','estimated_deal_value'=>'decimal:2','estimated_budget'=>'decimal:2','target_go_live'=>'date','probability'=>'integer','actual_deal_value'=>'decimal:2',
+            'contact_score'=>'integer','total_score'=>'integer','estimated_deal_value'=>'decimal:2','actual_deal_value'=>'decimal:2',
         ];
     }
 
@@ -82,10 +82,6 @@ class Prospect extends Model
     public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
     public function importBatch(): BelongsTo { return $this->belongsTo(ImportBatch::class, 'import_batch_id'); }
     public function activities(): HasMany { return $this->hasMany(ProspectActivity::class)->latest('occurred_at'); }
-    public function opportunities(): HasMany { return $this->hasMany(Opportunity::class); }
-    public function quotations(): HasMany { return $this->hasMany(Quotation::class); }
-    public function deals(): HasMany { return $this->hasMany(Deal::class); }
-    public function assignmentHistories(): HasMany { return $this->hasMany(ProspectAssignmentHistory::class)->latest(); }
 
     // IMPORTANT: migration creates `prospect_product`, while Laravel would infer
     // `product_prospect`. Being explicit here fixes the Prospek page SQL 500.
