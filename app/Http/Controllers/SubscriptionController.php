@@ -148,25 +148,19 @@ class SubscriptionController extends Controller
                 'payment_channel'=>$data['payment_channel'],
             ]);
 
-            $checkout = data_get($result,'Data.Url') ?? data_get($result,'Data.url') ?? data_get($result,'Url');
+            $presentation = $ipaymu->directPaymentPresentation($result);
+            $checkout = $presentation['checkout_url'];
             $payment->update([
-                'provider_transaction_id'=>(string)(data_get($result,'Data.SessionId') ?? data_get($result,'Data.TransactionId') ?? ''),
+                'provider_transaction_id'=>(string)($presentation['transaction_id'] ?: $presentation['session_id'] ?: ''),
                 'checkout_url'=>$checkout,
                 'provider_payload'=>$result,
             ]);
-
-            if (!$checkout) {
-                if ($request->expectsJson()) {
-                    return response()->json(['message'=>'iPaymu tidak mengembalikan URL pembayaran.'], 422);
-                }
-                return redirect()->route('subscription.payment-result',['reference'=>$payment->reference_id])
-                    ->with('error','iPaymu tidak mengembalikan URL pembayaran.');
-            }
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'reference'=>$payment->reference_id,
                     'checkout_url'=>$checkout,
+                    'presentation'=>$presentation,
                     'stream_url'=>route('subscription.payment-stream',['reference'=>$payment->reference_id]),
                     'status_url'=>route('subscription.status',['reference'=>$payment->reference_id]),
                     'result_url'=>route('subscription.payment-result',['reference'=>$payment->reference_id]),
@@ -174,7 +168,9 @@ class SubscriptionController extends Controller
                 ]);
             }
 
-            return redirect()->away($checkout);
+            return $checkout
+                ? redirect()->away($checkout)
+                : redirect()->route('subscription.payment-result',['reference'=>$payment->reference_id]);
         } catch (\Throwable $e) {
             report($e);
             $payment->update(['status'=>'failed']);
@@ -196,6 +192,7 @@ class SubscriptionController extends Controller
 
         return Inertia::render('Public/PaymentResult', [
             'payment'=>$payment ? $payment->only(['reference_id','status','amount','paid_at','payment_method','payment_channel']) : null,
+            'presentation'=>$payment ? $ipaymu->directPaymentPresentation($payment->provider_payload ?? []) : null,
             'subscription'=>$payment?->subscription,
             'gateway'=>[
                 'provider'=>'iPaymu',

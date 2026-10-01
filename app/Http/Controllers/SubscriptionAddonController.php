@@ -118,24 +118,20 @@ class SubscriptionAddonController extends Controller
                 'payment_method'=>$data['payment_method'],'payment_channel'=>$data['payment_channel'],
             ]);
 
-            $checkout = data_get($result,'Data.Url') ?? data_get($result,'Data.url') ?? data_get($result,'Url');
+            $presentation = $ipaymu->directPaymentPresentation($result);
+            $checkout = $presentation['checkout_url'];
             $payment->update([
-                'provider_transaction_id'=>(string)(data_get($result,'Data.SessionId') ?? data_get($result,'Data.TransactionId') ?? ''),
+                'provider_transaction_id'=>(string)($presentation['transaction_id'] ?: $presentation['session_id'] ?: ''),
                 'checkout_url'=>$checkout,
                 'provider_payload'=>$result,
+                'failure_reason'=>null,
             ]);
-
-            if (!$checkout) {
-                $payment->update(['status'=>'failed','failure_reason'=>'iPaymu tidak mengembalikan URL pembayaran.']);
-                $order->update(['status'=>'failed']);
-                $message = 'iPaymu tidak mengembalikan URL pembayaran.';
-                return $request->expectsJson() ? response()->json(['message'=>$message],422) : back()->with('error',$message);
-            }
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'reference'=>$payment->reference_id,
                     'checkout_url'=>$checkout,
+                    'presentation'=>$presentation,
                     'stream_url'=>route('subscription.addons.payment-stream',['reference'=>$payment->reference_id]),
                     'status_url'=>route('subscription.addons.status',['reference'=>$payment->reference_id]),
                     'result_url'=>route('subscription.addons.payment-result',['reference'=>$payment->reference_id]),
@@ -148,7 +144,9 @@ class SubscriptionAddonController extends Controller
                 ]);
             }
 
-            return redirect()->away($checkout);
+            return $checkout
+                ? redirect()->away($checkout)
+                : redirect()->route('subscription.addons.payment-result',['reference'=>$payment->reference_id]);
         } catch (\Throwable $e) {
             report($e);
             $payment->update(['status'=>'failed','failure_reason'=>$e->getMessage()]);
@@ -172,6 +170,7 @@ class SubscriptionAddonController extends Controller
                 'paid_at'=>$payment->paid_at?->toIso8601String(),'payment_method'=>$payment->payment_method,
                 'payment_channel'=>$payment->payment_channel,'failure_reason'=>$payment->failure_reason,
             ] : null,
+            'presentation'=>$payment ? $ipaymu->directPaymentPresentation($payment->provider_payload ?? []) : null,
             'order'=>$payment?->order ? [
                 'id'=>$payment->order->id,'status'=>$payment->order->status,
                 'addon'=>$payment->order->addon?->only(['key','name']),

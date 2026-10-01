@@ -202,6 +202,43 @@ class IpaymuService
         return false;
     }
 
+
+    public function directPaymentPresentation(?array $payload): array
+    {
+        $payload = is_array($payload) ? $payload : [];
+        $data = (array) data_get($payload, 'Data', []);
+
+        $checkoutUrl = trim((string) ($data['Url'] ?? $data['url'] ?? data_get($payload, 'Url') ?? ''));
+        $qrImage = trim((string) ($data['QrImage'] ?? ''));
+        $qrTemplate = trim((string) ($data['QrTemplate'] ?? ''));
+        $qrString = trim((string) ($data['QrString'] ?? ''));
+        $paymentNo = trim((string) ($data['PaymentNo'] ?? ''));
+
+        if ($checkoutUrl !== '') {
+            $type = 'redirect';
+        } elseif ($qrImage !== '' || $qrTemplate !== '' || $qrString !== '') {
+            $type = 'qris';
+        } elseif ($paymentNo !== '') {
+            $type = 'payment_code';
+        } else {
+            $type = 'unknown';
+        }
+
+        return [
+            'type'=>$type,
+            'checkout_url'=>$checkoutUrl !== '' ? $checkoutUrl : null,
+            'qr_image'=>$qrImage !== '' ? $qrImage : null,
+            'qr_template'=>$qrTemplate !== '' ? $qrTemplate : null,
+            'qr_string'=>$qrString !== '' ? $qrString : null,
+            'payment_no'=>$paymentNo !== '' ? $paymentNo : null,
+            'payment_name'=>filled($data['PaymentName'] ?? null) ? (string)$data['PaymentName'] : null,
+            'via'=>filled($data['Via'] ?? null) ? (string)$data['Via'] : null,
+            'channel'=>filled($data['Channel'] ?? null) ? (string)$data['Channel'] : null,
+            'expired'=>filled($data['Expired'] ?? null) ? (string)$data['Expired'] : null,
+            'transaction_id'=>filled($data['TransactionId'] ?? null) ? (string)$data['TransactionId'] : null,
+            'session_id'=>filled($data['SessionId'] ?? null) ? (string)$data['SessionId'] : null,
+        ];
+    }
     public function callbackAmount(array $payload): ?float
     {
         foreach (['amount','total','sub_total','nominal','total_amount','trx_amount'] as $key) {

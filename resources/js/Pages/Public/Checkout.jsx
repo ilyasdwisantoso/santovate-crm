@@ -164,8 +164,13 @@ export default function Checkout({ subscription, plans = [], configurations = []
             if (!response.ok) throw new Error(data.message || 'Tidak dapat membuat sesi pembayaran.');
 
             setSession(data);
-            if (popup) popup.location.href = data.checkout_url;
-            else window.location.href = data.checkout_url;
+            if (data.checkout_url) {
+                if (popup) popup.location.href = data.checkout_url;
+                else window.location.href = data.checkout_url;
+            } else {
+                try { popup?.close(); } catch { /* noop */ }
+                window.location.href = data.result_url;
+            }
         } catch (error) {
             try { popup?.close(); } catch { /* noop */ }
             setPaymentError(error.message || 'Terjadi kesalahan saat menghubungkan iPaymu.');

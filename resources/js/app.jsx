@@ -20,6 +20,7 @@ import '../css/brand-v1.css';
 import '../css/platform-batch5a.css';
 import '../css/entitlements-batch5b.css';
 import '../css/subscription-addons-batch5c.css';
+import '../css/direct-payment-hotfix-5c2.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
