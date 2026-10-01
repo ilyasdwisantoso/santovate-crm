@@ -1,4 +1,4 @@
-import { Link, router, usePage } from '@inertiajs/react';
+﻿import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import Icon from '../Components/Icon';
 import Flash from '../Components/Flash';
@@ -134,7 +134,7 @@ function MobileSidebar({ user, url, notifications, open, onClose, onNotification
             <aside className="mobile-sidebar-drawer premium-mobile-drawer" onClick={(e) => e.stopPropagation()}>
                 <div className="mobile-sidebar-head">
                     <div className="mobile-sidebar-brand">
-                        <span className="brand-mark sm">S</span>
+                        <img className="sv-brand-logo sm" src="/images/brand/santovate-crm-logo.png" alt="Santovate CRM"/>
                         <div>
                             <strong>Santovate</strong>
                             <small>Sales Operating System</small>
@@ -246,7 +246,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
         <div className="app-shell premium-app-shell">
             <aside className="sidebar premium-sidebar">
                 <div className="brand premium-brand">
-                    <span className="brand-mark">S</span>
+                    <img className="sv-brand-logo" src="/images/brand/santovate-crm-logo.png" alt="Santovate CRM"/>
                     <div className="brand-copy">
                         <strong>Santovate</strong>
                         <small>Sales Operating System</small>
@@ -287,7 +287,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
                         <button type="button" className="mobile-menu-trigger" onClick={() => setMobileSidebarOpen(true)} aria-label="Buka menu">
                             <Icon name="menu" size={19}/>
                         </button>
-                        <span className="brand-mark sm">S</span>
+                        <img className="sv-brand-logo sm" src="/images/brand/santovate-crm-logo.png" alt="Santovate CRM"/>
                         <strong>Santovate</strong>
                     </div>
 
@@ -341,3 +341,4 @@ export default function AppLayout({ children, title, subtitle, action }) {
         </div>
     );
 }
+

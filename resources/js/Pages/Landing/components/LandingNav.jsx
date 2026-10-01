@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../../../Components/Icon';
 
@@ -12,17 +12,25 @@ const navItems = [
 ];
 
 export default function LandingNav() {
-    const { auth } = usePage().props;
+    const { auth, subscription } = usePage().props;
     const user = auth?.user;
+    const hasActiveSubscription = subscription?.status === 'active';
     const [open, setOpen] = useState(false);
 
     const closeMenu = () => setOpen(false);
+    const accountHref = !user ? '/login' : hasActiveSubscription ? '/dashboard' : '/subscription/checkout';
+    const accountLabel = !user ? 'Log in' : hasActiveSubscription ? 'Dashboard' : 'Lanjut checkout';
+
+    const switchAccount = () => {
+        closeMenu();
+        router.post('/logout');
+    };
 
     return (
         <header className="fl-nav-shell">
             <div className="fl-container fl-nav">
                 <a href="#top" className="fl-brand" aria-label="Santovate CRM" onClick={closeMenu}>
-                    <span className="fl-brand-symbol">S</span>
+                    <img className="sv-brand-logo landing" src="/images/brand/santovate-crm-logo.png" alt="Santovate CRM"/>
                     <strong>Santovate</strong>
                 </a>
 
@@ -33,9 +41,8 @@ export default function LandingNav() {
                 </nav>
 
                 <div className="fl-nav-actions">
-                    <Link href={user ? '/dashboard' : '/login'} className="fl-nav-login">
-                        {user ? 'Dashboard' : 'Log in'}
-                    </Link>
+                    <Link href={accountHref} className="fl-nav-login">{accountLabel}</Link>
+                    {user && <button type="button" className="fl-nav-account-switch" onClick={switchAccount}>Ganti akun</button>}
                     <a href="/business-configurations" className="fl-nav-cta">
                         Request Demo <Icon name="chevron" size={15}/>
                     </a>
@@ -59,9 +66,10 @@ export default function LandingNav() {
                             {item.label}<Icon name="chevron" size={16}/>
                         </a>
                     ))}
-                    <Link href={user ? '/dashboard' : '/login'} onClick={closeMenu}>
-                        {user ? 'Open Dashboard' : 'Log in'}<Icon name="chevron" size={16}/>
+                    <Link href={accountHref} onClick={closeMenu}>
+                        {accountLabel}<Icon name="chevron" size={16}/>
                     </Link>
+                    {user && <button type="button" className="fl-mobile-account-switch" onClick={switchAccount}>Ganti akun</button>}
                     <a href="/business-configurations" className="fl-nav-cta mobile" onClick={closeMenu}>
                         Request Demo
                     </a>

@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+﻿import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../../Components/Icon';
 
@@ -22,7 +22,7 @@ export default function Login() {
             <main className="login-page login-page-v24">
                 <section className="login-brand-panel">
                     <div className="login-brand login-brand-v24">
-                        <span className="brand-mark login-logo-large">S</span>
+                        <img className="sv-brand-logo login-logo-large" src="/images/brand/santovate-crm-logo.png" alt="Santovate CRM"/>
                         <div>
                             <strong>Santovate</strong>
                             <small>Digital Solution</small>
@@ -49,12 +49,12 @@ export default function Login() {
                         </div>
                     </div>
 
-                    <p className="login-foot">Santovate CRM · Internal workspace</p>
+                    <p className="login-foot">Santovate CRM Â· Internal workspace</p>
                 </section>
 
                 <section className="login-form-panel">
                     <div className="login-mobile-brand login-mobile-brand-v24">
-                        <span className="brand-mark login-logo-mobile">S</span>
+                        <img className="sv-brand-logo login-logo-mobile" src="/images/brand/santovate-crm-logo.png" alt="Santovate CRM"/>
                         <div>
                             <strong>Santovate</strong>
                             <small>CRM Account Executive</small>
@@ -117,7 +117,7 @@ export default function Login() {
                         </button>
 
                         <div className="security-note">
-                            <span>●</span> Akses khusus tim internal Santovate
+                            <span>â—</span> Akses khusus tim internal Santovate
                         </div>
                     </form>
                 </section>
@@ -125,3 +125,4 @@ export default function Login() {
         </>
     );
 }
+

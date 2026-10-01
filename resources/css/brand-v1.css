@@ -1,0 +1,60 @@
+
+/* Santovate CRM brand asset v1 */
+.sv-brand-logo{
+    display:block;
+    flex:0 0 auto;
+    width:42px;
+    height:42px;
+    object-fit:cover;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 0 1px rgba(15,23,42,.08),0 8px 24px rgba(15,23,42,.12);
+}
+.sv-brand-logo.sm{width:34px;height:34px}
+.sv-brand-logo.public{width:38px;height:38px}
+.sv-brand-logo.landing{width:37px;height:37px}
+.premium-brand .sv-brand-logo{width:44px;height:44px}
+.mobile-sidebar-brand .sv-brand-logo{width:38px;height:38px}
+.mobile-brand .sv-brand-logo{width:32px;height:32px}
+.login-brand .sv-brand-logo{width:68px;height:68px}
+.login-mobile-brand .sv-brand-logo{width:44px;height:44px}
+.sv-public-brand{display:flex;align-items:center;gap:10px}
+.sv-public-nav nav{align-items:center}
+.sv-public-switch-account,
+.fl-nav-account-switch,
+.fl-mobile-account-switch,
+.fl-footer-account-switch{
+    appearance:none;
+    border:0;
+    background:transparent;
+    font:inherit;
+    color:inherit;
+    cursor:pointer;
+}
+.sv-public-switch-account{
+    padding:9px 12px;
+    border-radius:999px;
+    color:#475569;
+    font-weight:750;
+    transition:background .18s ease,color .18s ease,transform .18s ease;
+}
+.sv-public-switch-account:hover{background:#f1f5f9;color:#0f172a;transform:translateY(-1px)}
+.fl-nav-account-switch{font-size:13px;font-weight:700;color:#667085}
+.fl-nav-account-switch:hover{color:#111827}
+.fl-mobile-account-switch{
+    width:100%;
+    text-align:left;
+    padding:14px 0;
+    font-weight:750;
+    border-bottom:1px solid rgba(17,24,39,.08);
+}
+.fl-footer-account-switch{
+    padding:0;
+    text-align:left;
+    font-size:inherit;
+    opacity:.76;
+}
+.fl-footer-account-switch:hover{opacity:1}
+@media (max-width:700px){
+    .sv-brand-logo.public{width:34px;height:34px}
+}

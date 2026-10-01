@@ -1,4 +1,4 @@
-import '@fontsource-variable/plus-jakarta-sans';
+﻿import '@fontsource-variable/plus-jakarta-sans';
 import '../css/app.css';
 import '../css/v24-mobile.css';
 import '../css/landing.css';
@@ -15,6 +15,7 @@ import '../css/finance-batch3.css';
 import '../css/premium-design-system.css';
 import '../css/public-pricing-v1.css';
 import '../css/subscription-checkout-v2.css';
+import '../css/brand-v1.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
@@ -29,3 +30,4 @@ createInertiaApp({
     },
     progress: { color: '#5365ee', showSpinner: false },
 });
+
