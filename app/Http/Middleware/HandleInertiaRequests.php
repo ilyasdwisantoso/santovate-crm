@@ -34,6 +34,7 @@ class HandleInertiaRequests extends Middleware
                     'name'=>$org->name,
                     'slug'=>$org->slug,
                     'status'=>$org->status,
+                    'is_internal'=>$org->slug === 'santovate-internal' || (bool)data_get($org->settings, 'internal', false),
                     'business_configuration'=>$configuration ? [
                         'id'=>$configuration->id,
                         'key'=>$configuration->key,

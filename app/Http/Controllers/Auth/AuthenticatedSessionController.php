@@ -30,7 +30,9 @@ class AuthenticatedSessionController extends Controller
             return back()->withErrors(['email'=>'Akun Anda sedang dinonaktifkan.']);
         }
         $user->forceFill(['last_login_at'=>now()])->save();
-        return redirect()->intended(route('dashboard'));
+
+        $default = $user->isPlatformAdmin() ? route('platform.dashboard') : route('dashboard');
+        return redirect()->intended($default);
     }
 
     public function destroy(Request $request): RedirectResponse

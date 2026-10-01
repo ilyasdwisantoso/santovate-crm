@@ -1,5 +1,10 @@
 <?php
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ApprovalRequestController;
+use App\Http\Controllers\Platform\DashboardController as PlatformDashboardController;
+use App\Http\Controllers\Platform\ClientController as PlatformClientController;
+use App\Http\Controllers\Platform\BusinessConfigurationController as PlatformBusinessConfigurationController;
+use App\Http\Controllers\Platform\ApprovalController as PlatformApprovalController;
 use App\Http\Controllers\Admin\BusinessSettingsController;
 use App\Http\Controllers\Admin\ClientOnboardingController;
 use App\Http\Controllers\Admin\UserController;
@@ -44,6 +49,14 @@ Route::get('/payment-result/{reference}',CommercialPaymentResultController::clas
 Route::middleware('guest')->group(function(){Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');Route::post('/login',[AuthenticatedSessionController::class,'store'])->name('login.store');Route::get('/register',[RegistrationController::class,'create'])->name('register');Route::post('/register',[RegistrationController::class,'store'])->name('register.store');});
 Route::middleware('auth')->group(function(){
     Route::post('/logout',[AuthenticatedSessionController::class,'destroy'])->name('logout');
+    Route::middleware('platform.admin')->prefix('platform')->name('platform.')->group(function(){
+        Route::get('/',PlatformDashboardController::class)->name('dashboard');
+        Route::get('/clients',[PlatformClientController::class,'index'])->name('clients.index');
+        Route::get('/configurations',[PlatformBusinessConfigurationController::class,'index'])->name('configurations.index');
+        Route::put('/configurations/{configuration}',[PlatformBusinessConfigurationController::class,'update'])->name('configurations.update');
+        Route::get('/approvals',[PlatformApprovalController::class,'index'])->name('approvals.index');
+        Route::post('/approvals/{approval}/decision',[PlatformApprovalController::class,'decide'])->name('approvals.decide');
+    });
     Route::get('/subscription/checkout',[SubscriptionController::class,'checkout'])->name('subscription.checkout');
     Route::patch('/subscription/checkout',[SubscriptionController::class,'updateSelection'])->name('subscription.selection');
     Route::post('/subscription/pay',[SubscriptionController::class,'pay'])->name('subscription.pay');
@@ -53,6 +66,9 @@ Route::middleware('auth')->group(function(){
     Route::middleware('subscription.active')->group(function(){
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');Route::patch('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::get('/dashboard',DashboardController::class)->name('dashboard');
+        Route::get('/approvals',[ApprovalRequestController::class,'index'])->name('approvals.index');
+        Route::post('/approvals',[ApprovalRequestController::class,'store'])->name('approvals.store');
+        Route::post('/approvals/{approval}/decision',[ApprovalRequestController::class,'decide'])->name('approvals.decide');
         Route::get('/sales-guide',[SalesGuideController::class,'index'])->name('sales-guide.index');
         Route::get('/prospects/check-duplicates',[ProspectController::class,'checkDuplicates'])->name('prospects.duplicates');
         Route::patch('/prospects/{prospect}/status',[ProspectController::class,'updateStatus'])->name('prospects.status');Route::resource('prospects',ProspectController::class);Route::post('/prospects/{prospect}/activities',[ActivityController::class,'store'])->name('prospects.activities.store');

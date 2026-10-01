@@ -1,4 +1,4 @@
-﻿import '@fontsource-variable/plus-jakarta-sans';
+import '@fontsource-variable/plus-jakarta-sans';
 import '../css/app.css';
 import '../css/v24-mobile.css';
 import '../css/landing.css';
@@ -17,6 +17,7 @@ import '../css/public-pricing-v1.css';
 import '../css/subscription-checkout-v2.css';
 import '../css/subscription-checkout-v2-1.css';
 import '../css/brand-v1.css';
+import '../css/platform-batch5a.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';

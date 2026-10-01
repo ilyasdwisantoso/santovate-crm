@@ -1,4 +1,4 @@
-﻿import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import Icon from '../Components/Icon';
 import Flash from '../Components/Flash';
@@ -18,6 +18,7 @@ const executionNav = [
     { href: '/pipeline', label: 'Pipeline', icon: 'pipeline', match: (u) => u.startsWith('/pipeline') },
     { href: '/targets', label: 'Target AE', icon: 'target', match: (u) => u.startsWith('/targets') },
     { href: '/sales-guide', label: 'Panduan', icon: 'spark', match: (u) => u.startsWith('/sales-guide') },
+    { href: '/approvals', label: 'Approvals', icon: 'check', match: (u) => u.startsWith('/approvals') },
 ];
 
 function NavLink({ item, url, mobile = false, onClick }) {

@@ -7,6 +7,9 @@ return [
         'whatsapp' => env('SANTOVATE_WHATSAPP', '6281293047587'),
         'address' => env('SANTOVATE_BUSINESS_ADDRESS'),
     ],
+    'platform' => [
+        'owner_email' => env('SANTOVATE_PLATFORM_OWNER_EMAIL'),
+    ],
     'ipaymu' => [
         'mode' => env('IPAYMU_MODE', 'sandbox'),
 

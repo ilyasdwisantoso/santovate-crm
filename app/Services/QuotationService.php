@@ -25,9 +25,14 @@ class QuotationService {
         $discountPercent=$data['discount_type']==='percent'?(float)$data['discount_value']:($totals['subtotal']>0?($totals['discount_amount']/$totals['subtotal']*100):0);
         $belowFloor=collect($totals['items'])->contains(function($item){$floor=$item['minimum_price_snapshot'];return $floor!==null && $floor>0 && (float)$item['unit_price']+0.01<(float)$floor;});
         $belowCost=collect($totals['items'])->contains(function($item){$cost=$item['internal_cost_snapshot'];return $cost!==null && $cost>0 && (float)$item['unit_price']+0.01<(float)$cost;});
-        return $discountPercent>5||($data['pricing_type']??'standard')==='custom'||$totals['grand_total']>=50000000||$belowFloor||$belowCost;
+        $discountThreshold=(float)config('approvals.quotation.discount_percent_threshold',5);
+        $highValueThreshold=(float)config('approvals.quotation.high_value_threshold',50000000);
+        $defaultTerms=(string)config('approvals.quotation.default_payment_terms','50% DP, 30% UAT, 20% Go-Live');
+        $customTerms=filled($data['payment_terms']??null) && $this->normalizeTerms($data['payment_terms'])!==$this->normalizeTerms($defaultTerms);
+        return $discountPercent>$discountThreshold||($data['pricing_type']??'standard')==='custom'||$totals['grand_total']>=$highValueThreshold||$belowFloor||$belowCost||$customTerms;
     }
     public function snapshot(Quotation $q):array{$q->loadMissing('items');return['quotation'=>collect($q->getAttributes())->except(['updated_at'])->all(),'items'=>$q->items->map(fn($i)=>$i->only(['sort_order','solution_catalog_item_id','name','description','quantity','unit','unit_price','internal_cost_snapshot','recommended_price_snapshot','minimum_price_snapshot','discount_percent','line_total']))->values()->all()];}
     public function saveRevision(Quotation $q,User $actor,?string $reason=null):void{$q->revisions()->create(['revision_number'=>$q->revision_number,'created_by'=>$actor->id,'reason'=>$reason,'snapshot'=>$this->snapshot($q)]);}
     public function nextNumber(int $organizationId,string $prefix='QT'):string{return DB::transaction(function()use($organizationId,$prefix){$year=now()->format('Y');$last=Quotation::where('organization_id',$organizationId)->where('quotation_number','like',"{$prefix}-{$year}-%")->lockForUpdate()->orderByDesc('id')->value('quotation_number');$n=$last?(int)substr($last,-6)+1:1;return sprintf('%s-%s-%06d',$prefix,$year,$n);});}
+    private function normalizeTerms(?string $value):string{return strtolower(preg_replace('/\s+/','',(string)$value));}
 }

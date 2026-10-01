@@ -107,7 +107,7 @@ class DemoAccountSeeder extends Seeder
                 'password' => 'Santovate123!',
                 'role' => 'admin',
                 'config' => 'internal',
-                'platform' => true,
+                'platform' => blank(config('santovate.platform.owner_email')) || strtolower((string) config('santovate.platform.owner_email')) === 'admin@santovate.com',
             ],
             [
                 'email' => 'sales@santovate.com',
