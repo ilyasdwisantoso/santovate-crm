@@ -51,6 +51,7 @@ Route::get('/payment-result/{reference}',CommercialPaymentResultController::clas
 Route::middleware('guest')->group(function(){Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');Route::post('/login',[AuthenticatedSessionController::class,'store'])->name('login.store');Route::get('/register',[RegistrationController::class,'create'])->name('register');Route::post('/register',[RegistrationController::class,'store'])->name('register.store');});
 Route::middleware('auth')->group(function(){
     Route::post('/logout',[AuthenticatedSessionController::class,'destroy'])->name('logout');
+    Route::get('/session/csrf-token',fn()=>response()->json(['token'=>csrf_token()]))->name('session.csrf-token');
     Route::middleware('platform.admin')->prefix('platform')->name('platform.')->group(function(){
         Route::get('/',PlatformDashboardController::class)->name('dashboard');
         Route::get('/clients',[PlatformClientController::class,'index'])->name('clients.index');

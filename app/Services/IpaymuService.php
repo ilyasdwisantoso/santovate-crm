@@ -94,6 +94,8 @@ class IpaymuService
                 throw new RuntimeException((string) ($data['Message'] ?? 'Daftar channel iPaymu tidak tersedia.'));
             }
 
+            $allowedMethods = array_values(array_filter((array) config('santovate.ipaymu.allowed_methods', [])));
+
             return collect($data['Data'] ?? [])->map(function ($method) {
                 $channels = collect($method['Channels'] ?? [])->map(fn ($channel) => [
                     'code'=>(string) ($channel['Code'] ?? ''),
@@ -112,7 +114,10 @@ class IpaymuService
                     'description'=>(string) ($method['Description'] ?? ''),
                     'channels'=>$channels,
                 ];
-            })->filter(fn ($method) => filled($method['code']) && count($method['channels']) > 0)->values()->all();
+            })->filter(fn ($method) => filled($method['code'])
+                && count($method['channels']) > 0
+                && (empty($allowedMethods) || in_array($method['code'], $allowedMethods, true)))
+                ->values()->all();
         });
     }
 

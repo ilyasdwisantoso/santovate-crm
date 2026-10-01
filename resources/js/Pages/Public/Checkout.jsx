@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PublicShell from './PublicShell';
 import usePaymentStream from '../../Hooks/usePaymentStream';
+import csrfFetch from '../../Utils/csrfFetch';
 
 const rupiah = (value) => new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -82,15 +83,11 @@ export default function Checkout({ subscription, plans = [], configurations = []
         setSyncState('saving');
         setSyncError('');
 
-        const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        const response = await fetch('/subscription/checkout', {
+        const response = await csrfFetch('/subscription/checkout', {
             method: 'PATCH',
-            credentials: 'same-origin',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify(nextSelection),
         });
@@ -154,15 +151,11 @@ export default function Checkout({ subscription, plans = [], configurations = []
             // Always persist the latest instant UI selection before creating the iPaymu transaction.
             await persistSelection(selection);
 
-            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            const response = await fetch('/subscription/pay', {
+            const response = await csrfFetch('/subscription/pay', {
                 method: 'POST',
-                credentials: 'same-origin',
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrf,
-                    'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify({ payment_method: method, payment_channel: channel }),
             });

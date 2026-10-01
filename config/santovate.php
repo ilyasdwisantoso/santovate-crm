@@ -12,6 +12,7 @@ return [
     ],
     'ipaymu' => [
         'mode' => env('IPAYMU_MODE', 'sandbox'),
+        'allowed_methods' => array_values(array_filter(array_map('trim', explode(',', (string) env('IPAYMU_ALLOWED_METHODS', 'va,qris,ewallet,cstore,cc,debitonline,paylater'))))),
 
         // Keep sandbox and production credentials side by side. When both are
         // configured, switching environment only requires changing IPAYMU_MODE.
