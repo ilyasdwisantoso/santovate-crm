@@ -17,8 +17,6 @@ class SaasFoundationSeeder extends Seeder
     {
         $this->assertSchemaReady();
 
-        // Minimum paid plan: 1 user = Rp250.000/month.
-        // Final price still differs by business configuration via add-on pricing.
         $plans = [
             [
                 'key'=>'starter','name'=>'Starter','description'=>'Untuk owner / 1 Account Executive yang baru membangun pipeline.',
@@ -37,9 +35,7 @@ class SaasFoundationSeeder extends Seeder
             ],
         ];
 
-        foreach ($plans as $plan) {
-            SubscriptionPlan::updateOrCreate(['key'=>$plan['key']], $plan + ['is_active'=>true]);
-        }
+        foreach ($plans as $plan) SubscriptionPlan::updateOrCreate(['key'=>$plan['key']], $plan + ['is_active'=>true]);
 
         $configs = [
             'software-agency'=>[
@@ -50,6 +46,7 @@ class SaasFoundationSeeder extends Seeder
                 'pipeline'=>$this->pipeline(['Lead','Qualified','Contacted','Replied','Discovery','Demo','Proposal','Negotiation','Won']),
                 'terminology'=>['prospect'=>'Prospect','deal'=>'Project','sales'=>'Account Executive'],
                 'follow_up_rules'=>['lead_age_days'=>3,'no_reply_days'=>5],
+                'entitlement_features'=>['software_agency_workflow'],
                 'demo_templates'=>$this->templates('solusi digital'),
             ],
             'logistics-freight'=>[
@@ -60,6 +57,7 @@ class SaasFoundationSeeder extends Seeder
                 'pipeline'=>$this->pipeline(['Lead','Researched','Contacted','Replied','Meeting','Needs Analysis','Quotation','Negotiation','Won']),
                 'terminology'=>['prospect'=>'Shipper Account','deal'=>'Shipment Opportunity','sales'=>'Sales / AE'],
                 'follow_up_rules'=>['lead_age_days'=>3,'no_reply_days'=>4],
+                'entitlement_features'=>['logistics_workflow'],
                 'demo_templates'=>$this->templates('layanan logistics dan freight'),
             ],
             'distributor-b2b'=>[
@@ -70,6 +68,7 @@ class SaasFoundationSeeder extends Seeder
                 'pipeline'=>$this->pipeline(['Lead','Qualified','Contacted','Replied','Meeting','Product Trial','Quotation','Negotiation','Order']),
                 'terminology'=>['prospect'=>'Account','deal'=>'Order Opportunity','sales'=>'Sales Representative'],
                 'follow_up_rules'=>['lead_age_days'=>2,'no_reply_days'=>4],
+                'entitlement_features'=>['distributor_workflow'],
                 'demo_templates'=>$this->templates('produk dan penawaran B2B'),
             ],
             'parfum-retail'=>[
@@ -80,6 +79,7 @@ class SaasFoundationSeeder extends Seeder
                 'pipeline'=>$this->pipeline(['Lead Baru','Qualified','Dihubungi','Tertarik','Tester / Sample','Follow Up','Penawaran','Closing','Order']),
                 'terminology'=>['prospect'=>'Customer','deal'=>'Order','sales'=>'Sales / Reseller'],
                 'follow_up_rules'=>['lead_age_days'=>1,'no_reply_days'=>3],
+                'entitlement_features'=>['retail_workflow'],
                 'demo_templates'=>[
                     ['trigger_type'=>'lead_age','name'=>'Perkenalan Produk','wait_days'=>1,'message'=>'Halo Kak {contact_name}, saya {ae_first_name} dari {business_name}. Kakak sempat tertarik dengan {product_name} {product_variant}. Saat ini harganya {product_price}. Boleh saya kirim foto dan detail aromanya?','body_parameters'=>['contact_name','product_name','product_variant','product_price']],
                     ['trigger_type'=>'no_reply','name'=>'Follow-up Produk','wait_days'=>3,'message'=>'Halo Kak {contact_name}, izin follow-up {product_name}. Kalau masih mencari parfum untuk dipakai sendiri atau reseller, saya bisa bantu rekomendasikan varian dan penawaran yang cocok.','body_parameters'=>['contact_name','product_name']],
@@ -93,26 +93,15 @@ class SaasFoundationSeeder extends Seeder
             ],
         ];
 
-        foreach ($configs as $key=>$config) {
-            BusinessConfiguration::updateOrCreate(['key'=>$key], $config + ['is_active'=>true]);
-        }
+        foreach ($configs as $key=>$config) BusinessConfiguration::updateOrCreate(['key'=>$key], $config + ['is_active'=>true]);
 
-        // Santovate's own employees must live in a real internal tenant, not in a
-        // demo tenant. Keep the workspace stable across repeated seeding and upgrades.
         $internal = Organization::query()->firstOrCreate(
             ['slug'=>'santovate-internal'],
-            [
-                'name'=>'Santovate Internal',
-                'status'=>'active',
-                'settings'=>['internal'=>true,'demo'=>false],
-            ]
+            ['name'=>'Santovate Internal','status'=>'active','settings'=>['internal'=>true,'demo'=>false]]
         );
 
         $internalSettings = is_array($internal->settings) ? $internal->settings : [];
-        $internal->update([
-            'status'=>'active',
-            'settings'=>array_merge($internalSettings, ['internal'=>true,'demo'=>false]),
-        ]);
+        $internal->update(['status'=>'active','settings'=>array_merge($internalSettings, ['internal'=>true,'demo'=>false])]);
 
         $plan = SubscriptionPlan::where('key', 'scale')->firstOrFail();
         $config = BusinessConfiguration::where('key', 'software-agency')->firstOrFail();
@@ -136,7 +125,6 @@ class SaasFoundationSeeder extends Seeder
         app(BusinessConfigurationService::class)->activate($internal->fresh(), $config);
     }
 
-
     private function assertSchemaReady(): void
     {
         $requirements = [
@@ -146,23 +134,17 @@ class SaasFoundationSeeder extends Seeder
             'import_batches'=>['organization_id'],
             'sales_targets'=>['organization_id'],
             'subscription_plans'=>['key','monthly_price','annual_price'],
-            'business_configurations'=>['key','theme'],
+            'business_configurations'=>['key','theme','entitlement_features'],
             'organizations'=>['slug','business_configuration_id','settings'],
-            'subscriptions'=>['organization_id','subscription_plan_id','business_configuration_id','starts_at','ends_at','activated_at','cancelled_at'],
+            'subscriptions'=>['organization_id','subscription_plan_id','business_configuration_id','entitlement_overrides','starts_at','ends_at','activated_at','cancelled_at'],
+            'entitlement_grants'=>['organization_id','subscription_id','key','kind','operation','status'],
             'products'=>['organization_id','sku'],
         ];
 
         $missing = [];
         foreach ($requirements as $table => $columns) {
-            if (!Schema::hasTable($table)) {
-                $missing[] = $table;
-                continue;
-            }
-            foreach ($columns as $column) {
-                if (!Schema::hasColumn($table, $column)) {
-                    $missing[] = $table.'.'.$column;
-                }
-            }
+            if (!Schema::hasTable($table)) { $missing[] = $table; continue; }
+            foreach ($columns as $column) if (!Schema::hasColumn($table, $column)) $missing[] = $table.'.'.$column;
         }
 
         if ($missing) {
@@ -175,10 +157,7 @@ class SaasFoundationSeeder extends Seeder
     private function pipeline(array $labels): array
     {
         $keys = ['baru','diriset','dihubungi','membalas','meeting','demo','proposal','negosiasi','deal'];
-        return collect($keys)->map(fn ($key, $i) => [
-            'key'=>$key,
-            'label'=>$labels[$i] ?? ucfirst($key),
-        ])->all();
+        return collect($keys)->map(fn ($key, $i) => ['key'=>$key,'label'=>$labels[$i] ?? ucfirst($key)])->all();
     }
 
     private function templates(string $service): array

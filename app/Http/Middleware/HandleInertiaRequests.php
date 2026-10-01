@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\EntitlementService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -16,6 +17,7 @@ class HandleInertiaRequests extends Middleware
         $unread = 0;
         $organization = null;
         $subscription = null;
+        $entitlements = null;
 
         if ($user) {
             $unread = $user->unreadNotifications()->count();
@@ -46,6 +48,7 @@ class HandleInertiaRequests extends Middleware
 
                 $active = $org->activeSubscription();
                 if ($active) {
+                    $entitlements = app(EntitlementService::class)->snapshot($org,null,$active);
                     $subscription = [
                         'id'=>$active->id,
                         'status'=>$active->status,
@@ -67,6 +70,7 @@ class HandleInertiaRequests extends Middleware
             ] : null],
             'organization'=>$organization,
             'subscription'=>$subscription,
+            'entitlements'=>$entitlements,
             'notifications'=>['unread_count'=>$unread,'items'=>$notifications],
             'flash'=>[
                 'success'=>fn ()=>$request->session()->get('success'),

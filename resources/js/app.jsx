@@ -18,6 +18,7 @@ import '../css/subscription-checkout-v2.css';
 import '../css/subscription-checkout-v2-1.css';
 import '../css/brand-v1.css';
 import '../css/platform-batch5a.css';
+import '../css/entitlements-batch5b.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
@@ -32,5 +33,3 @@ createInertiaApp({
     },
     progress: { color: '#5365ee', showSpinner: false },
 });
-
-

@@ -5,6 +5,7 @@ use App\Models\PlatformAuditLog;
 use App\Models\Quotation;
 use App\Models\User;
 use App\Services\ApprovalService;
+use App\Services\EntitlementService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
@@ -91,7 +92,6 @@ Artisan::command('platform:owner {email} {--name=} {--demote=}', function () {
     return 0;
 })->purpose('Create/promote a Santovate Platform Owner safely and optionally demote the legacy platform admin');
 
-
 Artisan::command('platform:approvals-backfill', function () {
     $count = 0;
     Quotation::query()
@@ -108,3 +108,23 @@ Artisan::command('platform:approvals-backfill', function () {
     $this->info("Approval request synchronized for {$count} pending quotation(s).");
     return 0;
 })->purpose('Backfill generic approval requests for quotations that were pending before Batch 5A');
+
+Artisan::command('platform:entitlements-audit {--organization=}', function () {
+    $query = Organization::query()->orderBy('id');
+    if ($slug = $this->option('organization')) $query->where('slug',$slug);
+    $service = app(EntitlementService::class);
+    $rows = $query->get()->map(function ($org) use ($service) {
+        $e = $service->snapshot($org);
+        return [
+            $org->id,
+            $org->slug,
+            data_get($e,'subscription.plan.name','-'),
+            data_get($e,'limits.users.unlimited') ? 'unlimited' : data_get($e,'limits.users.used',0).'/'.data_get($e,'limits.users.limit',0),
+            data_get($e,'limits.prospects.unlimited') ? 'unlimited' : data_get($e,'limits.prospects.used',0).'/'.data_get($e,'limits.prospects.limit',0),
+            count($e['enabled_features'] ?? []),
+            data_get($e,'grants.active_count',0),
+        ];
+    })->all();
+    $this->table(['ID','Organization','Plan','Users','Prospects','Features','Grants'],$rows);
+    return 0;
+})->purpose('Audit effective entitlement and usage for all organizations');

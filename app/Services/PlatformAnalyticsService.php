@@ -11,6 +11,8 @@ use Illuminate\Support\Collection;
 
 class PlatformAnalyticsService
 {
+    public function __construct(private readonly EntitlementService $entitlements) {}
+
     public function dashboard(): array
     {
         $clients = $this->realClientOrganizations();
@@ -71,21 +73,41 @@ class PlatformAnalyticsService
 
     public function clients(): Collection
     {
-        return Organization::query()->with(['businessConfiguration:id,key,name','subscriptions'=>fn($q)=>$q->with('plan:id,key,name,user_limit')->latest('id')])
-            ->withCount('users')->latest('id')->get()
+        return Organization::query()
+            ->with([
+                'businessConfiguration:id,key,name,entitlement_features',
+                'subscriptions'=>fn($q)=>$q->with(['plan:id,key,name,user_limit,prospect_limit,features','businessConfiguration:id,key,name,entitlement_features'])->latest('id'),
+                'entitlementGrants'=>fn($q)=>$q->active()->orderBy('id'),
+            ])
+            ->withCount([
+                'users as active_users_count'=>fn($q)=>$q->where('is_active',true),
+                'prospects as prospects_count',
+            ])
+            ->latest('id')->get()
             ->reject(fn ($organization) => $this->isInternal($organization))
             ->map(function ($organization) {
                 $subscription = $organization->subscriptions->first(fn($s)=>$s->status==='active' && (!$s->ends_at || $s->ends_at->isFuture()))
                     ?: $organization->subscriptions->first();
+                $snapshot = $this->entitlements->snapshot($organization,[
+                    'users'=>(int)$organization->active_users_count,
+                    'prospects'=>(int)$organization->prospects_count,
+                ],$subscription && $subscription->status === 'active' ? $subscription : null);
                 return [
                     'id'=>$organization->id,'name'=>$organization->name,'slug'=>$organization->slug,'status'=>$organization->status,
-                    'is_demo'=>(bool)data_get($organization->settings,'demo',false),'users_count'=>$organization->users_count,
+                    'is_demo'=>(bool)data_get($organization->settings,'demo',false),'users_count'=>(int)$organization->active_users_count,
+                    'prospects_count'=>(int)$organization->prospects_count,
                     'configuration'=>$organization->businessConfiguration?->only(['id','key','name']),
                     'subscription'=>$subscription ? [
                         'id'=>$subscription->id,'status'=>$subscription->status,'billing_cycle'=>$subscription->billing_cycle,
                         'total_amount'=>(int)$subscription->total_amount,'ends_at'=>$subscription->ends_at?->toIso8601String(),
-                        'plan'=>$subscription->plan?->only(['id','key','name','user_limit']),
+                        'plan'=>$subscription->plan?->only(['id','key','name','user_limit','prospect_limit']),
                     ] : null,
+                    'entitlements'=>[
+                        'users'=>$snapshot['limits']['users'],
+                        'prospects'=>$snapshot['limits']['prospects'],
+                        'enabled_features'=>count($snapshot['enabled_features']),
+                        'active_grants'=>$snapshot['grants']['active_count'],
+                    ],
                 ];
             })->values();
     }

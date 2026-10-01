@@ -8,6 +8,7 @@ use App\Models\ProspectActivity;
 use App\Models\ProspectAssignmentHistory;
 use App\Models\User;
 use App\Services\BusinessConfigurationService;
+use App\Services\EntitlementService;
 use App\Services\ProspectStageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -32,7 +33,8 @@ class ProspectController extends Controller {
     public function create(Request $request,BusinessConfigurationService $cfg): Response {
         return Inertia::render('Prospects/Form',['prospect'=>['fit_score'=>0,'pain_score'=>0,'contact_score'=>0,'status'=>'baru','qualification_status'=>'new','tracking_portal'=>null,'estimated_deal_value'=>0,'estimated_budget'=>'','probability'=>10,'assigned_to'=>$request->user()->isAdmin()?null:$request->user()->id,'product_ids'=>[]],'mode'=>'create','statuses'=>$cfg->statusLabels($request->user()->organization),'qualificationStatuses'=>$this->qualificationStatuses(),'salesUsers'=>$this->salesUsers($request),'products'=>Product::where('organization_id',$request->user()->organization_id)->where('is_active',true)->get()]);
     }
-    public function store(ProspectRequest $request): RedirectResponse {
+    public function store(ProspectRequest $request,EntitlementService $entitlements): RedirectResponse {
+        $entitlements->assertCanConsume($request->user()->organization,'prospects',1);
         $data=$request->validated();
         if(!$request->boolean('force_duplicate')){
             $dupes=$this->findDuplicates($request,$data);
