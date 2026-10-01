@@ -68,7 +68,7 @@ class SubscriptionController extends Controller
         ]);
     }
 
-    public function updateSelection(Request $request): RedirectResponse
+    public function updateSelection(Request $request): RedirectResponse|JsonResponse
     {
         $data = $request->validate([
             'plan_key'=>['required','exists:subscription_plans,key'],
@@ -77,12 +77,12 @@ class SubscriptionController extends Controller
         ]);
 
         $org = $request->user()->organization;
-        $plan = SubscriptionPlan::where('key',$data['plan_key'])->firstOrFail();
-        $cfg = BusinessConfiguration::where('key',$data['configuration_key'])->firstOrFail();
-        $base = $data['billing_cycle']==='annual' ? $plan->annual_price : $plan->monthly_price;
-        $addon = $data['billing_cycle']==='annual' ? $cfg->annual_addon_price : $cfg->monthly_addon_price;
-        $sub = $org->subscriptions()->where('status','pending')->latest()->first();
+        $plan = SubscriptionPlan::where('key',$data['plan_key'])->where('is_active',true)->firstOrFail();
+        $cfg = BusinessConfiguration::where('key',$data['configuration_key'])->where('is_active',true)->firstOrFail();
+        $base = $data['billing_cycle'] === 'annual' ? $plan->annual_price : $plan->monthly_price;
+        $addon = $data['billing_cycle'] === 'annual' ? $cfg->annual_addon_price : $cfg->monthly_addon_price;
 
+        $sub = $org->subscriptions()->where('status','pending')->latest()->first();
         if (!$sub) {
             $sub = new Subscription(['organization_id'=>$org->id,'status'=>'pending']);
         }
@@ -95,6 +95,26 @@ class SubscriptionController extends Controller
             'configuration_amount'=>$addon,
             'total_amount'=>$base+$addon,
         ])->save();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'saved'=>true,
+                'selection'=>[
+                    'plan_key'=>$plan->key,
+                    'configuration_key'=>$cfg->key,
+                    'billing_cycle'=>$sub->billing_cycle,
+                ],
+                'subscription'=>[
+                    'id'=>$sub->id,
+                    'base_amount'=>(int)$sub->base_amount,
+                    'configuration_amount'=>(int)$sub->configuration_amount,
+                    'total_amount'=>(int)$sub->total_amount,
+                    'billing_cycle'=>$sub->billing_cycle,
+                    'plan'=>$plan->only(['id','key','name']),
+                    'business_configuration'=>$cfg->only(['id','key','name']),
+                ],
+            ]);
+        }
 
         return back()->with('success','Paket dan konfigurasi diperbarui.');
     }
@@ -130,7 +150,7 @@ class SubscriptionController extends Controller
 
             $checkout = data_get($result,'Data.Url') ?? data_get($result,'Data.url') ?? data_get($result,'Url');
             $payment->update([
-                'provider_transaction_id'=>(string) (data_get($result,'Data.SessionId') ?? data_get($result,'Data.TransactionId') ?? ''),
+                'provider_transaction_id'=>(string)(data_get($result,'Data.SessionId') ?? data_get($result,'Data.TransactionId') ?? ''),
                 'checkout_url'=>$checkout,
                 'provider_payload'=>$result,
             ]);
@@ -158,18 +178,16 @@ class SubscriptionController extends Controller
         } catch (\Throwable $e) {
             report($e);
             $payment->update(['status'=>'failed']);
-
             if ($request->expectsJson()) {
                 return response()->json(['message'=>$e->getMessage()], 422);
             }
-
             return back()->with('error',$e->getMessage());
         }
     }
 
     public function result(Request $request, IpaymuService $ipaymu): Response
     {
-        $reference = (string) $request->query('reference');
+        $reference = (string)$request->query('reference');
         $payment = Payment::query()
             ->where('organization_id',$request->user()->organization_id)
             ->where('reference_id',$reference)
@@ -189,7 +207,7 @@ class SubscriptionController extends Controller
 
     public function status(Request $request): array
     {
-        $reference = (string) $request->query('reference');
+        $reference = (string)$request->query('reference');
         $payment = Payment::query()
             ->where('organization_id',$request->user()->organization_id)
             ->where('reference_id',$reference)
@@ -201,10 +219,10 @@ class SubscriptionController extends Controller
 
     public function stream(Request $request): StreamedResponse
     {
-        $reference = trim((string) $request->query('reference'));
+        $reference = trim((string)$request->query('reference'));
         abort_if($reference === '', 422, 'Reference pembayaran wajib diisi.');
 
-        $organizationId = (int) $request->user()->organization_id;
+        $organizationId = (int)$request->user()->organization_id;
         abort_unless(
             Payment::query()->where('organization_id',$organizationId)->where('reference_id',$reference)->exists(),
             404
@@ -221,9 +239,7 @@ class SubscriptionController extends Controller
             $lastHeartbeat = 0.0;
 
             while ((microtime(true) - $startedAt) < 25) {
-                if (connection_aborted()) {
-                    break;
-                }
+                if (connection_aborted()) break;
 
                 $payment = Payment::query()
                     ->where('organization_id',$organizationId)
@@ -285,9 +301,7 @@ class SubscriptionController extends Controller
 
     private function flushStream(): void
     {
-        if (ob_get_level() > 0) {
-            @ob_flush();
-        }
+        if (ob_get_level() > 0) @ob_flush();
         flush();
     }
 }
