@@ -9,10 +9,20 @@ return [
     ],
     'ipaymu' => [
         'mode' => env('IPAYMU_MODE', 'sandbox'),
-        'va' => env('IPAYMU_VA'),
-        'api_key' => env('IPAYMU_API_KEY'),
-        'sandbox_url' => env('IPAYMU_SANDBOX_URL', 'https://sandbox.ipaymu.com'),
-        'production_url' => env('IPAYMU_PRODUCTION_URL', 'https://my.ipaymu.com'),
+
+        // Keep sandbox and production credentials side by side. When both are
+        // configured, switching environment only requires changing IPAYMU_MODE.
+        // IPAYMU_VA / IPAYMU_API_KEY remain as backward-compatible fallbacks.
+        'sandbox' => [
+            'va' => env('IPAYMU_SANDBOX_VA', env('IPAYMU_VA')),
+            'api_key' => env('IPAYMU_SANDBOX_API_KEY', env('IPAYMU_API_KEY')),
+            'url' => env('IPAYMU_SANDBOX_URL', 'https://sandbox.ipaymu.com'),
+        ],
+        'production' => [
+            'va' => env('IPAYMU_PRODUCTION_VA', env('IPAYMU_VA')),
+            'api_key' => env('IPAYMU_PRODUCTION_API_KEY', env('IPAYMU_API_KEY')),
+            'url' => env('IPAYMU_PRODUCTION_URL', 'https://my.ipaymu.com'),
+        ],
     ],
     'whatsapp' => [
         'graph_version' => env('WHATSAPP_GRAPH_VERSION', 'v23.0'),

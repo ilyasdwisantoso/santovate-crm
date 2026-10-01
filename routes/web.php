@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function(){
     Route::post('/subscription/pay',[SubscriptionController::class,'pay'])->name('subscription.pay');
     Route::get('/subscription/payment-result',[SubscriptionController::class,'result'])->name('subscription.payment-result');
     Route::get('/subscription/status',[SubscriptionController::class,'status'])->name('subscription.status');
+    Route::get('/subscription/payment-stream',[SubscriptionController::class,'stream'])->name('subscription.payment-stream');
     Route::middleware('subscription.active')->group(function(){
         Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');Route::patch('/profile',[ProfileController::class,'update'])->name('profile.update');
         Route::get('/dashboard',DashboardController::class)->name('dashboard');

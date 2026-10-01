@@ -1,4 +1,35 @@
 import { Link } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import PublicShell from './PublicShell';
-export default function PaymentResult({ payment }) { const [status,setStatus]=useState(payment?.status||'unknown'); useEffect(()=>{if(!payment?.reference_id||status==='paid')return;const id=setInterval(async()=>{const r=await fetch(`/subscription/status?reference=${encodeURIComponent(payment.reference_id)}`,{headers:{Accept:'application/json'}});if(r.ok){const d=await r.json();setStatus(d.status);if(d.active)window.location.href='/dashboard';}},3000);return()=>clearInterval(id);},[payment?.reference_id,status]); return <PublicShell title="Status Pembayaran"><section className="sv-result-card"><span>/ PAYMENT</span><h1>{status==='paid'?'Pembayaran berhasil':'Menunggu konfirmasi pembayaran'}</h1><p>Reference: {payment?.reference_id||'-'}</p><strong className={`sv-status ${status}`}>{status.toUpperCase()}</strong>{status==='paid'?<Link href="/dashboard" className="btn btn-primary">Buka CRM</Link>:<p>Halaman akan mengecek status otomatis. Jangan melakukan pembayaran kedua untuk reference yang sama.</p>}</section></PublicShell>; }
+import usePaymentStream from '../../Hooks/usePaymentStream';
+
+const rupiah = (value) => new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', maximumFractionDigits:0 }).format(Number(value || 0));
+
+export default function PaymentResult({ payment, subscription, gateway = {} }) {
+    const reference = payment?.reference_id;
+    const done = useCallback(() => window.setTimeout(() => { window.location.href = '/dashboard'; }, 1500), []);
+    const { payment: live, connection } = usePaymentStream({
+        reference,
+        streamUrl: reference ? `/subscription/payment-stream?reference=${encodeURIComponent(reference)}` : null,
+        statusUrl: reference ? `/subscription/status?reference=${encodeURIComponent(reference)}` : null,
+        initialStatus: payment?.status || 'unknown',
+        onComplete: done,
+    });
+
+    const paid = live.active || live.status === 'paid';
+    return <PublicShell title="Status Pembayaran">
+        <div className="sv-payment-result-v2">
+            <div className={`sv-result-visual-v2 ${paid ? 'done' : ''}`}><i/><i/><span>{paid ? '✓' : '↻'}</span></div>
+            <span className={`sv-result-mode-v2 ${gateway.mode === 'production' ? 'live' : 'sandbox'}`}>iPaymu {gateway.mode === 'production' ? 'Live' : 'Sandbox'} · {connection === 'live' ? 'SSE connected' : connection}</span>
+            <h1>{paid ? 'Pembayaran berhasil.' : 'Menunggu konfirmasi pembayaran.'}</h1>
+            <p>{paid ? 'Subscription sudah terverifikasi. Workspace sedang dibuka.' : 'Jangan melakukan pembayaran kedua untuk reference yang sama. Status akan berubah otomatis setelah callback iPaymu diterima.'}</p>
+            <div className="sv-result-detail-v2">
+                <span><small>Reference</small><strong>{reference || '—'}</strong></span>
+                <span><small>Subscription</small><strong>{subscription?.plan?.name || '—'}</strong></span>
+                <span><small>Total</small><strong>{rupiah(payment?.amount)}</strong></span>
+                <span><small>Status</small><strong>{String(live.status || 'unknown').toUpperCase()}</strong></span>
+            </div>
+            {paid ? <Link href="/dashboard" className="sv-result-button-v2">Buka Dashboard →</Link> : <Link href="/subscription/checkout" className="sv-result-button-v2 secondary">Kembali ke Checkout</Link>}
+        </div>
+    </PublicShell>;
+}

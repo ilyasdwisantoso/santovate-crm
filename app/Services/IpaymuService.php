@@ -4,21 +4,38 @@ namespace App\Services;
 
 use App\Models\Payment;
 use App\Models\PaymentTransaction;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 class IpaymuService
 {
+    public function mode(): string
+    {
+        return config('santovate.ipaymu.mode') === 'production' ? 'production' : 'sandbox';
+    }
+
+    public function credentials(?string $mode = null): array
+    {
+        $mode = $mode ?: $this->mode();
+        $config = (array) config("santovate.ipaymu.{$mode}", []);
+
+        return [
+            'va' => (string) ($config['va'] ?? ''),
+            'api_key' => (string) ($config['api_key'] ?? ''),
+            'url' => rtrim((string) ($config['url'] ?? ''), '/'),
+        ];
+    }
+
     public function baseUrl(): string
     {
-        return config('santovate.ipaymu.mode') === 'production'
-            ? rtrim((string) config('santovate.ipaymu.production_url'), '/')
-            : rtrim((string) config('santovate.ipaymu.sandbox_url'), '/');
+        return $this->credentials()['url'];
     }
 
     public function configured(): bool
     {
-        return filled(config('santovate.ipaymu.va')) && filled(config('santovate.ipaymu.api_key'));
+        $credentials = $this->credentials();
+        return filled($credentials['va']) && filled($credentials['api_key']) && filled($credentials['url']);
     }
 
     public function createCheckout(Payment $payment, array $buyer): array
@@ -41,6 +58,49 @@ class IpaymuService
             route('commercial-payment.result', ['reference'=>$payment->reference_id]),
             route('commercial-payment.result', ['reference'=>$payment->reference_id])
         );
+    }
+
+    public function paymentChannels(): array
+    {
+        if (!$this->configured()) {
+            return [];
+        }
+
+        return Cache::remember('ipaymu:channels:'.$this->mode(), now()->addMinutes(5), function (): array {
+            $json = '{}';
+            $response = Http::acceptJson()
+                ->withHeaders($this->headers('GET', $json))
+                ->get($this->baseUrl().'/api/v2/payment-channels');
+
+            if (!$response->successful()) {
+                throw new RuntimeException('Gagal mengambil channel iPaymu: '.$response->status());
+            }
+
+            $data = $response->json();
+            if ((int) ($data['Status'] ?? 0) !== 200) {
+                throw new RuntimeException((string) ($data['Message'] ?? 'Daftar channel iPaymu tidak tersedia.'));
+            }
+
+            return collect($data['Data'] ?? [])->map(function ($method) {
+                $channels = collect($method['Channels'] ?? [])->map(fn ($channel) => [
+                    'code'=>(string) ($channel['Code'] ?? ''),
+                    'name'=>(string) ($channel['Name'] ?? $channel['Code'] ?? ''),
+                    'description'=>(string) ($channel['Description'] ?? ''),
+                    'logo'=>$channel['Logo'] ?? null,
+                    'feature_status'=>strtolower((string) ($channel['FeatureStatus'] ?? 'active')),
+                    'health_status'=>strtolower((string) ($channel['HealthStatus'] ?? 'online')),
+                    'fee'=>data_get($channel, 'TransactionFee.ActualFee'),
+                    'fee_type'=>data_get($channel, 'TransactionFee.ActualFeeType'),
+                ])->filter(fn ($channel) => filled($channel['code']))->values()->all();
+
+                return [
+                    'code'=>(string) ($method['Code'] ?? ''),
+                    'name'=>(string) ($method['Name'] ?? $method['Code'] ?? ''),
+                    'description'=>(string) ($method['Description'] ?? ''),
+                    'channels'=>$channels,
+                ];
+            })->filter(fn ($method) => filled($method['code']) && count($method['channels']) > 0)->values()->all();
+        });
     }
 
     private function createCheckoutRequest(
@@ -73,7 +133,7 @@ class IpaymuService
         }
 
         $response = Http::acceptJson()
-            ->withHeaders($this->headers('POST', '/api/v2/payment/direct', $json))
+            ->withHeaders($this->headers('POST', $json))
             ->withBody($json, 'application/json')
             ->post($this->baseUrl().'/api/v2/payment/direct');
 
@@ -91,7 +151,7 @@ class IpaymuService
 
     public function validateCallback(array $payload, ?string $signature): bool
     {
-        if (!$signature || !filled(config('santovate.ipaymu.va'))) {
+        if (!$signature) {
             return false;
         }
 
@@ -106,8 +166,21 @@ class IpaymuService
             return false;
         }
 
-        $expected = hash_hmac('sha256', $json, (string) config('santovate.ipaymu.va'));
-        return hash_equals(strtolower($expected), strtolower(trim($signature)));
+        // During a controlled sandbox -> production cutover, a delayed callback
+        // may still arrive from the previous environment. Validate against both
+        // configured merchant VAs without ever exposing them to the client.
+        foreach (['sandbox', 'production'] as $mode) {
+            $va = $this->credentials($mode)['va'];
+            if (!filled($va)) {
+                continue;
+            }
+            $expected = hash_hmac('sha256', $json, $va);
+            if (hash_equals(strtolower($expected), strtolower(trim($signature)))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function callbackAmount(array $payload): ?float
@@ -120,10 +193,11 @@ class IpaymuService
         return null;
     }
 
-    private function headers(string $method, string $path, string $json): array
+    private function headers(string $method, string $json): array
     {
-        $va = (string) config('santovate.ipaymu.va');
-        $apiKey = (string) config('santovate.ipaymu.api_key');
+        $credentials = $this->credentials();
+        $va = $credentials['va'];
+        $apiKey = $credentials['api_key'];
         $bodyHash = strtolower(hash('sha256', $json));
         $stringToSign = strtoupper($method).':'.$va.':'.$bodyHash.':'.$apiKey;
 
@@ -165,8 +239,6 @@ class IpaymuService
                 continue;
             }
 
-            // All other callback fields stay strings. This intentionally keeps
-            // amount/total/sub_total/fee/payment_no/va as strings.
             $normalized[$key] = $value === null ? 'null' : (string) $value;
         }
 

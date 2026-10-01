@@ -14,6 +14,7 @@ import '../css/typography-motion-v4.css';
 import '../css/finance-batch3.css';
 import '../css/premium-design-system.css';
 import '../css/public-pricing-v1.css';
+import '../css/subscription-checkout-v2.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
