@@ -50,6 +50,7 @@ function MobileSidebar({ user, entitlements, url, notifications, open, onClose, 
         { href: '/campaigns', label: 'WA Campaign', icon: 'whatsapp', feature: 'campaigns', match: (u) => u.startsWith('/campaigns') },
         { href: '/settings/whatsapp', label: 'WhatsApp API', icon: 'whatsapp', feature: 'whatsapp_api', match: (u) => u.startsWith('/settings/whatsapp') },
         { href: '/settings/business', label: 'Business Config', icon: 'spark', match: (u) => u.startsWith('/settings/business') },
+        { href: '/subscription/addons', label: 'Subscription Add-ons', icon: 'spark', match: (u) => u.startsWith('/subscription/addons') },
         ...(user.is_platform_admin ? [{ href: '/admin/clients', label: 'Client Onboarding', icon: 'users', match: (u) => u.startsWith('/admin/clients') }] : []),
     ].filter((item)=>featureOn(entitlements,item.feature));
 
@@ -74,6 +75,7 @@ export default function AppLayout({ children, title, subtitle, action }) {
         { href:'/campaigns',label:'WA Campaign',icon:'whatsapp',feature:'campaigns',match:(u)=>u.startsWith('/campaigns') },
         { href:'/settings/whatsapp',label:'WhatsApp API',icon:'whatsapp',feature:'whatsapp_api',match:(u)=>u.startsWith('/settings/whatsapp') },
         { href:'/settings/business',label:'Business Config',icon:'spark',match:(u)=>u.startsWith('/settings/business') },
+        { href:'/subscription/addons',label:'Subscription Add-ons',icon:'spark',match:(u)=>u.startsWith('/subscription/addons') },
         ...(user.is_platform_admin?[{href:'/admin/clients',label:'Client Onboarding',icon:'users',match:(u)=>u.startsWith('/admin/clients')}]:[]),
     ].filter((item)=>featureOn(entitlements,item.feature)),[user.is_platform_admin,entitlements]);
     const allNav=[...workspaceNav,...executionItems,...(user.is_admin?adminNav:[])];

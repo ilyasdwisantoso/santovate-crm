@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Payment;
 use App\Models\PaymentTransaction;
+use App\Models\SubscriptionAddonPayment;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -46,6 +47,18 @@ class IpaymuService
             $buyer,
             route('subscription.payment-result', ['reference'=>$payment->reference_id]),
             route('subscription.checkout')
+        );
+    }
+
+    public function createAddonCheckout(SubscriptionAddonPayment $payment, array $buyer): array
+    {
+        return $this->createCheckoutRequest(
+            (string) $payment->reference_id,
+            (float) $payment->amount,
+            $buyer,
+            route('subscription.addons.payment-result', ['reference'=>$payment->reference_id]),
+            route('subscription.addons.index'),
+            route('api.ipaymu.addon-callback')
         );
     }
 
@@ -108,7 +121,8 @@ class IpaymuService
         float $amount,
         array $buyer,
         string $successUrl,
-        string $cancelUrl
+        string $cancelUrl,
+        ?string $notifyUrl = null
     ): array {
         if (!$this->configured()) {
             throw new RuntimeException('Kredensial iPaymu belum dikonfigurasi.');
@@ -121,7 +135,7 @@ class IpaymuService
             'amount'=>(int) round($amount),
             'paymentMethod'=>$buyer['payment_method'] ?? 'va',
             'paymentChannel'=>$buyer['payment_channel'] ?? 'bca',
-            'notifyUrl'=>route('api.ipaymu.callback'),
+            'notifyUrl'=>$notifyUrl ?: route('api.ipaymu.callback'),
             'successUrl'=>$successUrl,
             'cancelUrl'=>$cancelUrl,
             'referenceId'=>$reference,

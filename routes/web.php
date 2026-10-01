@@ -5,6 +5,7 @@ use App\Http\Controllers\Platform\DashboardController as PlatformDashboardContro
 use App\Http\Controllers\Platform\ClientController as PlatformClientController;
 use App\Http\Controllers\Platform\BusinessConfigurationController as PlatformBusinessConfigurationController;
 use App\Http\Controllers\Platform\ApprovalController as PlatformApprovalController;
+use App\Http\Controllers\Platform\SubscriptionAddonController as PlatformSubscriptionAddonController;
 use App\Http\Controllers\Admin\BusinessSettingsController;
 use App\Http\Controllers\Admin\ClientOnboardingController;
 use App\Http\Controllers\Admin\UserController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SalesTargetController;
 use App\Http\Controllers\SalesGuideController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SubscriptionAddonController;
 use App\Http\Controllers\WhatsAppSendController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,6 +58,8 @@ Route::middleware('auth')->group(function(){
         Route::put('/configurations/{configuration}',[PlatformBusinessConfigurationController::class,'update'])->name('configurations.update');
         Route::get('/approvals',[PlatformApprovalController::class,'index'])->name('approvals.index');
         Route::post('/approvals/{approval}/decision',[PlatformApprovalController::class,'decide'])->name('approvals.decide');
+        Route::get('/addons',[PlatformSubscriptionAddonController::class,'index'])->name('addons.index');
+        Route::put('/addons/{addon}',[PlatformSubscriptionAddonController::class,'update'])->name('addons.update');
     });
     Route::get('/subscription/checkout',[SubscriptionController::class,'checkout'])->name('subscription.checkout');
     Route::patch('/subscription/checkout',[SubscriptionController::class,'updateSelection'])->name('subscription.selection');
@@ -111,6 +115,11 @@ Route::middleware('auth')->group(function(){
         Route::get('/targets',[SalesTargetController::class,'index'])->middleware('entitlement.feature:targets')->name('targets.index');
         Route::post('/notifications/{notification}/read',[NotificationController::class,'read'])->name('notifications.read');Route::post('/notifications/read-all',[NotificationController::class,'readAll'])->name('notifications.read-all');
         Route::middleware('role:admin')->group(function(){
+            Route::get('/subscription/addons',[SubscriptionAddonController::class,'index'])->name('subscription.addons.index');
+            Route::post('/subscription/addons/pay',[SubscriptionAddonController::class,'pay'])->name('subscription.addons.pay');
+            Route::get('/subscription/addons/payment-result',[SubscriptionAddonController::class,'result'])->name('subscription.addons.payment-result');
+            Route::get('/subscription/addons/status',[SubscriptionAddonController::class,'status'])->name('subscription.addons.status');
+            Route::get('/subscription/addons/payment-stream',[SubscriptionAddonController::class,'stream'])->name('subscription.addons.payment-stream');
             Route::post('/sales-guide/solutions',[SalesGuideController::class,'store'])->name('sales-guide.solutions.store');
             Route::put('/sales-guide/solutions/{solution}',[SalesGuideController::class,'update'])->name('sales-guide.solutions.update');
             Route::put('/targets/{user}',[SalesTargetController::class,'update'])->middleware('entitlement.feature:targets')->name('targets.update');Route::put('/follow-up-templates/{template}',[FollowUpTemplateController::class,'update'])->name('follow-up-templates.update');

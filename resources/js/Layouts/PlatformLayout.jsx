@@ -6,6 +6,7 @@ const nav = [
     { href:'/platform', label:'Overview', icon:'home', match:(u)=>u==='/platform' || u.startsWith('/platform?') },
     { href:'/platform/clients', label:'Clients', icon:'users', match:(u)=>u.startsWith('/platform/clients') },
     { href:'/platform/configurations', label:'Business Configurations', icon:'spark', match:(u)=>u.startsWith('/platform/configurations') },
+    { href:'/platform/addons', label:'Subscription Add-ons', icon:'briefcase', match:(u)=>u.startsWith('/platform/addons') },
     { href:'/platform/approvals', label:'Approvals', icon:'check', match:(u)=>u.startsWith('/platform/approvals') },
 ];
 

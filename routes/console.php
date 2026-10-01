@@ -3,6 +3,9 @@
 use App\Models\Organization;
 use App\Models\PlatformAuditLog;
 use App\Models\Quotation;
+use App\Models\SubscriptionAddon;
+use App\Models\SubscriptionAddonOrder;
+use App\Models\SubscriptionAddonPayment;
 use App\Models\User;
 use App\Services\ApprovalService;
 use App\Services\EntitlementService;
@@ -128,3 +131,14 @@ Artisan::command('platform:entitlements-audit {--organization=}', function () {
     $this->table(['ID','Organization','Plan','Users','Prospects','Features','Grants'],$rows);
     return 0;
 })->purpose('Audit effective entitlement and usage for all organizations');
+
+Artisan::command('platform:addons-audit', function () {
+    $catalog = SubscriptionAddon::query()->orderBy('sort_order')->get()->map(fn($a)=>[
+        $a->key,$a->resource_key,$a->resource_quantity,$a->monthly_price,$a->annual_price,$a->is_active?'active':'inactive',
+    ])->all();
+    $this->table(['Key','Resource','Qty','Monthly','Annual','Status'],$catalog);
+    $this->newLine();
+    $this->info('Orders: '.SubscriptionAddonOrder::count().' | Activated: '.SubscriptionAddonOrder::where('status','activated')->count().' | Pending: '.SubscriptionAddonOrder::where('status','pending')->count());
+    $this->info('Payments paid: '.SubscriptionAddonPayment::where('status','paid')->count().' | Pending: '.SubscriptionAddonPayment::where('status','pending')->count().' | Review: '.SubscriptionAddonPayment::where('status','pending_verification')->count());
+    return 0;
+})->purpose('Audit subscription add-on catalog, orders and payment lifecycle');
