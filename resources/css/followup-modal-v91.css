@@ -1,0 +1,86 @@
+/* Santovate CRM V9.1 — viewport-safe Follow Up / WhatsApp modal */
+body.followup-modal-open-v91{overflow:hidden!important}
+
+.followup-modal-backdrop-v91{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10000!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:24px!important;
+  background:rgba(10,18,32,.46)!important;
+  backdrop-filter:blur(7px) saturate(.9)!important;
+  -webkit-backdrop-filter:blur(7px) saturate(.9)!important;
+  overflow:auto!important;
+  isolation:isolate!important;
+}
+
+.followup-modal-panel-v91{
+  position:relative!important;
+  z-index:1!important;
+  width:min(760px,calc(100vw - 48px))!important;
+  max-width:760px!important;
+  max-height:calc(100dvh - 48px)!important;
+  margin:auto!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  background:#fff!important;
+  border:1px solid #e1e6ef!important;
+  border-radius:22px!important;
+  padding:22px!important;
+  box-shadow:0 28px 90px rgba(15,23,42,.28)!important;
+}
+
+.followup-modal-panel-v91 .modal-head{
+  position:sticky;
+  top:-22px;
+  z-index:3;
+  margin:-22px -22px 18px!important;
+  padding:20px 22px 16px!important;
+  background:rgba(255,255,255,.97)!important;
+  border-bottom:1px solid #edf0f5!important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.followup-modal-panel-v91 .modal-head h3{font-size:19px!important;line-height:1.25!important}
+.followup-modal-panel-v91 .modal-head p{font-size:11px!important;line-height:1.45!important}
+.followup-modal-panel-v91 .followup-v7-owner-line{font-size:10px!important}
+.followup-modal-panel-v91 .field>span{font-size:10px!important}
+.followup-modal-panel-v91 .field input,
+.followup-modal-panel-v91 .field select{min-height:42px!important;font-size:11.5px!important}
+.followup-modal-panel-v91 .field textarea{font-size:11.5px!important;line-height:1.55!important}
+.followup-modal-panel-v91 .followup-v7-status-row span{font-size:10px!important}
+.followup-modal-error-v91{margin:12px 0 0!important;font-size:10.5px!important;line-height:1.5!important}
+.followup-whatsapp-button-v91{border-color:#b9dfc9!important;background:#f0faf4!important;color:#12603b!important}
+.followup-whatsapp-button-v91:hover{background:#e2f5e9!important}
+
+@media(max-width:780px){
+  .followup-modal-backdrop-v91{
+    align-items:flex-end!important;
+    justify-content:center!important;
+    padding:max(6px,env(safe-area-inset-top)) 6px max(0px,env(safe-area-inset-bottom))!important;
+  }
+  .followup-modal-panel-v91{
+    width:100%!important;
+    max-width:100%!important;
+    max-height:calc(100dvh - max(6px,env(safe-area-inset-top)))!important;
+    margin:0!important;
+    padding:16px!important;
+    border-radius:22px 22px 0 0!important;
+  }
+  .followup-modal-panel-v91 .modal-head{
+    top:-16px;
+    margin:-16px -16px 15px!important;
+    padding:16px 16px 13px!important;
+  }
+  .followup-modal-panel-v91 .modal-head h3{font-size:17px!important}
+  .followup-modal-panel-v91 .modal-head p{font-size:10px!important}
+  .followup-modal-panel-v91 .followup-v7-modal-actions{display:grid!important;grid-template-columns:1fr!important;gap:7px!important}
+  .followup-modal-panel-v91 .followup-v7-modal-actions .btn{width:100%!important;min-height:44px!important;justify-content:center!important}
+}
+
+@media(max-width:380px){
+  .followup-modal-panel-v91{padding:13px!important}
+  .followup-modal-panel-v91 .modal-head{top:-13px;margin:-13px -13px 13px!important;padding:13px!important}
+}

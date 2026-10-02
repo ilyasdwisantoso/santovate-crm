@@ -1,5 +1,6 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import AppLayout from '../../Layouts/AppLayout';
 import Icon from '../../Components/Icon';
 import { EmptyState, PriorityBadge } from '../../Components/Ui';
@@ -18,36 +19,80 @@ const helper = {
 };
 const waNumber = (v='') => { let d=String(v).replace(/\D/g,''); if(d.startsWith('0')) d=`62${d.slice(1)}`; if(d.startsWith('8')) d=`62${d}`; return d; };
 
+function FollowUpModalPortal({ children, close }) {
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('followup-modal-open-v91');
+    const onKeyDown = (event) => { if (event.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      document.body.classList.remove('followup-modal-open-v91');
+    };
+  }, [close]);
+
+  if (typeof document === 'undefined') return null;
+  return createPortal(children, document.body);
+}
+
 function Composer({ item, queueType, templates, apiReady, close }) {
   const suggested = item.suggested_template_id ? String(item.suggested_template_id) : '';
   const [templateId,setTemplateId] = useState(suggested);
   const [opened,setOpened] = useState(false);
+  const [manualError,setManualError] = useState('');
   const form = useForm({ template_id:suggested, message:item.suggested_message||'', queue_type:queueType, feedback_note:'', next_follow_up_days:queueType==='lead_age_due'?3:5 });
   const selected = templates.find(t=>String(t.id)===String(templateId));
-  const choose = e => { const id=e.target.value; setTemplateId(id); form.setData('template_id',id); if(id && item.template_messages?.[id] !== undefined) form.setData('message',item.template_messages[id]); };
-  const manual = () => { const n=waNumber(item.phone); if(!n || !form.data.message.trim()) return; window.open(`https://wa.me/${n}?text=${encodeURIComponent(form.data.message.trim())}`,'_blank','noopener,noreferrer'); setOpened(true); };
+  const choose = e => { const id=e.target.value; setTemplateId(id); form.setData('template_id',id); setManualError(''); if(id && item.template_messages?.[id] !== undefined) form.setData('message',item.template_messages[id]); };
+  const manualPhone = waNumber(item.phone);
+  const manual = () => {
+    if (!manualPhone) { setManualError('Nomor WhatsApp prospect belum tersedia atau tidak valid. Lengkapi nomor pada data prospect terlebih dahulu.'); return; }
+    if (!form.data.message.trim()) { setManualError('Pesan follow-up masih kosong. Pilih template atau isi pesan sebelum membuka WhatsApp.'); return; }
+    setManualError('');
+    window.open(`https://wa.me/${manualPhone}?text=${encodeURIComponent(form.data.message.trim())}`,'_blank','noopener,noreferrer');
+    setOpened(true);
+  };
   const cloud = () => form.post(`/follow-ups/${item.id}/cloud-send`,{preserveScroll:true,onSuccess:close});
   const mark = () => form.post(`/follow-ups/${item.id}/sent`,{preserveScroll:true,onSuccess:close});
-  return <div className="modal-backdrop" onClick={close}><section className="followup-composer followup-composer-v7" onClick={e=>e.stopPropagation()}>
-    <div className="modal-head"><div><span className="eyebrow">WhatsApp follow-up</span><h3>{item.company_name}</h3><p>{item.contact_name||'PIC'} · {item.phone||'Nomor belum ada'}</p>{item.assigned_user?.name&&<small className="followup-v7-owner-line">Account Executive: <b>{item.assigned_user.name}</b></small>}</div><button type="button" className="icon-button" onClick={close} aria-label="Tutup"><Icon name="close"/></button></div>
-    <div className="sv-wa-status-row followup-v7-status-row"><span>Nomor <b>{item.whatsapp_status||'unknown'}</b></span><span>Opt-in <b>{item.whatsapp_opted_in?'YES':'NO'}</b></span><span>Channel <b>{apiReady?'Cloud API + manual':'Manual wa.me'}</b></span></div>
-    <label className="field"><span>Template</span><select value={templateId} onChange={choose}><option value="">Draft</option>{templates.map(t=><option value={t.id} key={t.id}>{t.name} · {t.meta_status}</option>)}</select></label>
-    {selected?.image_url && <img className="sv-template-image" src={selected.image_url} alt="Template header"/>}
-    <label className="field"><span>Review pesan</span><textarea rows="9" value={form.data.message} onChange={e=>form.setData('message',e.target.value)}/></label>
-    {queueType==='lead_age_due' && <label className="field"><span>Feedback AE * wajib</span><textarea rows="3" value={form.data.feedback_note} onChange={e=>form.setData('feedback_note',e.target.value)}/></label>}
-    <label className="field"><span>Reminder berikutnya</span><select value={form.data.next_follow_up_days} onChange={e=>form.setData('next_follow_up_days',Number(e.target.value))}>{[1,3,5,7,14,0].map(x=><option value={x} key={x}>{x?`${x} hari`:'Tidak dijadwalkan'}</option>)}</select></label>
-    {Object.values(form.errors).length>0 && <div className="alert alert-error">{Object.values(form.errors)[0]}</div>}
-    <div className="modal-actions followup-v7-modal-actions"><button type="button" className="btn btn-secondary" onClick={manual}><Icon name="whatsapp" size={16}/>Buka WhatsApp</button>{apiReady&&<button type="button" className="btn btn-primary" onClick={cloud} disabled={!templateId||form.processing||(queueType==='lead_age_due'&&!form.data.feedback_note.trim())}>Kirim Cloud API</button>}<button type="button" className="btn btn-secondary" onClick={mark} disabled={!opened||form.processing||(queueType==='lead_age_due'&&!form.data.feedback_note.trim())}>Tandai Manual Terkirim</button></div>
-  </section></div>;
-}
 
+  return <FollowUpModalPortal close={close}>
+    <div className="modal-backdrop followup-modal-backdrop-v91" role="presentation" onClick={close}>
+      <section className="followup-composer followup-composer-v7 followup-modal-panel-v91" role="dialog" aria-modal="true" aria-label={`Review follow-up ${item.company_name}`} onClick={e=>e.stopPropagation()}>
+        <div className="modal-head"><div><span className="eyebrow">WhatsApp follow-up</span><h3>{item.company_name}</h3><p>{item.contact_name||'PIC'} · {item.phone||'Nomor belum ada'}</p>{item.assigned_user?.name&&<small className="followup-v7-owner-line">Account Executive: <b>{item.assigned_user.name}</b></small>}</div><button type="button" className="icon-button" onClick={close} aria-label="Tutup"><Icon name="close"/></button></div>
+        <div className="sv-wa-status-row followup-v7-status-row"><span>Nomor <b>{item.whatsapp_status||'unknown'}</b></span><span>Opt-in <b>{item.whatsapp_opted_in?'YES':'NO'}</b></span><span>Channel <b>{apiReady?'Cloud API + manual':'Manual wa.me'}</b></span></div>
+        <label className="field"><span>Template</span><select value={templateId} onChange={choose}><option value="">Draft</option>{templates.map(t=><option value={t.id} key={t.id}>{t.name} · {t.meta_status}</option>)}</select></label>
+        {selected?.image_url && <img className="sv-template-image" src={selected.image_url} alt="Template header"/>}
+        <label className="field"><span>Review pesan</span><textarea rows="9" value={form.data.message} onChange={e=>{form.setData('message',e.target.value);setManualError('');}}/></label>
+        {queueType==='lead_age_due' && <label className="field"><span>Feedback AE * wajib</span><textarea rows="3" value={form.data.feedback_note} onChange={e=>form.setData('feedback_note',e.target.value)}/></label>}
+        <label className="field"><span>Reminder berikutnya</span><select value={form.data.next_follow_up_days} onChange={e=>form.setData('next_follow_up_days',Number(e.target.value))}>{[1,3,5,7,14,0].map(x=><option value={x} key={x}>{x?`${x} hari`:'Tidak dijadwalkan'}</option>)}</select></label>
+        {manualError&&<div className="alert alert-error followup-modal-error-v91">{manualError}</div>}
+        {Object.values(form.errors).length>0 && <div className="alert alert-error">{Object.values(form.errors)[0]}</div>}
+        <div className="modal-actions followup-v7-modal-actions">
+          <button type="button" className="btn btn-secondary followup-whatsapp-button-v91" onClick={manual}><Icon name="whatsapp" size={16}/>Buka WhatsApp</button>
+          {apiReady&&<button type="button" className="btn btn-primary" onClick={cloud} disabled={!templateId||form.processing||(queueType==='lead_age_due'&&!form.data.feedback_note.trim())}>Kirim Cloud API</button>}
+          <button type="button" className="btn btn-secondary" onClick={mark} disabled={!opened||form.processing||(queueType==='lead_age_due'&&!form.data.feedback_note.trim())}>Tandai Manual Terkirim</button>
+        </div>
+      </section>
+    </div>
+  </FollowUpModalPortal>;
+}
 function TemplateEditor({ template, close }) {
   const [params,setParams]=useState((template.body_parameters||[]).join(', '));
   const form=useForm({name:template.name,wait_days:template.wait_days,message:template.message,header_type:template.header_type||'none',image_url:template.image_url||'',meta_template_name:template.meta_template_name||'',meta_language:template.meta_language||'id',meta_status:template.meta_status||'draft',meta_category:template.meta_category||'marketing',body_parameters:template.body_parameters||[]});
   const submit=e=>{e.preventDefault();form.transform(data=>({...data,body_parameters:params.split(',').map(x=>x.trim()).filter(Boolean)})).put(`/follow-up-templates/${template.id}`,{preserveScroll:true,onSuccess:close});};
-  return <div className="modal-backdrop" onClick={close}><form className="followup-composer followup-composer-v7" onClick={e=>e.stopPropagation()} onSubmit={submit}><div className="modal-head"><div><span className="eyebrow">Template + Meta</span><h3>{template.name}</h3></div><button type="button" className="icon-button" onClick={close} aria-label="Tutup"><Icon name="close"/></button></div><div className="form-grid two"><label className="field"><span>Nama</span><input value={form.data.name} onChange={e=>form.setData('name',e.target.value)}/></label><label className="field"><span>Jeda hari</span><input type="number" value={form.data.wait_days} onChange={e=>form.setData('wait_days',Number(e.target.value))}/></label><label className="field"><span>Header</span><select value={form.data.header_type} onChange={e=>form.setData('header_type',e.target.value)}><option value="none">None</option><option value="image">Image</option></select></label><label className="field"><span>Image URL</span><input value={form.data.image_url} onChange={e=>form.setData('image_url',e.target.value)}/></label><label className="field"><span>Meta template name</span><input value={form.data.meta_template_name} onChange={e=>form.setData('meta_template_name',e.target.value)}/></label><label className="field"><span>Meta status</span><select value={form.data.meta_status} onChange={e=>form.setData('meta_status',e.target.value)}><option value="draft">Draft</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></label></div><label className="field"><span>Body parameters (comma separated)</span><input value={params} onChange={e=>setParams(e.target.value)}/></label><label className="field"><span>Pesan draft/manual</span><textarea rows="8" value={form.data.message} onChange={e=>form.setData('message',e.target.value)}/></label><button className="btn btn-primary">Simpan Template</button></form></div>;
+  return <FollowUpModalPortal close={close}>
+    <div className="modal-backdrop followup-modal-backdrop-v91" role="presentation" onClick={close}>
+      <form className="followup-composer followup-composer-v7 followup-modal-panel-v91" role="dialog" aria-modal="true" aria-label={`Edit template ${template.name}`} onClick={e=>e.stopPropagation()} onSubmit={submit}>
+        <div className="modal-head"><div><span className="eyebrow">Template + Meta</span><h3>{template.name}</h3></div><button type="button" className="icon-button" onClick={close} aria-label="Tutup"><Icon name="close"/></button></div>
+        <div className="form-grid two"><label className="field"><span>Nama</span><input value={form.data.name} onChange={e=>form.setData('name',e.target.value)}/></label><label className="field"><span>Jeda hari</span><input type="number" value={form.data.wait_days} onChange={e=>form.setData('wait_days',Number(e.target.value))}/></label><label className="field"><span>Header</span><select value={form.data.header_type} onChange={e=>form.setData('header_type',e.target.value)}><option value="none">None</option><option value="image">Image</option></select></label><label className="field"><span>Image URL</span><input value={form.data.image_url} onChange={e=>form.setData('image_url',e.target.value)}/></label><label className="field"><span>Meta template name</span><input value={form.data.meta_template_name} onChange={e=>form.setData('meta_template_name',e.target.value)}/></label><label className="field"><span>Meta status</span><select value={form.data.meta_status} onChange={e=>form.setData('meta_status',e.target.value)}><option value="draft">Draft</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></label></div>
+        <label className="field"><span>Body parameters (comma separated)</span><input value={params} onChange={e=>setParams(e.target.value)}/></label>
+        <label className="field"><span>Pesan draft/manual</span><textarea rows="8" value={form.data.message} onChange={e=>form.setData('message',e.target.value)}/></label>
+        <button className="btn btn-primary">Simpan Template</button>
+      </form>
+    </div>
+  </FollowUpModalPortal>;
 }
-
 export default function FollowUpsIndex({ queues, stats, templates, noReplyDays, leadAgeDays, whatsappApiReady, salesUsers=[], filters={} }) {
   const { auth }=usePage().props;
   const [tab,setTab]=useState(stats.response_needed?'response_needed':stats.lead_age_due?'lead_age_due':stats.no_reply?'no_reply':'scheduled');
