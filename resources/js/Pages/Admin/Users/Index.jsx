@@ -4,8 +4,8 @@ import Icon from '../../../Components/Icon';
 import { Avatar, Badge } from '../../../Components/Ui';
 import { dateTime } from '../../../Utils/format';
 
-const roleLabel=(role)=>role==='admin'?'Administrator':role==='finance'?'Finance':'Account Executive';
-const roleTone=(role)=>role==='admin'?'violet':role==='finance'?'warning':'info';
+const roleLabel=(role)=>role==='admin'?'Administrator':'Account Executive';
+const roleTone=(role)=>role==='admin'?'violet':'info';
 const limitText=(r)=>r?.unlimited?'Tidak terbatas':`${Number(r?.used||0).toLocaleString('id-ID')} / ${Number(r?.limit||0).toLocaleString('id-ID')}`;
 
 export default function Index({ users, entitlements }) {

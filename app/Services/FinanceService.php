@@ -319,7 +319,7 @@ class FinanceService
                 'entry_type'=>'payout',
                 'amount'=>$payable,
                 'reference_number'=>$reference,
-                'notes'=>'Commission payout recorded by Finance/Admin.',
+                'notes'=>'Commission payout recorded by Administrator.',
                 'occurred_at'=>$paidAt ?: now(),
             ]);
 

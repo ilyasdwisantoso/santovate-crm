@@ -196,7 +196,7 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
 
             <section className="dashboard-command-grid">
                 <div className="dashboard-command-main">
-                    {!user.is_admin && !user.is_finance && <PerformanceCard performance={salesPerformance}/>} 
+                    {!user.is_admin && <PerformanceCard performance={salesPerformance}/>} 
 
                     {user.is_admin && (
                         <section className="panel dashboard-team-panel premium-team-panel">
@@ -255,7 +255,7 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
                             : <EmptyState icon="calendar" title="Queue aman" description="Tidak ada follow-up terdekat."/>}
                         <Link href="/follow-ups" className="btn btn-soft btn-block">Buka queue</Link>
                     </section>
-                    {!user.is_finance && <CommissionSnapshot summary={financeSummary}/>} 
+                    {!user.is_admin && <CommissionSnapshot summary={financeSummary}/>} 
                 </aside>
             </section>
 

@@ -93,10 +93,10 @@ Route::middleware('auth')->group(function(){
         Route::post('/deals/{deal}/documents',[DealController::class,'uploadDocument'])->name('deals.documents.store');
 
         // Batch 3 - Finance, Payment, AR, Refund and Commission.
-        Route::get('/finance',[FinanceController::class,'index'])->name('finance.index');
         Route::get('/finance/commissions',[FinanceCommissionController::class,'index'])->name('finance.commissions.index');
 
-        Route::middleware('role:admin,finance')->group(function(){
+        Route::middleware('role:admin')->group(function(){
+            Route::get('/finance',[FinanceController::class,'index'])->name('finance.index');
             Route::get('/finance/invoices/create',[FinanceInvoiceController::class,'create'])->name('finance.invoices.create');
             Route::post('/finance/invoices',[FinanceInvoiceController::class,'store'])->name('finance.invoices.store');
             Route::post('/finance/invoices/{invoice}/issue',[FinanceInvoiceController::class,'issue'])->name('finance.invoices.issue');

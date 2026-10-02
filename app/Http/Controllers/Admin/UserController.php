@@ -76,7 +76,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name'=>['required','string','max:255'],
             'email'=>['required','email','max:255',Rule::unique('users','email')->ignore($user->id)],
-            'role'=>['required',Rule::in(['admin','sales','finance'])],
+            'role'=>['required',Rule::in(['admin','sales'])],
             'is_active'=>['nullable','boolean'],
             'password'=>['nullable','string','min:8','confirmed'],
         ]);
@@ -101,7 +101,7 @@ class UserController extends Controller
         return $request->validate([
             'name'=>['required','string','max:255'],
             'email'=>['required','email','max:255','unique:users,email'],
-            'role'=>['required',Rule::in(['admin','sales','finance'])],
+            'role'=>['required',Rule::in(['admin','sales'])],
             'password'=>['required','string','min:8','confirmed'],
             'is_active'=>['nullable','boolean'],
         ]);

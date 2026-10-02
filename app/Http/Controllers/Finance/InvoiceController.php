@@ -250,7 +250,7 @@ class InvoiceController extends Controller
             'proof_path'=>$path,
         ]);
 
-        return back()->with('success', 'Bukti transfer tersimpan dan menunggu verifikasi Finance/Admin.');
+        return back()->with('success', 'Bukti transfer tersimpan dan menunggu verifikasi Administrator.');
     }
 
     public function createGatewayPayment(
