@@ -124,8 +124,10 @@ export default function Checkout({ subscription, plans = [], configurations = []
 
     const paymentComplete = useCallback(() => {
         try { paymentWindow.current?.close(); } catch { /* noop */ }
-        window.setTimeout(() => { window.location.href = '/dashboard'; }, 1400);
-    }, []);
+        if (session?.result_url) {
+            window.setTimeout(() => { window.location.href = session.result_url; }, 450);
+        }
+    }, [session?.result_url]);
 
     const { payment, connection } = usePaymentStream({
         reference: session?.reference,
@@ -190,8 +192,8 @@ export default function Checkout({ subscription, plans = [], configurations = []
         setSelection((current) => ({ ...current, [key]: value }));
     };
 
-    return <PublicShell title="Checkout Subscription">
-        <div className="sv-checkout-v2">
+    return <PublicShell title="Checkout Subscription" wide>
+        <div className="sv-checkout-v2 sv-checkout-v5">
             <section className="sv-checkout-hero-v2">
                 <div>
                     <span className="sv-checkout-kicker">SECURE SUBSCRIPTION CHECKOUT</span>
@@ -208,7 +210,7 @@ export default function Checkout({ subscription, plans = [], configurations = []
             </div>}
 
             <div className="sv-checkout-layout-v2">
-                <main className="sv-checkout-main-v2">
+                <div className="sv-checkout-main-v2">
                     <section className="sv-checkout-section-v2">
                         <div className="sv-checkout-section-head"><span>01</span><div><h2>Pilih paket</h2><p>Klik paket untuk melihat total baru secara realtime.</p></div></div>
                         <div className="sv-plan-picker-v2">
@@ -254,7 +256,7 @@ export default function Checkout({ subscription, plans = [], configurations = []
                             </button>)}
                         </div>}
                     </section>
-                </main>
+                </div>
 
                 <aside className="sv-checkout-summary-v2">
                     <div className="sv-summary-top-v2"><small>ORDER SUMMARY</small><h2>{selectedPlan?.name || 'Subscription'}</h2><p>{selectedConfiguration?.name || 'Business configuration'}</p></div>

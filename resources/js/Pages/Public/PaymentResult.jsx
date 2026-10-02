@@ -50,7 +50,7 @@ export default function PaymentResult({ payment, subscription, presentation, gat
     const methodLabel = `${String(payment?.payment_method || '—').toUpperCase()} · ${String(payment?.payment_channel || '—').toUpperCase()}`;
 
     return <PublicShell title="Status Pembayaran" wide>
-        <main className="payv4-page">
+        <div className="payv4-page payv5-page">
             <div className="payv4-ambient payv4-ambient-left" aria-hidden="true"/>
             <div className="payv4-ambient payv4-ambient-right" aria-hidden="true"/>
 
@@ -163,6 +163,6 @@ export default function PaymentResult({ payment, subscription, presentation, gat
                     </aside>
                 </div>
             </section>
-        </main>
+        </div>
     </PublicShell>;
 }
