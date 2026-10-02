@@ -1,0 +1,60 @@
+/* Santovate CRM Hotfix 5C.6 — single document scrollbar for wide payment pages
+   Legacy v24 sets overflow-x:hidden on both html and body. On modern browsers,
+   that can promote the other axis to a scrolling overflow and produce two
+   vertical scrollbar owners. Wide checkout/payment pages explicitly restore
+   the normal document scrolling model: html scrolls; body/app remain visible. */
+
+html.sv-payment-document-scroll{
+    width:100%!important;
+    max-width:100%!important;
+    min-height:100%!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow-x:clip!important;
+    overflow-y:auto!important;
+    scrollbar-gutter:auto!important;
+    overscroll-behavior-y:auto;
+}
+
+body.sv-payment-document-scroll{
+    width:100%!important;
+    max-width:100%!important;
+    min-height:100vh!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+    overscroll-behavior-y:auto;
+}
+
+body.sv-payment-document-scroll #app{
+    width:100%!important;
+    min-height:100vh!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+}
+
+body.sv-payment-document-scroll .sv-public--wide,
+body.sv-payment-document-scroll .sv-public-main-wide,
+body.sv-payment-document-scroll .payv5-page,
+body.sv-payment-document-scroll .sv-checkout-v5{
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow-y:visible!important;
+}
+
+/* The payment surfaces may clip decoration horizontally, but never own Y scroll. */
+body.sv-payment-document-scroll .sv-public--wide{
+    overflow-x:clip!important;
+}
+
+body.sv-payment-document-scroll .payv4-shell,
+body.sv-payment-document-scroll .payv4-grid,
+body.sv-payment-document-scroll .payv4-main,
+body.sv-payment-document-scroll .payv4-summary,
+body.sv-payment-document-scroll .sv-checkout-layout-v2,
+body.sv-payment-document-scroll .sv-checkout-main-v2,
+body.sv-payment-document-scroll .sv-checkout-summary-v2{
+    max-height:none!important;
+}

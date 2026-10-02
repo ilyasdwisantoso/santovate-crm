@@ -1,9 +1,30 @@
+import { useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 
 export default function PublicShell({ title, children, wide = false }) {
     const { auth, subscription } = usePage().props;
     const user = auth?.user;
     const hasActiveSubscription = subscription?.status === 'active';
+
+    useEffect(() => {
+        const html = document.documentElement;
+        const body = document.body;
+        const scrollClass = 'sv-payment-document-scroll';
+
+        if (!wide) {
+            html.classList.remove(scrollClass);
+            body.classList.remove(scrollClass);
+            return undefined;
+        }
+
+        html.classList.add(scrollClass);
+        body.classList.add(scrollClass);
+
+        return () => {
+            html.classList.remove(scrollClass);
+            body.classList.remove(scrollClass);
+        };
+    }, [wide]);
 
     const switchAccount = () => {
         router.post('/logout');
