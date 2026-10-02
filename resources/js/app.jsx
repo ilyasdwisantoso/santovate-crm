@@ -26,6 +26,7 @@ import '../css/payment-result-v4.css';
 import '../css/payment-flow-v5.css';
 import '../css/payment-scroll-v6.css';
 import '../css/sales-monitoring-followup-v7.css';
+import '../css/account-lifecycle-v8.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';

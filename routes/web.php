@@ -132,7 +132,11 @@ Route::middleware('auth')->group(function(){
             Route::get('/campaigns',[CampaignController::class,'index'])->middleware('entitlement.feature:campaigns')->name('campaigns.index');Route::post('/campaigns',[CampaignController::class,'store'])->middleware('entitlement.feature:campaigns')->name('campaigns.store');Route::post('/campaigns/{campaign}/send',[CampaignController::class,'send'])->middleware('entitlement.feature:campaigns')->name('campaigns.send');
             Route::get('/settings/business',[BusinessSettingsController::class,'index'])->name('settings.business');Route::get('/settings/whatsapp',[WhatsAppSettingsController::class,'edit'])->middleware('entitlement.feature:whatsapp_api')->name('settings.whatsapp');Route::put('/settings/whatsapp',[WhatsAppSettingsController::class,'update'])->middleware('entitlement.feature:whatsapp_api')->name('settings.whatsapp.update');
             Route::middleware('platform.admin')->group(function(){Route::get('/admin/clients',[ClientOnboardingController::class,'index'])->name('admin.clients.index');Route::post('/admin/clients',[ClientOnboardingController::class,'store'])->name('admin.clients.store');});
-            Route::prefix('admin')->name('admin.')->group(function(){Route::resource('users',UserController::class)->except(['show','destroy']);});
+            Route::prefix('admin')->name('admin.')->group(function(){
+                Route::patch('users/{user}/status',[UserController::class,'status'])->name('users.status');
+                Route::post('users/{user}/deactivate',[UserController::class,'deactivate'])->name('users.deactivate');
+                Route::resource('users',UserController::class)->except(['show']);
+            });
         });
     });
 });
