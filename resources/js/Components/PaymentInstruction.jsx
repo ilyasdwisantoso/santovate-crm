@@ -54,7 +54,7 @@ function CopyButton({ value, label = 'Salin nomor' }) {
         }
     };
 
-    return <button type="button" className="payv3-copy" onClick={copy}>
+    return <button type="button" className="payv4-copy" onClick={copy}>
         <span>{copied ? 'Berhasil disalin' : label}</span>
         <i>{copied ? '✓' : '⧉'}</i>
     </button>;
@@ -77,24 +77,24 @@ export default function PaymentInstruction({ presentation }) {
     const channel = presentation.channel || '';
     const expiredLabel = formatExpiry(presentation.expired);
 
-    return <section className="payv3-instruction">
-        <header className="payv3-instruction-head">
+    return <section className="payv4-instruction">
+        <header className="payv4-instruction-head">
             <div>
-                <span className="payv3-kicker">PAYMENT INSTRUCTION</span>
+                <span className="payv4-eyebrow">PAYMENT INSTRUCTION</span>
                 <h2>{via}{channel ? ` · ${channel}` : ''}</h2>
-                <p>Instruksi dibuat oleh iPaymu. Santovate memantau status transaksi secara realtime.</p>
+                <p>Instruksi dibuat oleh iPaymu. Santovate memantau status transaksi secara real-time.</p>
             </div>
-            {presentation.expired && <div className={`payv3-expiry ${countdown === 'Kedaluwarsa' ? 'expired' : ''}`}>
+            {presentation.expired && <div className={`payv4-expiry ${countdown === 'Kedaluwarsa' ? 'is-expired' : ''}`}>
                 <small>Sisa waktu pembayaran</small>
                 <strong>{countdown || '—'}</strong>
                 <span>{expiredLabel}</span>
             </div>}
         </header>
 
-        {presentation.type === 'qris' && <div className="payv3-qr-layout">
-            <div className={`payv3-qr-frame ${qrLoaded ? 'is-loaded' : ''} ${qrError ? 'has-error' : 'is-loading'}`}>
-                <div className="payv3-qr-corners" aria-hidden="true"><i/><i/><i/><i/></div>
-                {!qrLoaded && !qrError && <div className="payv3-qr-skeleton" aria-hidden="true">
+        {presentation.type === 'qris' && <div className="payv4-qr-layout">
+            <div className={`payv4-qr-frame ${qrLoaded ? 'is-loaded' : ''} ${qrError ? 'has-error' : 'is-loading'}`}>
+                <div className="payv4-qr-corners" aria-hidden="true"><i/><i/><i/><i/></div>
+                {!qrLoaded && !qrError && <div className="payv4-qr-skeleton" aria-hidden="true">
                     <span/><span/><span/><span/><span/><span/><span/><span/><span/>
                     <b>Menyiapkan QRIS…</b>
                 </div>}
@@ -106,41 +106,48 @@ export default function PaymentInstruction({ presentation }) {
                         onLoad={() => setQrLoaded(true)}
                         onError={() => setQrError(true)}
                     />
-                    : <div className="payv3-qr-fallback">
+                    : <div className="payv4-qr-fallback">
                         <span>QR</span>
                         <strong>QR belum dapat dimuat</strong>
-                        <small>Gunakan tombol fallback iPaymu di bawah untuk membuka QR asli.</small>
+                        <small>Gunakan aplikasi mobile banking Anda atau buka QR asli dari iPaymu.</small>
                     </div>}
-                {!qrError && <div className="payv3-scanline" aria-hidden="true"/>}
+                {!qrError && <div className="payv4-scanline" aria-hidden="true"/>}
             </div>
 
-            <div className="payv3-instruction-copy">
-                <span className="payv3-method-pill">QRIS · SECURE PAYMENT</span>
+            <div className="payv4-instruction-copy">
+                <span className="payv4-method-pill">QRIS · SECURE PAYMENT</span>
                 <h3>Scan QR untuk menyelesaikan pembayaran</h3>
                 <p>Buka mobile banking atau e-wallet yang mendukung QRIS. Anda tidak perlu refresh halaman ini setelah pembayaran.</p>
-                <div className="payv3-trust-row"><span>✓ Status realtime</span><span>✓ Signature divalidasi server</span><span>✓ Tenant-scoped</span></div>
-                {qrError && <div className="payv3-inline-error">QR proxy belum dapat mengambil image dari Sandbox. Transaksi tetap valid dan dapat dilanjutkan melalui iPaymu.</div>}
-                {presentation.qr_template && <a className="payv3-secondary-link" href={presentation.qr_template} target="_blank" rel="noreferrer">Buka QR langsung di iPaymu <span>↗</span></a>}
+                <div className="payv4-trust-row">
+                    <span><i>✓</i> Status realtime</span>
+                    <span><i>✓</i> Signature divalidasi</span>
+                    <span><i>✓</i> Tenant-scoped</span>
+                </div>
+                {qrError && <div className="payv4-inline-error">
+                    <strong>QR proxy belum dapat mengambil image dari Sandbox.</strong>
+                    <span>Transaksi tetap valid dan dapat dilanjutkan melalui iPaymu.</span>
+                </div>}
+                {presentation.qr_template && <a className="payv4-secondary-link" href={presentation.qr_template} target="_blank" rel="noreferrer">Buka QR langsung di iPaymu <span>↗</span></a>}
             </div>
         </div>}
 
-        {presentation.type === 'payment_code' && <div className="payv3-code-layout">
+        {presentation.type === 'payment_code' && <div className="payv4-code-layout">
             <div>
-                <span className="payv3-method-pill">{String(via || 'Payment code').toUpperCase()}</span>
+                <span className="payv4-method-pill">{String(via || 'Payment code').toUpperCase()}</span>
                 <h3>Gunakan nomor pembayaran berikut</h3>
                 <p>Selesaikan transaksi melalui channel yang Anda pilih. Nomor ini hanya berlaku untuk reference pembayaran saat ini.</p>
             </div>
-            <div className="payv3-code-box">
+            <div className="payv4-code-box">
                 <small>Nomor / kode pembayaran</small>
                 <strong>{presentation.payment_no || '—'}</strong>
                 <CopyButton value={presentation.payment_no}/>
             </div>
         </div>}
 
-        {presentation.type === 'redirect' && <div className="payv3-redirect">
-            <div className="payv3-redirect-icon">↗</div>
+        {presentation.type === 'redirect' && <div className="payv4-redirect">
+            <div className="payv4-redirect-icon">↗</div>
             <div>
-                <span className="payv3-method-pill">SECURE REDIRECT</span>
+                <span className="payv4-method-pill">SECURE REDIRECT</span>
                 <h3>Lanjutkan pembayaran di iPaymu</h3>
                 <p>Metode yang dipilih menggunakan halaman pembayaran aman milik iPaymu.</p>
             </div>

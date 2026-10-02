@@ -1,6 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 
-export default function PublicShell({ title, children }) {
+export default function PublicShell({ title, children, wide = false }) {
     const { auth, subscription } = usePage().props;
     const user = auth?.user;
     const hasActiveSubscription = subscription?.status === 'active';
@@ -9,7 +9,7 @@ export default function PublicShell({ title, children }) {
         router.post('/logout');
     };
 
-    return <div className="sv-public">
+    return <div className={`sv-public ${wide ? 'sv-public--wide' : ''}`}>
         <Head title={title}/>
         <header className="sv-public-nav">
             <Link href="/" className="sv-public-brand">
@@ -35,7 +35,7 @@ export default function PublicShell({ title, children }) {
                 )}
             </nav>
         </header>
-        <main>{children}</main>
+        <main className={wide ? 'sv-public-main-wide' : undefined}>{children}</main>
         <footer className="sv-public-footer">
             <span>© {new Date().getFullYear()} Santovate Digital Solution</span>
             <nav>
