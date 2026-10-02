@@ -1,4 +1,4 @@
-﻿import { Head, useForm } from '@inertiajs/react';
+﻿import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../../Components/Icon';
 
@@ -116,6 +116,14 @@ export default function Login() {
                             <Icon name="chevron" size={18}/>
                         </button>
 
+                        <Link
+                            href="/"
+                            className="login-home-button-v92"
+                            aria-label="Kembali ke Home Santovate"
+                        >
+                            <Icon name="home" size={18}/>
+                            <span>Kembali ke Home</span>
+                        </Link>
                         <div className="security-note">
                             <span>â—</span> Akses khusus tim internal Santovate
                         </div>
