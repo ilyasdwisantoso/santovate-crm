@@ -35,6 +35,7 @@ use App\Http\Controllers\SalesTargetController;
 use App\Http\Controllers\SalesGuideController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SubscriptionAddonController;
+use App\Http\Controllers\IpaymuPaymentAssetController;
 use App\Http\Controllers\WhatsAppSendController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -66,6 +67,7 @@ Route::middleware('auth')->group(function(){
     Route::patch('/subscription/checkout',[SubscriptionController::class,'updateSelection'])->name('subscription.selection');
     Route::post('/subscription/pay',[SubscriptionController::class,'pay'])->name('subscription.pay');
     Route::get('/subscription/payment-result',[SubscriptionController::class,'result'])->name('subscription.payment-result');
+    Route::get('/subscription/payment-qr',[IpaymuPaymentAssetController::class,'subscriptionQr'])->name('subscription.payment-qr');
     Route::get('/subscription/status',[SubscriptionController::class,'status'])->name('subscription.status');
     Route::get('/subscription/payment-stream',[SubscriptionController::class,'stream'])->name('subscription.payment-stream');
     Route::middleware('subscription.active')->group(function(){
@@ -119,6 +121,7 @@ Route::middleware('auth')->group(function(){
             Route::get('/subscription/addons',[SubscriptionAddonController::class,'index'])->name('subscription.addons.index');
             Route::post('/subscription/addons/pay',[SubscriptionAddonController::class,'pay'])->name('subscription.addons.pay');
             Route::get('/subscription/addons/payment-result',[SubscriptionAddonController::class,'result'])->name('subscription.addons.payment-result');
+            Route::get('/subscription/addons/payment-qr',[IpaymuPaymentAssetController::class,'addonQr'])->name('subscription.addons.payment-qr');
             Route::get('/subscription/addons/status',[SubscriptionAddonController::class,'status'])->name('subscription.addons.status');
             Route::get('/subscription/addons/payment-stream',[SubscriptionAddonController::class,'stream'])->name('subscription.addons.payment-stream');
             Route::post('/sales-guide/solutions',[SalesGuideController::class,'store'])->name('sales-guide.solutions.store');

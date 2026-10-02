@@ -19,11 +19,13 @@ return [
         // IPAYMU_VA / IPAYMU_API_KEY remain as backward-compatible fallbacks.
         'sandbox' => [
             'va' => env('IPAYMU_SANDBOX_VA', env('IPAYMU_VA')),
+            'callback_secret' => env('IPAYMU_SANDBOX_CALLBACK_SECRET', env('IPAYMU_SANDBOX_VA', env('IPAYMU_VA'))),
             'api_key' => env('IPAYMU_SANDBOX_API_KEY', env('IPAYMU_API_KEY')),
             'url' => env('IPAYMU_SANDBOX_URL', 'https://sandbox.ipaymu.com'),
         ],
         'production' => [
             'va' => env('IPAYMU_PRODUCTION_VA', env('IPAYMU_VA')),
+            'callback_secret' => env('IPAYMU_PRODUCTION_CALLBACK_SECRET', env('IPAYMU_PRODUCTION_VA', env('IPAYMU_VA'))),
             'api_key' => env('IPAYMU_PRODUCTION_API_KEY', env('IPAYMU_API_KEY')),
             'url' => env('IPAYMU_PRODUCTION_URL', 'https://my.ipaymu.com'),
         ],

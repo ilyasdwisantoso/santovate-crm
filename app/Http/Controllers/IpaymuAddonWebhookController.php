@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SubscriptionAddonPayment;
+use App\Services\IpaymuCallbackVerifier;
 use App\Services\IpaymuService;
 use App\Services\SubscriptionAddonService;
 use Illuminate\Http\JsonResponse;
@@ -10,11 +11,10 @@ use Illuminate\Http\Request;
 
 class IpaymuAddonWebhookController extends Controller
 {
-    public function __invoke(Request $request, IpaymuService $ipaymu, SubscriptionAddonService $addons): JsonResponse
+    public function __invoke(Request $request, IpaymuService $ipaymu, SubscriptionAddonService $addons, IpaymuCallbackVerifier $callbackVerifier): JsonResponse
     {
         $payload = $request->all();
-        $signature = $request->header('X-Signature');
-        if (!$ipaymu->validateCallback($payload,$signature)) {
+        if (!$callbackVerifier->validate($request)) {
             return response()->json(['message'=>'Invalid signature'],401);
         }
 

@@ -46,7 +46,8 @@ class IpaymuService
             (float) $payment->amount,
             $buyer,
             route('subscription.payment-result', ['reference'=>$payment->reference_id]),
-            route('subscription.checkout')
+            route('subscription.checkout'),
+            route('api.ipaymu.callback')
         );
     }
 

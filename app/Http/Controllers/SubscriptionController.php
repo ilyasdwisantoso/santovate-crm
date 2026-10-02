@@ -192,7 +192,10 @@ class SubscriptionController extends Controller
 
         return Inertia::render('Public/PaymentResult', [
             'payment'=>$payment ? $payment->only(['reference_id','status','amount','paid_at','payment_method','payment_channel']) : null,
-            'presentation'=>$payment ? $ipaymu->directPaymentPresentation($payment->provider_payload ?? []) : null,
+            'presentation'=>$payment ? array_merge(
+                $ipaymu->directPaymentPresentation($payment->provider_payload ?? []),
+                ['qr_proxy_url'=>route('subscription.payment-qr',['reference'=>$payment->reference_id])]
+            ) : null,
             'subscription'=>$payment?->subscription,
             'gateway'=>[
                 'provider'=>'iPaymu',

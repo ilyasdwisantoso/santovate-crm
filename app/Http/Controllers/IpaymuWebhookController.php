@@ -3,14 +3,15 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\PaymentTransaction;
 use App\Services\FinanceService;
+use App\Services\IpaymuCallbackVerifier;
 use App\Services\IpaymuService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 class IpaymuWebhookController extends Controller {
-    public function __invoke(Request $request,IpaymuService $ipaymu,SubscriptionService $subscriptions,FinanceService $finance):JsonResponse {
-        $payload=$request->all();$signature=$request->header('X-Signature');
-        if(!$ipaymu->validateCallback($payload,$signature))return response()->json(['message'=>'Invalid signature'],401);
+    public function __invoke(Request $request,IpaymuService $ipaymu,SubscriptionService $subscriptions,FinanceService $finance,IpaymuCallbackVerifier $callbackVerifier):JsonResponse {
+        $payload=$request->all();
+        if(!$callbackVerifier->validate($request))return response()->json(['message'=>'Invalid signature'],401);
         $reference=(string)($payload['reference_id']??$payload['referenceId']??$payload['reference']??'');
         $statusRaw=strtolower((string)($payload['status']??$payload['trx_status']??''));
         $statusCode=(int)($payload['transaction_status_code']??$payload['status_code']??0);

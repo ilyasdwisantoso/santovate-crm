@@ -170,7 +170,10 @@ class SubscriptionAddonController extends Controller
                 'paid_at'=>$payment->paid_at?->toIso8601String(),'payment_method'=>$payment->payment_method,
                 'payment_channel'=>$payment->payment_channel,'failure_reason'=>$payment->failure_reason,
             ] : null,
-            'presentation'=>$payment ? $ipaymu->directPaymentPresentation($payment->provider_payload ?? []) : null,
+            'presentation'=>$payment ? array_merge(
+                $ipaymu->directPaymentPresentation($payment->provider_payload ?? []),
+                ['qr_proxy_url'=>route('subscription.addons.payment-qr',['reference'=>$payment->reference_id])]
+            ) : null,
             'order'=>$payment?->order ? [
                 'id'=>$payment->order->id,'status'=>$payment->order->status,
                 'addon'=>$payment->order->addon?->only(['key','name']),
