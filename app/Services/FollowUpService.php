@@ -34,10 +34,11 @@ class FollowUpService
             ?? $this->configs->rule($user->organization,'lead_age_days',3));
     }
 
-    public function queue(User $user): array
+    public function queue(User $user, ?int $assignedTo = null): array
     {
         $closed = ['deal','ditolak','tidak_cocok'];
         $base = fn (): Builder => Prospect::query()->visibleTo($user)->with(['assignedUser','products'])
+            ->when($user->isAdmin() && $assignedTo, fn ($q) => $q->where('assigned_to',$assignedTo))
             ->when($closed, fn ($q) => $q->whereNotIn('status',$closed))
             ->where(fn ($q) => $q->whereNull('follow_up_snoozed_until')->orWhere('follow_up_snoozed_until','<=',now()));
 
@@ -66,9 +67,9 @@ class FollowUpService
         return compact('responseNeeded','leadAgeDue','noReply','scheduled');
     }
 
-    public function payload(User $user): array
+    public function payload(User $user, ?int $assignedTo = null): array
     {
-        $q=$this->queue($user); $templates=$this->templates($user);
+        $q=$this->queue($user, $assignedTo); $templates=$this->templates($user);
         $raw=['response_needed'=>$q['responseNeeded'],'lead_age_due'=>$q['leadAgeDue'],'no_reply'=>$q['noReply'],'scheduled'=>$q['scheduled']];
         $select=[
             'response_needed'=>$templates->firstWhere('trigger_type',FollowUpTemplate::TYPE_CUSTOMER_REPLIED),
@@ -79,14 +80,15 @@ class FollowUpService
         $serialized=[];
         foreach ($raw as $type=>$prospects) {
             $serialized[$type]=$prospects->map(function (Prospect $p) use ($templates,$select,$user,$type) {
-                $messages=$templates->mapWithKeys(fn ($t)=>[(string)$t->id=>$this->renderTemplate($t,$p,$user)])->all();
+                $messageUser=$user->isAdmin() && $p->assignedUser ? $p->assignedUser : $user;
+                $messages=$templates->mapWithKeys(fn ($t)=>[(string)$t->id=>$this->renderTemplate($t,$p,$messageUser)])->all();
                 return [
                     ...(new ProspectResource($p))->resolve(),
                     'queue_type'=>$type,
                     'lead_age_days'=>$p->created_at?max(0,(int)$p->created_at->diffInDays(now())):0,
                     'feedback_required'=>$type==='lead_age_due',
                     'suggested_template_id'=>$select[$type]?->id,
-                    'suggested_message'=>$select[$type]?$this->renderTemplate($select[$type],$p,$user):'',
+                    'suggested_message'=>$select[$type]?$this->renderTemplate($select[$type],$p,$messageUser):'',
                     'template_messages'=>$messages,
                     'whatsapp_status'=>$p->whatsapp_status,
                     'whatsapp_opted_in'=>(bool)$p->whatsapp_opt_in_at && !$p->whatsapp_opt_out_at,
@@ -102,6 +104,8 @@ class FollowUpService
                 'meta_language'=>$t->meta_language,'meta_status'=>$t->meta_status,'meta_category'=>$t->meta_category,'body_parameters'=>$t->body_parameters ?? [],
             ])->values()->all(),
             'noReplyDays'=>$this->noReplyDays($user),'leadAgeDays'=>$this->leadAgeDays($user),
+            'filters'=>['assigned_to'=>$assignedTo],
+            'salesUsers'=>$user->isAdmin()?User::query()->where('organization_id',$user->organization_id)->where('role','sales')->where('is_active',true)->orderBy('name')->get(['id','name'])->toArray():[],
             'whatsappApiReady'=>$this->whatsappApiReady($user),
         ];
     }

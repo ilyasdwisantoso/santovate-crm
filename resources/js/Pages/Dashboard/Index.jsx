@@ -106,6 +106,58 @@ function MobileProspectCard({ prospect }) {
     );
 }
 
+function SalesAssignmentMonitor({ rows = [] }) {
+    const totals = rows.reduce((acc,row)=>({
+        assigned:acc.assigned+(row.assigned||0),
+        worked:acc.worked+(row.worked||0),
+        untouched:acc.untouched+(row.untouched||0),
+        overdue:acc.overdue+(row.overdue||0),
+    }),{assigned:0,worked:0,untouched:0,overdue:0});
+
+    return (
+        <section className="panel sales-monitor-v7">
+            <div className="sales-monitor-v7-head">
+                <div>
+                    <span className="eyebrow">Admin · Assignment monitoring</span>
+                    <h3>Progress database per Account Executive</h3>
+                    <p>Pantau apakah database yang Anda assign sudah dikerjakan, mendapat respons, masuk meeting, atau masih tertahan di follow-up.</p>
+                </div>
+                <div className="sales-monitor-v7-summary">
+                    <span><small>Assigned</small><strong>{totals.assigned}</strong></span>
+                    <span><small>Dikerjakan</small><strong>{totals.worked}</strong></span>
+                    <span className="warn"><small>Belum disentuh</small><strong>{totals.untouched}</strong></span>
+                    <span className="danger"><small>Overdue</small><strong>{totals.overdue}</strong></span>
+                </div>
+            </div>
+
+            {rows.length ? <>
+                <div className="sales-monitor-v7-table-wrap">
+                    <table className="sales-monitor-v7-table">
+                        <thead><tr><th>Account Executive</th><th>Database</th><th>Progress kerja</th><th>Respons</th><th>Meeting+</th><th>Deal</th><th>Overdue</th><th>Pipeline</th><th>Aktivitas terakhir</th><th/></tr></thead>
+                        <tbody>{rows.map(row=><tr key={row.user.id}>
+                            <td><div className="sales-monitor-v7-person"><Avatar name={row.user.name}/><div><strong>{row.user.name}</strong><small>{row.user.email}</small></div></div></td>
+                            <td><span className="sales-monitor-v7-number">{row.assigned}</span><small className="cell-sub">{row.untouched} belum disentuh · {row.stale} stale H+{row.lead_age_days}</small></td>
+                            <td><div className="sales-monitor-v7-progress-cell"><div className="sales-monitor-v7-progress-copy"><span>{row.worked}/{row.assigned}</span><strong>{row.progress_percent}%</strong></div><div className="sales-monitor-v7-progress"><i style={{width:`${Math.min(100,row.progress_percent||0)}%`}}/></div></div></td>
+                            <td><span className="sales-monitor-v7-number">{row.responded}</span><small className="cell-sub">{row.contact_rate}% contacted</small></td>
+                            <td><span className="sales-monitor-v7-number">{row.meeting_plus}</span></td>
+                            <td><span className="sales-monitor-v7-number">{row.won}</span><small className="cell-sub">{row.conversion_rate}% conversion</small></td>
+                            <td><span className={`sales-monitor-v7-number ${row.overdue?'danger':''}`}>{row.overdue}</span></td>
+                            <td><strong>{money(row.pipeline_value||0)}</strong><small className="cell-sub">Won {money(row.won_value||0)}</small></td>
+                            <td><div className="sales-monitor-v7-last"><strong>{row.last_activity?dateTime(row.last_activity):'Belum ada aktivitas'}</strong><small>Login {row.last_login_at?dateTime(row.last_login_at):'belum pernah'}</small></div></td>
+                            <td><div className="sales-monitor-v7-actions"><Link className="btn btn-soft" href={`/prospects?assigned_to=${row.user.id}`}>Database</Link><Link className="btn btn-secondary" href={`/follow-ups?assigned_to=${row.user.id}`}>Follow Up</Link></div></td>
+                        </tr>)}</tbody>
+                    </table>
+                </div>
+                <div className="sales-monitor-v7-mobile">{rows.map(row=><article className="sales-monitor-v7-mobile-card" key={row.user.id}>
+                    <div className="sales-monitor-v7-mobile-top"><div><strong>{row.user.name}</strong><small>{row.user.email}</small></div><b>{row.progress_percent}%</b></div>
+                    <div className="sales-monitor-v7-progress"><i style={{width:`${Math.min(100,row.progress_percent||0)}%`}}/></div>
+                    <div className="sales-monitor-v7-mobile-grid"><span><small>Assigned</small><strong>{row.assigned}</strong></span><span><small>Dikerjakan</small><strong>{row.worked}</strong></span><span><small>Belum disentuh</small><strong className={row.untouched?'text-danger':''}>{row.untouched}</strong></span><span><small>Overdue</small><strong className={row.overdue?'text-danger':''}>{row.overdue}</strong></span><span><small>Respons</small><strong>{row.responded}</strong></span><span><small>Meeting+</small><strong>{row.meeting_plus}</strong></span></div>
+                    <div className="sales-monitor-v7-mobile-actions"><Link className="btn btn-soft" href={`/prospects?assigned_to=${row.user.id}`}>Lihat Database</Link><Link className="btn btn-secondary" href={`/follow-ups?assigned_to=${row.user.id}`}>Buka Follow Up</Link></div>
+                </article>)}</div>
+            </> : <EmptyState title="Belum ada Account Executive aktif" description="Tambahkan user Sales untuk mulai memonitor distribusi database."/>}
+        </section>
+    );
+}
 function CommissionSnapshot({ summary }) {
     return (
         <section className="panel commission-snapshot">
@@ -132,7 +184,7 @@ function greeting() {
     return 'Selamat malam';
 }
 
-export default function Dashboard({ stats, pipeline, followUps, topProspects, salesPerformance, teamPerformance, financeSummary }) {
+export default function Dashboard({ stats, pipeline, followUps, topProspects, salesPerformance, teamPerformance, financeSummary, salesMonitoring = [] }) {
     const { auth } = usePage().props;
     const user = auth.user;
     const firstName = user.name?.split(' ')[0] || user.name;
@@ -194,9 +246,11 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
                 <QuickStat label="Earned Commission" value={`Rp${compactMoney(financeSummary?.earned_commission || 0)}`} icon="target" tone="amber" href="/finance/commissions"/>
             </section>
 
+            {user.is_admin && <SalesAssignmentMonitor rows={salesMonitoring}/>}
+
             <section className="dashboard-command-grid">
                 <div className="dashboard-command-main">
-                    {!user.is_admin && <PerformanceCard performance={salesPerformance}/>} 
+                    {!user.is_admin && <PerformanceCard performance={salesPerformance}/>}
 
                     {user.is_admin && (
                         <section className="panel dashboard-team-panel premium-team-panel">
@@ -255,7 +309,7 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
                             : <EmptyState icon="calendar" title="Queue aman" description="Tidak ada follow-up terdekat."/>}
                         <Link href="/follow-ups" className="btn btn-soft btn-block">Buka queue</Link>
                     </section>
-                    {!user.is_admin && <CommissionSnapshot summary={financeSummary}/>} 
+                    {!user.is_admin && <CommissionSnapshot summary={financeSummary}/>}
                 </aside>
             </section>
 

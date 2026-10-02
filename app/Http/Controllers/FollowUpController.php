@@ -16,7 +16,11 @@ class FollowUpController extends Controller
 {
     public function index(Request $request, FollowUpService $followUps): Response
     {
-        return Inertia::render('FollowUps/Index', $followUps->payload($request->user()));
+        $assignedTo = $request->user()->isAdmin() && $request->filled('assigned_to')
+            ? (int) $request->query('assigned_to')
+            : null;
+
+        return Inertia::render('FollowUps/Index', $followUps->payload($request->user(), $assignedTo));
     }
 
     public function markCustomerReply(Request $request, Prospect $prospect, ProspectStageService $stages): RedirectResponse
