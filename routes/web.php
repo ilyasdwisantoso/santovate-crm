@@ -50,7 +50,7 @@ Route::get('/faq',fn()=>app(PublicController::class)->legal('faq'))->name('faq.p
 Route::get('/contact',fn()=>app(PublicController::class)->legal('contact'))->name('contact');
 Route::get('/payment-result/{reference}',CommercialPaymentResultController::class)->name('commercial-payment.result');
 Route::middleware('guest')->group(function(){Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');Route::post('/login',[AuthenticatedSessionController::class,'store'])->name('login.store');Route::get('/register',[RegistrationController::class,'create'])->name('register');Route::post('/register',[RegistrationController::class,'store'])->name('register.store');});
-Route::middleware('auth')->group(function(){
+Route::middleware(['auth','account.active'])->group(function(){
     Route::post('/logout',[AuthenticatedSessionController::class,'destroy'])->name('logout');
     Route::get('/session/csrf-token',fn()=>response()->json(['token'=>csrf_token()]))->name('session.csrf-token');
     Route::middleware('platform.admin')->prefix('platform')->name('platform.')->group(function(){

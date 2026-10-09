@@ -160,19 +160,20 @@ class IpaymuCallbackVerifier
 
     private function callbackSecrets(): array
     {
-        $secrets = [];
-        foreach (['sandbox', 'production'] as $mode) {
-            $config = (array) config("santovate.ipaymu.{$mode}", []);
-            $secret = trim((string) ($config['callback_secret'] ?? ''));
-            if ($secret === '') {
-                $secret = trim((string) ($config['va'] ?? ''));
-            }
-            if ($secret !== '') {
-                $secrets[$mode] = $secret;
-            }
+        // Never accept a sandbox signature in production (or vice versa).
+        // Reject unknown mode and empty active credential instead of falling back.
+        $mode = strtolower(trim((string) config('santovate.ipaymu.mode', 'sandbox')));
+        if (!in_array($mode, ['sandbox', 'production'], true)) {
+            return [];
         }
 
-        return $secrets;
+        $config = (array) config("santovate.ipaymu.{$mode}", []);
+        $secret = trim((string) ($config['callback_secret'] ?? ''));
+        if ($secret === '') {
+            $secret = trim((string) ($config['va'] ?? ''));
+        }
+
+        return $secret !== '' ? [$mode => $secret] : [];
     }
 
     private function logFailure(Request $request, string $received, array $expectedPrefixes): void

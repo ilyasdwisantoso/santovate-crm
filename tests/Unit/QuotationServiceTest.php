@@ -3,10 +3,18 @@
 namespace Tests\Unit;
 
 use App\Services\QuotationService;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class QuotationServiceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Keep these tests independent of local production .env values.
+        config()->set('approvals.quotation.discount_percent_threshold', 5);
+        config()->set('approvals.quotation.high_value_threshold', 50000000);
+    }
+
     public function test_it_calculates_line_discount_global_discount_tax_and_total(): void
     {
         $service = new QuotationService();
@@ -25,12 +33,12 @@ class QuotationServiceTest extends TestCase
     {
         $service = new QuotationService();
         $base = ['discount_type'=>'percent','discount_value'=>6,'pricing_type'=>'standard'];
-        $this->assertTrue($service->approvalRequired($base, ['subtotal'=>10000000,'discount_amount'=>600000,'grand_total'=>9400000]));
+        $this->assertTrue($service->approvalRequired($base, ['items'=>[], 'subtotal'=>10000000,'discount_amount'=>600000,'grand_total'=>9400000]));
 
         $custom = ['discount_type'=>'percent','discount_value'=>0,'pricing_type'=>'custom'];
-        $this->assertTrue($service->approvalRequired($custom, ['subtotal'=>10000000,'discount_amount'=>0,'grand_total'=>10000000]));
+        $this->assertTrue($service->approvalRequired($custom, ['items'=>[], 'subtotal'=>10000000,'discount_amount'=>0,'grand_total'=>10000000]));
 
         $large = ['discount_type'=>'percent','discount_value'=>0,'pricing_type'=>'standard'];
-        $this->assertTrue($service->approvalRequired($large, ['subtotal'=>50000000,'discount_amount'=>0,'grand_total'=>50000000]));
+        $this->assertTrue($service->approvalRequired($large, ['items'=>[], 'subtotal'=>50000000,'discount_amount'=>0,'grand_total'=>50000000]));
     }
 }
