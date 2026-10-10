@@ -1,0 +1,7 @@
+.sv-invite-unavailable{text-align:center;}
+.sv-invite-expired-icon{width:60px;height:60px;display:grid;place-items:center;margin:0 auto 20px;color:#92400e;background:#fef3c7;border:1px solid #fde68a;border-radius:50%;font-size:28px;font-weight:750;}
+.sv-invite-unavailable .eyebrow{display:block;}
+.sv-invite-unavailable p{max-width:415px;margin:12px auto;}
+.sv-invite-unavailable-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px;}
+.sv-invite-unavailable-actions .btn{min-height:42px;justify-content:center;}
+@media(max-width:560px){.sv-invite-unavailable-actions{flex-direction:column;}.sv-invite-unavailable-actions .btn{width:100%;}}

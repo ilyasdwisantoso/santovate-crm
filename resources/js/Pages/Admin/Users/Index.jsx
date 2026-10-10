@@ -173,6 +173,7 @@ export default function Index({ users, entitlements, replacementUsers=[], pendin
     const [modal,setModal]=useState(null);
     const [inviteOpen,setInviteOpen]=useState(false);
     const [invitationBusy,setInvitationBusy]=useState(null);
+    const { errors: invitationErrors = {} } = usePage().props;
     const rows=useMemo(()=>users?.data||[],[users]);
 
     return <AppLayout title="Tim & Access" subtitle="Kelola akun, role, status akses, workload, dan kapasitas seat workspace." action={<div style={{display:'flex',gap:8,flexWrap:'wrap'}}><button className="btn btn-primary" type="button" onClick={()=>setInviteOpen(true)}><Icon name="plus" size={17}/>Undang User</button><Link href="/admin/users/create" className="btn btn-secondary">Buat Manual</Link></div>}>
@@ -180,6 +181,7 @@ export default function Index({ users, entitlements, replacementUsers=[], pendin
         {seats&&<section className="panel entitlement-summary-card"><div><span className="eyebrow">Effective entitlement</span><h3>Seat pengguna</h3><p>Hanya user aktif yang memakai seat. User nonaktif tidak mengurangi kapasitas.</p></div><div className="entitlement-capacity"><strong>{limitText(seats)}</strong><span>{seats.unlimited?'Internal workspace':`${seats.remaining} seat tersisa`}</span><div className="entitlement-meter"><i style={{width:`${seats.usage_percent||0}%`}}/></div></div></section>}
 
         <section className="panel sv-team-invite-list">
+            {(invitationErrors.invitation || invitationErrors.entitlement) && <div role="alert" className="alert alert-error">{invitationErrors.invitation || invitationErrors.entitlement}</div>}
             <div className="panel-head"><div><span className="eyebrow">Undangan Tim</span><h3>Undangan menunggu aktivasi ({pendingInvitations.length})</h3>
                 <p>Email berisi link privat yang berlaku 48 jam. Seat diperiksa ulang saat aktivasi.</p></div></div>
             {pendingInvitations.length ? <div className="sv-team-invite-items">{pendingInvitations.map(invite => <article key={invite.id} className="sv-team-invite-item">

@@ -17,6 +17,7 @@ class TeamInvitationService
     /** @return array{0:TeamInvitation,1:string} */
     public function invite(User $actor, string $email, string $role): array
     {
+        $this->assertInvitationAdmin($actor);
         $email = mb_strtolower(trim($email));
         return DB::transaction(function () use ($actor, $email, $role) {
             $organization = Organization::query()->lockForUpdate()->findOrFail($actor->organization_id);
@@ -48,12 +49,13 @@ class TeamInvitationService
     /** @return array{0:TeamInvitation,1:string} */
     public function resend(User $actor, TeamInvitation $invitation): array
     {
+        $this->assertInvitationAdmin($actor);
         return DB::transaction(function () use ($actor, $invitation) {
             $organization = Organization::query()->lockForUpdate()->findOrFail($actor->organization_id);
             $locked = TeamInvitation::query()->where('organization_id', $organization->id)
                 ->lockForUpdate()->findOrFail($invitation->id);
-            if ($locked->status === 'accepted') {
-                throw ValidationException::withMessages(['invitation' => 'Undangan telah digunakan.']);
+            if (!$locked->canResend()) {
+                throw ValidationException::withMessages(['invitation' => 'Hanya undangan pending yang dapat dikirim ulang. Buat undangan baru jika sebelumnya dibatalkan.']);
             }
             if ($locked->updated_at && $locked->updated_at->gt(now()->subMinute())) {
                 throw ValidationException::withMessages(['invitation' => 'Tunggu sedikitnya 60 detik sebelum mengirim ulang.']);
@@ -78,12 +80,13 @@ class TeamInvitationService
 
     public function revoke(User $actor, TeamInvitation $invitation): void
     {
+        $this->assertInvitationAdmin($actor);
         DB::transaction(function () use ($actor, $invitation) {
             $organization = Organization::query()->lockForUpdate()->findOrFail($actor->organization_id);
             $locked = TeamInvitation::query()->where('organization_id', $organization->id)
                 ->lockForUpdate()->findOrFail($invitation->id);
-            if ($locked->status !== 'pending') {
-                throw ValidationException::withMessages(['invitation' => 'Undangan tidak dapat dibatalkan.']);
+            if (!$locked->canRevoke()) {
+                throw ValidationException::withMessages(['invitation' => 'Hanya undangan pending yang dapat dibatalkan.']);
             }
             $locked->update(['status' => 'revoked', 'revoked_at' => now()]);
         });
@@ -132,6 +135,11 @@ class TeamInvitationService
             route('team-invitation.show', ['token' => $token]),
             $invitation->expires_at->format('d-m-Y H:i T'),
         ));
+    }
+
+    private function assertInvitationAdmin(User $actor): void
+    {
+        abort_unless($actor->isAdmin() && $actor->is_active && $actor->organization_id, 403);
     }
 
     private function assertEmailAvailable(string $email): void

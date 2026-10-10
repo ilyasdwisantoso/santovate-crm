@@ -26,6 +26,17 @@ class TeamInvitation extends Model
         return $this->belongsTo(Organization::class);
     }
 
+    public function canResend(): bool
+    {
+        // Expired pending invitations may be refreshed, but revoked/accepted ones must never be reopened.
+        return $this->status === 'pending';
+    }
+
+    public function canRevoke(): bool
+    {
+        return $this->status === 'pending';
+    }
+
     public function isRedeemable(): bool
     {
         return $this->status === 'pending' && $this->expires_at !== null && $this->expires_at->isFuture();
