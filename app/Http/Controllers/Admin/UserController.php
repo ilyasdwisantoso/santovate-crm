@@ -19,11 +19,15 @@ class UserController extends Controller
     public function index(Request $request, EntitlementService $entitlements, UserLifecycleService $lifecycle): Response
     {
         $organization = $request->user()->organization;
+        $userView = (string) $request->query('view', 'active');
+        if (!in_array($userView, ['active', 'inactive', 'all'], true)) $userView = 'active';
         $users = User::query()
             ->where('organization_id', $request->user()->organization_id)
+            ->when($userView === 'active', fn ($query) => $query->where('is_active', true))
+            ->when($userView === 'inactive', fn ($query) => $query->where('is_active', false))
             ->withCount('assignedProspects')
             ->orderBy('name')
-            ->paginate(20);
+            ->paginate(20)->withQueryString();
 
         $summaries = $lifecycle->summaries($users->getCollection(), $request->user());
         $users->setCollection($users->getCollection()->map(function (User $user) use ($summaries) {
@@ -43,6 +47,7 @@ class UserController extends Controller
             'users' => $users,
             'entitlements' => $organization ? $entitlements->snapshot($organization) : null,
             'replacementUsers' => $replacementUsers,
+            'userView' => $userView,
         ]);
     }
 

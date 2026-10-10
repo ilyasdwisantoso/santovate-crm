@@ -90,7 +90,7 @@ function LifecycleModal({ state, replacementUsers, close }) {
                 {canDelete ? <>
                     <div className="account-danger-note">
                         <Icon name="trash" size={20}/>
-                        <div><strong>Hapus permanen akun kosong</strong><span>Tindakan ini tidak dapat dibatalkan. Hanya akun nonaktif tanpa histori CRM yang boleh dihapus.</span></div>
+                        <div><strong>Hapus permanen akun tanpa referensi</strong><span>Tindakan ini tidak dapat dibatalkan. Akun aktif maupun nonaktif hanya dapat dihapus jika tidak memiliki referensi CRM. Seluruh sesi login akun juga dicabut.</span></div>
                     </div>
                     <label className="field">
                         <span>Ketik email <b>{user.email}</b> untuk konfirmasi</span>
@@ -106,7 +106,7 @@ function LifecycleModal({ state, replacementUsers, close }) {
                 </> : <>
                     <div className="account-danger-note muted-danger">
                         <Icon name="alert" size={20}/>
-                        <div><strong>Tidak aman untuk hard delete</strong><span>Akun ini masih aktif, dilindungi, atau sudah memiliki histori CRM. Gunakan nonaktifkan agar audit dan histori tetap utuh.</span></div>
+                        <div><strong>Tidak aman untuk hard delete</strong><span>Akun ini dilindungi atau masih memiliki histori CRM. Nonaktifkan agar audit dan histori tetap utuh. Gunakan filter Aktif untuk menyembunyikan akun nonaktif dari daftar kerja.</span></div>
                     </div>
                     <div className="account-blocker-list"><strong>Alasan</strong>{(lifecycle.blockers||['Akun memiliki histori CRM.']).map((x,i)=><span key={i}>{x}</span>)}</div>
                     <div className="modal-actions account-modal-actions"><button type="button" className="btn btn-primary" onClick={close}>Mengerti</button></div>
@@ -147,7 +147,7 @@ function MobileUserCard({ user, open }) {
     </article>;
 }
 
-export default function Index({ users, entitlements, replacementUsers=[] }) {
+export default function Index({ users, entitlements, replacementUsers=[], userView='active' }) {
     const seats=entitlements?.limits?.users;
     const [modal,setModal]=useState(null);
     const rows=useMemo(()=>users?.data||[],[users]);
@@ -156,6 +156,11 @@ export default function Index({ users, entitlements, replacementUsers=[] }) {
         <Head title="Tim & Access"/>
         {seats&&<section className="panel entitlement-summary-card"><div><span className="eyebrow">Effective entitlement</span><h3>Seat pengguna</h3><p>Hanya user aktif yang memakai seat. User nonaktif tidak mengurangi kapasitas.</p></div><div className="entitlement-capacity"><strong>{limitText(seats)}</strong><span>{seats.unlimited?'Internal workspace':`${seats.remaining} seat tersisa`}</span><div className="entitlement-meter"><i style={{width:`${seats.usage_percent||0}%`}}/></div></div></section>}
 
+        <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center',marginBottom:12}}>
+            <strong style={{marginRight:6,fontSize:13}}>Tampilkan akun:</strong>
+            {[['active','Aktif'],['inactive','Nonaktif'],['all','Semua']].map(([value,label])=><Link key={value} href={`/admin/users?view=${value}`} preserveScroll className={`btn btn-sm ${userView===value?'btn-primary':'btn-secondary'}`}>{label}</Link>)}
+            <small style={{color:'#64748b'}}>Akun dengan histori tetap tersimpan untuk menjaga audit CRM.</small>
+        </div>
         <section className="panel no-pad account-user-panel">
             <div className="clean-table-wrap desktop-only"><table className="clean-table account-user-table"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Prospek di-handle</th><th>Login terakhir</th><th>Aksi</th></tr></thead><tbody>{rows.map(u=><tr key={u.id}><td><div className="user-cell"><Avatar name={u.name}/><div><strong>{u.name}</strong><span>{u.email}</span></div></div></td><td><Badge tone={roleTone(u.role)}>{roleLabel(u.role)}</Badge></td><td><Badge tone={u.is_active?'success':'neutral'}>{u.is_active?'Aktif':'Nonaktif'}</Badge></td><td><strong>{u.assigned_prospects_count}</strong> perusahaan</td><td>{dateTime(u.last_login_at)}</td><td><UserActions user={u} open={setModal}/></td></tr>)}</tbody></table></div>
             <div className="account-mobile-list mobile-only">{rows.map(u=><MobileUserCard key={u.id} user={u} open={setModal}/>)}</div>

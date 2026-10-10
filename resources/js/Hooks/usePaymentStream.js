@@ -13,7 +13,10 @@ export default function usePaymentStream({ reference, streamUrl, statusUrl, init
     }, [reference, initialStatus]);
 
     useEffect(() => {
-        if (!reference || !streamUrl || typeof window === 'undefined' || !('EventSource' in window)) {
+        // PHP artisan serve may serialize long SSE requests, blocking QR image requests locally.
+        // Use short JSON polling on loopback; preserve SSE on real web servers.
+        const localPolling = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+        if (!reference || !streamUrl || typeof window === 'undefined' || !('EventSource' in window) || localPolling) {
             if (reference) setConnection('fallback');
             return undefined;
         }

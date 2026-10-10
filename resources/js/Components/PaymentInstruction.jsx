@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { qrImageCandidates, paymentTemplateUrl } from '../Utils/paymentQrSources';
+import { localQrisMatrix } from '../Utils/ipaymuQrisLocal';
 
 const formatExpiry = (value) => {
     if (!value) return null;
@@ -61,15 +63,24 @@ function CopyButton({ value, label = 'Salin nomor' }) {
 }
 
 export default function PaymentInstruction({ presentation }) {
-    const qrSource = presentation?.qr_proxy_url || presentation?.qr_image || null;
     const countdown = useCountdown(presentation?.expired);
-    const [qrError, setQrError] = useState(false);
+    const isLocalBrowser = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    const candidates = qrImageCandidates(presentation, isLocalBrowser);
+    const templateUrl = paymentTemplateUrl(presentation);
+    // Draw QR directly from the merchant-provided QrString, without any external renderer.
+    const localQr = useMemo(() => localQrisMatrix(presentation?.qr_string), [presentation?.qr_string]);
+    const [candidateIndex, setCandidateIndex] = useState(0);
     const [qrLoaded, setQrLoaded] = useState(false);
+    const showLocalQr = Boolean(localQr) && candidateIndex === 0;
+    const imageIndex = localQr ? candidateIndex - 1 : candidateIndex;
+    const qrSource = imageIndex >= 0 ? candidates[imageIndex] || null : null;
+    const qrUnavailable = !showLocalQr && !qrSource;
+    const qrReady = showLocalQr || qrLoaded;
 
     useEffect(() => {
-        setQrError(false);
+        setCandidateIndex(0);
         setQrLoaded(false);
-    }, [qrSource]);
+    }, [presentation?.qr_image, presentation?.qr_template, presentation?.qr_proxy_url, presentation?.qr_string]);
 
     if (!presentation || presentation.type === 'unknown') return null;
 
@@ -92,26 +103,38 @@ export default function PaymentInstruction({ presentation }) {
         </header>
 
         {presentation.type === 'qris' && <div className="payv4-qr-layout">
-            <div className={`payv4-qr-frame ${qrLoaded ? 'is-loaded' : ''} ${qrError ? 'has-error' : 'is-loading'}`}>
+            <div className={`payv4-qr-frame ${qrReady ? 'is-loaded' : ''} ${qrUnavailable ? 'has-error' : 'is-loading'}`}>
                 <div className="payv4-qr-corners" aria-hidden="true"><i/><i/><i/><i/></div>
-                {!qrLoaded && !qrError && <div className="payv4-qr-skeleton" aria-hidden="true">
+                {!qrReady && !qrUnavailable && <div className="payv4-qr-skeleton" aria-hidden="true">
                     <span/><span/><span/><span/><span/><span/><span/><span/><span/>
                     <b>Menyiapkan QRIS…</b>
                 </div>}
-                {!qrError && qrSource
-                    ? <img
-                        src={qrSource}
-                        alt="QRIS iPaymu"
-                        className={qrLoaded ? 'visible' : ''}
-                        onLoad={() => setQrLoaded(true)}
-                        onError={() => setQrError(true)}
-                    />
-                    : <div className="payv4-qr-fallback">
-                        <span>QR</span>
-                        <strong>QR belum dapat dimuat</strong>
-                        <small>Gunakan aplikasi mobile banking Anda atau buka QR asli dari iPaymu.</small>
-                    </div>}
-                {!qrError && <div className="payv4-scanline" aria-hidden="true"/>}
+                {showLocalQr
+                    ? <svg
+                        className="payv935-local-qr"
+                        role="img"
+                        aria-label="QRIS dari kode pembayaran resmi iPaymu"
+                        viewBox={`0 0 ${localQr.size} ${localQr.size}`}
+                        xmlns="http://www.w3.org/2000/svg"
+                        shapeRendering="crispEdges"
+                    >
+                        <rect width={localQr.size} height={localQr.size} fill="#ffffff"/>
+                        <path d={localQr.path} fill="#111827"/>
+                    </svg>
+                    : qrSource
+                        ? <img
+                            src={qrSource}
+                            alt="QRIS resmi iPaymu"
+                            className={qrLoaded ? 'visible' : ''}
+                            onLoad={() => setQrLoaded(true)}
+                            onError={() => { setQrLoaded(false); setCandidateIndex((index) => index + 1); }}
+                        />
+                        : <div className="payv4-qr-fallback">
+                            <span>QR</span>
+                            <strong>QR belum dapat dimuat</strong>
+                            <small>Buka QRIS dari halaman resmi iPaymu melalui tautan di sebelah.</small>
+                        </div>}
+                {!qrReady && !qrUnavailable && <div className="payv4-scanline" aria-hidden="true"/>}
             </div>
 
             <div className="payv4-instruction-copy">
@@ -123,11 +146,12 @@ export default function PaymentInstruction({ presentation }) {
                     <span><i>✓</i> Signature divalidasi</span>
                     <span><i>✓</i> Tenant-scoped</span>
                 </div>
-                {qrError && <div className="payv4-inline-error">
-                    <strong>QR proxy belum dapat mengambil image dari Sandbox.</strong>
-                    <span>Transaksi tetap valid dan dapat dilanjutkan melalui iPaymu.</span>
+                {showLocalQr && <p className="payv935-qr-caption">QRIS ditampilkan langsung dari kode pembayaran yang diberikan iPaymu. Tidak menggunakan layanan QR pihak ketiga.</p>}
+                {qrUnavailable && <div className="payv4-inline-error">
+                    <strong>QRIS belum dapat ditampilkan melalui browser.</strong>
+                    <span>Gunakan halaman QR resmi iPaymu di bawah. Jangan membuat transaksi ganda.</span>
                 </div>}
-                {presentation.qr_template && <a className="payv4-secondary-link" href={presentation.qr_template} target="_blank" rel="noreferrer">Buka QR langsung di iPaymu <span>↗</span></a>}
+                {templateUrl && <a className="payv4-secondary-link" href={templateUrl} target="_blank" rel="noreferrer">Buka QR langsung di iPaymu <span>↗</span></a>}
             </div>
         </div>}
 

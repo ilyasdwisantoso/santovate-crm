@@ -116,13 +116,12 @@ class UserLifecycleService
             $isLastAdmin = $user->role === 'admin' && $user->is_active
                 && $activeAdminIds->filter(fn ($id) => $id !== (int) $user->id)->isEmpty();
             $canDeactivate = !$isSelf && !$isPlatformAdmin && !$isLastAdmin;
-            $canDelete = $canDeactivate && !$user->is_active && $historyTotal === 0;
+            $canDelete = \App\Support\UserDeletionEligibility::allows($isSelf, $isPlatformAdmin, $isLastAdmin, $historyTotal);
 
             $blockers = [];
             if ($isSelf) $blockers[] = 'Akun yang sedang digunakan tidak dapat dihapus atau dinonaktifkan.';
             if ($isPlatformAdmin) $blockers[] = 'Platform Owner / Platform Admin tidak dapat dihapus dari tenant.';
             if ($isLastAdmin) $blockers[] = 'Administrator aktif terakhir harus tetap tersedia.';
-            if ($user->is_active) $blockers[] = 'Nonaktifkan akun terlebih dahulu sebelum hapus permanen.';
             foreach ($references as $reference) {
                 $blockers[] = $reference['label'].' ('.$reference['count'].')';
             }

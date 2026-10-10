@@ -1,0 +1,34 @@
+/* V9.3.4: render the official iPaymu QR poster as a fallback, never a third-party QR API. */
+.payv4-qr-frame.is-ipaymu-poster,
+.payv5-page .payv4-qr-frame.is-ipaymu-poster {
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: auto;
+    min-height: 510px;
+    padding: 14px 8px;
+    align-content: start;
+    justify-content: center;
+    overflow: hidden;
+}
+.payv934-poster-container {
+    position: relative;
+    width: 284px;
+    height: 466px;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 9px;
+    background: #fff;
+}
+.payv934-poster-container iframe {
+    display: block;
+    width: 400px;
+    height: 650px;
+    border: 0;
+    transform: scale(.71);
+    transform-origin: top left;
+}
+.payv934-poster-note { margin: 8px 0; font-size: 11px; color: #64748b; line-height: 1.55; }
+@media(max-width:720px) {
+    .payv4-qr-frame.is-ipaymu-poster,
+    .payv5-page .payv4-qr-frame.is-ipaymu-poster { width: min(100%, 340px); }
+}

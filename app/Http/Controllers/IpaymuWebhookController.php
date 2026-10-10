@@ -1,68 +1,167 @@
 <?php
+
 namespace App\Http\Controllers;
+
+use App\Models\CommercialInvoice;
 use App\Models\Payment;
 use App\Models\PaymentTransaction;
+use App\Models\Subscription;
 use App\Services\FinanceService;
+use App\Services\IpaymuCallbackGuard;
 use App\Services\IpaymuCallbackVerifier;
 use App\Services\IpaymuService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-class IpaymuWebhookController extends Controller {
-    public function __invoke(Request $request,IpaymuService $ipaymu,SubscriptionService $subscriptions,FinanceService $finance,IpaymuCallbackVerifier $callbackVerifier):JsonResponse {
-        $payload=$request->all();
-        if(!$callbackVerifier->validate($request))return response()->json(['message'=>'Invalid signature'],401);
-        $reference=(string)($payload['reference_id']??$payload['referenceId']??$payload['reference']??'');
-        $statusRaw=strtolower((string)($payload['status']??$payload['trx_status']??''));
-        $statusCode=(int)($payload['transaction_status_code']??$payload['status_code']??0);
-        $paid=in_array($statusRaw,['success','paid','berhasil','completed'],true)||in_array($statusCode,[1,6],true);
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-        $commercial=PaymentTransaction::where('reference_id',$reference)->with('invoice')->first();
-        if($commercial){
-            $commercial->update(['provider_payload'=>$payload,'provider_transaction_id'=>(string)($payload['trx_id']??$payload['transaction_id']??$commercial->provider_transaction_id)]);
-            if(!$paid){
-                if(in_array($statusRaw,['failed','failure','expired','cancelled','canceled'],true)&&!in_array($commercial->status,['paid','refunded'],true)){
-                    $mapped=in_array($statusRaw,['cancelled','canceled'],true)?'cancelled':(str_contains($statusRaw,'expire')?'expired':'failed');
-                    $commercial->update(['status'=>$mapped]);
-                }
-                return response()->json(['message'=>'OK'],200);
-            }
-            if(in_array($commercial->status,['paid','refunded'],true))return response()->json(['message'=>'OK'],200);
-            if($commercial->invoice?->status==='void'){
-                $commercial->update(['status'=>'pending_verification','failure_reason'=>'Payment callback received for a void invoice. Finance review required.']);
-                return response()->json(['message'=>'OK'],200);
-            }
+class IpaymuWebhookController extends Controller
+{
+    public function __invoke(
+        Request $request,
+        IpaymuService $ipaymu,
+        SubscriptionService $subscriptions,
+        FinanceService $finance,
+        IpaymuCallbackVerifier $verifier,
+        IpaymuCallbackGuard $guard
+    ): JsonResponse {
+        if (!$verifier->validate($request)) {
+            return response()->json(['message' => 'Invalid signature'], 401);
+        }
 
-            $callbackAmount=$ipaymu->callbackAmount($payload);
-            if($callbackAmount!==null&&abs($callbackAmount-(float)$commercial->amount)>1){
-                $commercial->update(['status'=>'pending_verification','failure_reason'=>'Gateway callback amount mismatch. Finance review required.']);
-                return response()->json(['message'=>'OK'],200);
-            }
+        $payload = $request->all();
+        $reference = $guard->reference($payload);
+        if ($reference === '') return $this->ack();
 
-            $invoice=$finance->syncInvoice($commercial->invoice);
-            if((float)$commercial->amount>$invoice->outstanding_amount+0.01){
-                $commercial->update(['status'=>'pending_verification','failure_reason'=>'Gateway payment exceeds current invoice outstanding. Finance review required.']);
-                return response()->json(['message'=>'OK'],200);
+        // Per-reference payment row locks serialize duplicate / simultaneous callbacks.
+        // All payment + subscription/finance updates commit as one transaction.
+        return DB::transaction(function () use ($payload, $reference, $ipaymu, $subscriptions, $finance, $guard) {
+            $commercial = PaymentTransaction::query()
+                ->where('reference_id', $reference)->lockForUpdate()->first();
+            if ($commercial) {
+                return $this->commercial($commercial, $payload, $reference, $ipaymu, $finance, $guard);
             }
 
-            $commercial->update(['status'=>'paid','paid_at'=>now(),'verified_at'=>now(),'failure_reason'=>null]);
-            $finance->syncInvoice($invoice,[
-                'commercial_invoice_id'=>$invoice->id,
-                'payment_transaction_id'=>$commercial->id,
-                'reference_number'=>$commercial->reference_id,
-                'notes'=>'Verified automatically from iPaymu webhook.',
+            $payment = Payment::query()
+                ->where('reference_id', $reference)->lockForUpdate()->first();
+            if ($payment) {
+                return $this->subscription($payment, $payload, $reference, $ipaymu, $subscriptions, $guard);
+            }
+
+            return $this->ack(); // Do not reveal whether a reference exists.
+        }, 3);
+    }
+
+    private function commercial(
+        PaymentTransaction $payment,
+        array $payload,
+        string $reference,
+        IpaymuService $ipaymu,
+        FinanceService $finance,
+        IpaymuCallbackGuard $guard
+    ): JsonResponse {
+        if (in_array($payment->status, ['paid', 'refunded'], true)) return $this->ack();
+
+        $data = [
+            'provider_payload' => $payload,
+            'provider_transaction_id' => (string) ($payload['trx_id'] ?? $payload['transaction_id'] ?? $payment->provider_transaction_id),
+        ];
+
+        if (!$guard->isPaid($payload)) {
+            if ($payment->status === 'pending' && $failed = $guard->failedStatus($payload)) {
+                $data['status'] = $failed;
+            }
+            $payment->update($data);
+            return $this->ack();
+        }
+
+        $invoice = $payment->commercial_invoice_id
+            ? CommercialInvoice::query()->whereKey($payment->commercial_invoice_id)->lockForUpdate()->first()
+            : null;
+        if (!$invoice || !$guard->organizationMatches((int) $payment->organization_id, $invoice ? (int) $invoice->organization_id : null)) {
+            return $this->reviewCommercial($payment, $data, $reference, 'Invoice tenant mismatch or missing invoice.');
+        }
+
+        if (in_array($invoice->status, ['draft', 'void'], true)) {
+            return $this->reviewCommercial($payment, $data, $reference, 'Invoice is draft or void.');
+        }
+
+        $issue = $guard->paymentIssue($payload, $reference, (float) $payment->amount, $ipaymu->callbackAmount($payload));
+        if ($issue !== null) return $this->reviewCommercial($payment, $data, $reference, $issue);
+
+        $invoice = $finance->syncInvoice($invoice);
+        if ((float) $payment->amount > $invoice->outstanding_amount + 0.01) {
+            return $this->reviewCommercial($payment, $data, $reference, 'Payment exceeds invoice outstanding amount.');
+        }
+
+        $payment->update($data + [
+            'status' => 'paid', 'paid_at' => now(), 'verified_at' => now(), 'failure_reason' => null,
+        ]);
+        $finance->syncInvoice($invoice, [
+            'commercial_invoice_id' => $invoice->id,
+            'payment_transaction_id' => $payment->id,
+            'reference_number' => $reference,
+            'notes' => 'Verified automatically from signed iPaymu callback.',
+        ]);
+        return $this->ack();
+    }
+
+    private function subscription(
+        Payment $payment,
+        array $payload,
+        string $reference,
+        IpaymuService $ipaymu,
+        SubscriptionService $subscriptions,
+        IpaymuCallbackGuard $guard
+    ): JsonResponse {
+        if (in_array($payment->status, ['paid', 'refunded'], true)) return $this->ack();
+
+        if (!$guard->isPaid($payload)) {
+            if ($payment->status === 'pending') $payment->update(['provider_payload' => $payload]);
+            return $this->ack();
+        }
+
+        $sub = $payment->subscription_id
+            ? Subscription::query()->whereKey($payment->subscription_id)->lockForUpdate()->first()
+            : null;
+        $issue = $guard->paymentIssue($payload, $reference, (float) $payment->amount, $ipaymu->callbackAmount($payload));
+        $invalidSubscription = !$sub
+            || !$guard->organizationMatches((int) $payment->organization_id, $sub ? (int) $sub->organization_id : null)
+            || !in_array($sub->status, ['pending', 'active'], true)
+            || !$guard->storedAmountsMatch((float) $payment->amount, (float) $sub->total_amount);
+
+        if ($issue !== null || $invalidSubscription) {
+            $payment->update(['status' => 'pending_verification', 'provider_payload' => $payload]);
+            Log::warning('iPaymu subscription callback awaiting review', [
+                'reference' => $reference,
+                'reason' => $issue ?? 'Subscription tenant mismatch or invalid lifecycle state.',
             ]);
-            return response()->json(['message'=>'OK'],200);
+            return $this->ack();
         }
 
-        $payment=Payment::where('reference_id',$reference)->first();
-        if(!$payment)return response()->json(['message'=>'OK'],200);
-        if($paid&&$payment->status!=='paid'){
-            $payment->update(['status'=>'paid','paid_at'=>now(),'provider_transaction_id'=>(string)($payload['trx_id']??$payload['transaction_id']??$payment->provider_transaction_id),'provider_payload'=>$payload]);
-            if($payment->subscription->status!=='active')$subscriptions->activate($payment->subscription);
-        }elseif(!$paid&&$payment->status==='pending'){
-            $payment->update(['provider_payload'=>$payload]);
-        }
-        return response()->json(['message'=>'OK'],200);
+        $payment->update([
+            'status' => 'paid',
+            'paid_at' => $payment->paid_at ?: now(),
+            'provider_transaction_id' => (string) ($payload['trx_id'] ?? $payload['transaction_id'] ?? $payment->provider_transaction_id),
+            'provider_payload' => $payload,
+        ]);
+        if ($sub->status === 'pending') $subscriptions->activate($sub);
+        return $this->ack();
+    }
+
+    private function reviewCommercial(PaymentTransaction $payment, array $data, string $reference, string $reason): JsonResponse
+    {
+        $payment->update($data + [
+            'status' => 'pending_verification',
+            'failure_reason' => 'iPaymu callback requires finance review: '.$reason,
+        ]);
+        Log::warning('iPaymu commercial callback awaiting review', ['reference' => $reference, 'reason' => $reason]);
+        return $this->ack();
+    }
+
+    private function ack(): JsonResponse
+    {
+        return response()->json(['message' => 'OK'], 200);
     }
 }
