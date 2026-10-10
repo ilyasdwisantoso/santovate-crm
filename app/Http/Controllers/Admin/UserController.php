@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
+use App\Models\TeamInvitation;
 use App\Models\User;
 use App\Services\EntitlementService;
 use App\Services\UserLifecycleService;
@@ -43,7 +44,18 @@ class UserController extends Controller
             ->get(['id', 'name', 'email'])
             ->values();
 
+        $pendingInvitations = TeamInvitation::query()
+            ->where('organization_id', $request->user()->organization_id)
+            ->where('status', 'pending')
+            ->orderByDesc('created_at')->limit(30)->get()
+            ->map(fn (TeamInvitation $invite) => [
+                'id' => $invite->id, 'email' => $invite->email, 'role' => $invite->role,
+                'expires_at' => $invite->expires_at?->toIso8601String(),
+                'is_expired' => !$invite->isRedeemable(),
+            ])->values();
+
         return Inertia::render('Admin/Users/Index', [
+            'pendingInvitations' => $pendingInvitations,
             'users' => $users,
             'entitlements' => $organization ? $entitlements->snapshot($organization) : null,
             'replacementUsers' => $replacementUsers,

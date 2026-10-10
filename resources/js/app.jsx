@@ -29,6 +29,7 @@ import '../css/sales-monitoring-followup-v7.css';
 import '../css/account-lifecycle-v8.css';
 import '../css/followup-modal-v91.css';
 import '../css/login-home-v92.css';
+import '../css/team-invitation-v937.css';
 import '../css/qr-display-v934.css';
 import '../css/qr-display-v935.css';
 import './landing-motion';

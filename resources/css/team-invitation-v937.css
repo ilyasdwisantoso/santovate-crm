@@ -1,0 +1,17 @@
+.sv-invite-public{width:min(100%,520px);margin:35px auto 70px;padding:32px;background:#fff;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 20px 55px rgba(23,48,85,.09)}
+.sv-invite-icon{width:47px;height:47px;display:grid;place-items:center;color:#fff;background:#1d4289;border-radius:12px;font-weight:900;margin-bottom:18px}
+.sv-invite-public h1{font-size:clamp(23px,3vw,31px);line-height:1.2;margin:8px 0;color:#142d55}
+.sv-invite-public p{font-size:13px;line-height:1.65;color:#617089}
+.sv-invite-mail{display:grid;gap:4px;margin:18px 0;padding:15px;background:#f5f8fe;border-radius:12px;overflow-wrap:anywhere}
+.sv-invite-mail small,.sv-invite-footer,.sv-invite-hint{font-size:11px;color:#64748b}
+.sv-invite-mail strong{font-size:14px;color:#1e3557}
+.sv-invite-public form{display:grid;gap:14px}.sv-invite-public form>.btn{margin-top:6px;justify-content:center;min-height:42px}
+.sv-invite-footer{display:block;margin-top:18px}
+.sv-team-invite-list{margin:16px 0;padding:18px}
+.sv-team-invite-items{display:grid;gap:10px;margin-top:14px}
+.sv-team-invite-item{display:flex;gap:15px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px;border:1px solid #e5eaf3;border-radius:12px}
+.sv-team-invite-item>div:first-child{display:grid;gap:3px;overflow-wrap:anywhere}
+.sv-team-invite-item small{color:#64748b;font-size:11px}
+.sv-team-invite-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sv-team-invite-modal .field{margin:14px 0}.sv-team-invite-modal .modal-actions{margin-top:20px}
+@media(max-width:600px){.sv-invite-public{margin:16px auto;padding:21px}}

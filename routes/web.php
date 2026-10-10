@@ -9,6 +9,8 @@ use App\Http\Controllers\Platform\SubscriptionAddonController as PlatformSubscri
 use App\Http\Controllers\Admin\BusinessSettingsController;
 use App\Http\Controllers\Admin\ClientOnboardingController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\TeamInvitationController;
+use App\Http\Controllers\Auth\AcceptTeamInvitationController;
 use App\Http\Controllers\Admin\WhatsAppSettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CampaignController;
@@ -49,7 +51,10 @@ Route::get('/privacy-policy',fn()=>app(PublicController::class)->legal('privacy-
 Route::get('/faq',fn()=>app(PublicController::class)->legal('faq'))->name('faq.public');
 Route::get('/contact',fn()=>app(PublicController::class)->legal('contact'))->name('contact');
 Route::get('/payment-result/{reference}',CommercialPaymentResultController::class)->name('commercial-payment.result');
-Route::middleware('guest')->group(function(){Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');Route::post('/login',[AuthenticatedSessionController::class,'store'])->name('login.store');Route::get('/register',[RegistrationController::class,'create'])->name('register');Route::post('/register',[RegistrationController::class,'store'])->name('register.store');});
+Route::middleware('guest')->group(function(){
+    Route::get('/team-invite/{token}',[AcceptTeamInvitationController::class,'show'])->name('team-invitation.show');
+    Route::post('/team-invite/{token}/accept',[AcceptTeamInvitationController::class,'accept'])->middleware('throttle:10,1')->name('team-invitation.accept');
+    Route::get('/login',[AuthenticatedSessionController::class,'create'])->name('login');Route::post('/login',[AuthenticatedSessionController::class,'store'])->name('login.store');Route::get('/register',[RegistrationController::class,'create'])->name('register');Route::post('/register',[RegistrationController::class,'store'])->name('register.store');});
 Route::middleware(['auth','account.active'])->group(function(){
     Route::post('/logout',[AuthenticatedSessionController::class,'destroy'])->name('logout');
     Route::get('/session/csrf-token',fn()=>response()->json(['token'=>csrf_token()]))->name('session.csrf-token');
@@ -133,6 +138,9 @@ Route::middleware(['auth','account.active'])->group(function(){
             Route::get('/settings/business',[BusinessSettingsController::class,'index'])->name('settings.business');Route::get('/settings/whatsapp',[WhatsAppSettingsController::class,'edit'])->middleware('entitlement.feature:whatsapp_api')->name('settings.whatsapp');Route::put('/settings/whatsapp',[WhatsAppSettingsController::class,'update'])->middleware('entitlement.feature:whatsapp_api')->name('settings.whatsapp.update');
             Route::middleware('platform.admin')->group(function(){Route::get('/admin/clients',[ClientOnboardingController::class,'index'])->name('admin.clients.index');Route::post('/admin/clients',[ClientOnboardingController::class,'store'])->name('admin.clients.store');});
             Route::prefix('admin')->name('admin.')->group(function(){
+                Route::post('users/invitations',[TeamInvitationController::class,'store'])->middleware('throttle:10,1')->name('team-invitations.store');
+                Route::post('users/invitations/{invitation}/resend',[TeamInvitationController::class,'resend'])->middleware('throttle:10,1')->name('team-invitations.resend');
+                Route::delete('users/invitations/{invitation}',[TeamInvitationController::class,'destroy'])->name('team-invitations.destroy');
                 Route::patch('users/{user}/status',[UserController::class,'status'])->name('users.status');
                 Route::post('users/{user}/deactivate',[UserController::class,'deactivate'])->name('users.deactivate');
                 Route::resource('users',UserController::class)->except(['show']);

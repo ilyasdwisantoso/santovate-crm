@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AppLayout from '../../../Layouts/AppLayout';
 import Icon from '../../../Components/Icon';
@@ -147,14 +147,51 @@ function MobileUserCard({ user, open }) {
     </article>;
 }
 
-export default function Index({ users, entitlements, replacementUsers=[], userView='active' }) {
+function InviteTeamModal({ onClose }) {
+    const form = useForm({ email: '', role: 'sales' });
+    const submit = (event) => {
+        event.preventDefault();
+        form.post('/admin/users/invitations', { preserveScroll: true, onSuccess: onClose });
+    };
+    return <div className="modal-backdrop" onClick={onClose}>
+        <form className="modal-card sv-team-invite-modal" onSubmit={submit} onClick={e => e.stopPropagation()}>
+            <div className="modal-head"><div><span className="eyebrow">Team invitation</span><h3>Undang anggota tim</h3><p>Penerima menentukan nama dan password sendiri melalui email. Link berlaku 48 jam.</p></div>
+                <button className="icon-button" type="button" onClick={onClose}><Icon name="close"/></button></div>
+            <label className="field"><span>Email penerima *</span><input type="email" required autoComplete="off" value={form.data.email} onChange={e=>form.setData('email',e.target.value)}/>
+                {form.errors.email&&<small className="field-error">{form.errors.email}</small>}</label>
+            <label className="field"><span>Role *</span><select value={form.data.role} onChange={e=>form.setData('role',e.target.value)}>
+                <option value="sales">Account Executive</option><option value="admin">Administrator</option></select></label>
+            {Object.keys(form.errors).length>0&&<p className="field-error">{Object.values(form.errors)[0]}</p>}
+            <div className="modal-actions"><button className="btn btn-secondary" type="button" onClick={onClose}>Batal</button>
+                <button className="btn btn-primary" type="submit" disabled={form.processing}>{form.processing?'Mengirim…':'Kirim Undangan'}</button></div>
+        </form>
+    </div>;
+}
+
+export default function Index({ users, entitlements, replacementUsers=[], pendingInvitations=[], userView='active' }) {
     const seats=entitlements?.limits?.users;
     const [modal,setModal]=useState(null);
+    const [inviteOpen,setInviteOpen]=useState(false);
+    const [invitationBusy,setInvitationBusy]=useState(null);
     const rows=useMemo(()=>users?.data||[],[users]);
 
-    return <AppLayout title="Tim & Access" subtitle="Kelola akun, role, status akses, workload, dan kapasitas seat workspace." action={<Link href="/admin/users/create" className="btn btn-primary"><Icon name="plus" size={17}/>Tambah User</Link>}>
+    return <AppLayout title="Tim & Access" subtitle="Kelola akun, role, status akses, workload, dan kapasitas seat workspace." action={<div style={{display:'flex',gap:8,flexWrap:'wrap'}}><button className="btn btn-primary" type="button" onClick={()=>setInviteOpen(true)}><Icon name="plus" size={17}/>Undang User</button><Link href="/admin/users/create" className="btn btn-secondary">Buat Manual</Link></div>}>
         <Head title="Tim & Access"/>
         {seats&&<section className="panel entitlement-summary-card"><div><span className="eyebrow">Effective entitlement</span><h3>Seat pengguna</h3><p>Hanya user aktif yang memakai seat. User nonaktif tidak mengurangi kapasitas.</p></div><div className="entitlement-capacity"><strong>{limitText(seats)}</strong><span>{seats.unlimited?'Internal workspace':`${seats.remaining} seat tersisa`}</span><div className="entitlement-meter"><i style={{width:`${seats.usage_percent||0}%`}}/></div></div></section>}
+
+        <section className="panel sv-team-invite-list">
+            <div className="panel-head"><div><span className="eyebrow">Undangan Tim</span><h3>Undangan menunggu aktivasi ({pendingInvitations.length})</h3>
+                <p>Email berisi link privat yang berlaku 48 jam. Seat diperiksa ulang saat aktivasi.</p></div></div>
+            {pendingInvitations.length ? <div className="sv-team-invite-items">{pendingInvitations.map(invite => <article key={invite.id} className="sv-team-invite-item">
+                <div><strong>{invite.email}</strong><small>{roleLabel(invite.role)} · {invite.is_expired?'Kedaluwarsa':`Aktif sampai ${dateTime(invite.expires_at)}`}</small></div>
+                <div className="sv-team-invite-actions"><button type="button" className="btn btn-secondary btn-sm" disabled={invitationBusy!==null} onClick={()=>{
+                    setInvitationBusy(invite.id);router.post(`/admin/users/invitations/${invite.id}/resend`,{}, {preserveScroll:true,onFinish:()=>setInvitationBusy(null)});
+                }}>Kirim ulang</button><button type="button" className="btn btn-secondary btn-sm" disabled={invitationBusy!==null} onClick={()=>{
+                    if(!window.confirm(`Batalkan undangan untuk ${invite.email}?`))return;
+                    setInvitationBusy(invite.id);router.delete(`/admin/users/invitations/${invite.id}`,{preserveScroll:true,onFinish:()=>setInvitationBusy(null)});
+                }}>Batalkan</button></div>
+            </article>)}</div>:<p style={{fontSize:13,color:'#64748b'}}>Belum ada undangan tertunda.</p>}
+        </section>
 
         <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center',marginBottom:12}}>
             <strong style={{marginRight:6,fontSize:13}}>Tampilkan akun:</strong>
@@ -167,6 +204,7 @@ export default function Index({ users, entitlements, replacementUsers=[], userVi
             {!rows.length&&<div className="mini-empty padded">Belum ada user.</div>}
         </section>
 
+        {inviteOpen&&<InviteTeamModal onClose={()=>setInviteOpen(false)}/>}
         {modal&&<LifecycleModal state={modal} replacementUsers={replacementUsers} close={()=>setModal(null)}/>}
     </AppLayout>;
 }
