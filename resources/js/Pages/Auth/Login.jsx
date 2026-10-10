@@ -1,4 +1,4 @@
-﻿import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import Icon from '../../Components/Icon';
 
@@ -38,7 +38,7 @@ export default function Login() {
                             <em>Follow-up lebih disiplin.</em>
                         </h1>
                         <p>
-                            CRM internal untuk membantu tim Santovate mengubah database prospek
+                            Platform CRM untuk membantu tim sales mengubah data prospek
                             menjadi percakapan, proposal, dan revenue yang terukur.
                         </p>
 
@@ -49,7 +49,7 @@ export default function Login() {
                         </div>
                     </div>
 
-                    <p className="login-foot">Santovate CRM Â· Internal workspace</p>
+                    <p className="login-foot">Santovate CRM · Sales Operating System</p>
                 </section>
 
                 <section className="login-form-panel">
@@ -125,7 +125,7 @@ export default function Login() {
                             <span>Kembali ke Home</span>
                         </Link>
                         <div className="security-note">
-                            <span>â—</span> Akses khusus tim internal Santovate
+                            <span aria-hidden="true">●</span> Akses aman untuk pengguna Santovate CRM
                         </div>
                     </form>
                 </section>

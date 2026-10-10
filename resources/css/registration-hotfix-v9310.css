@@ -1,0 +1,5 @@
+/* Santovate CRM V9.3.10: inline registration field errors and guidance. */
+.sv-register-card .sv-register-field-error{display:block;margin-top:6px;font-size:12px;line-height:1.5;color:#b42318;font-weight:600}
+.sv-register-card .sv-register-helper{display:block;margin-top:5px;font-size:11px;line-height:1.5;color:#64748b;font-weight:500}
+.sv-register-card [aria-invalid="true"]{border-color:#d92d20!important;box-shadow:0 0 0 2px rgba(217,45,32,.12)}
+.sv-register-card button[disabled]{opacity:.72;cursor:not-allowed}

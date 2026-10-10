@@ -31,6 +31,7 @@ import '../css/followup-modal-v91.css';
 import '../css/login-home-v92.css';
 import '../css/team-invitation-v937.css';
 import '../css/team-invitation-v938.css';
+import '../css/registration-hotfix-v9310.css';
 import '../css/qr-display-v934.css';
 import '../css/qr-display-v935.css';
 import './landing-motion';
