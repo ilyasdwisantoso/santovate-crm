@@ -263,7 +263,7 @@ class SubscriptionController extends Controller
                     break;
                 }
 
-                if (in_array(($payload['status'] ?? null), ['failed','expired','cancelled','canceled'], true)) {
+                if (in_array(($payload['status'] ?? null), ['failed','expired','cancelled','canceled','pending_verification'], true)) {
                     echo "event: terminal\n";
                     echo 'data: '.json_encode($payload, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)."\n\n";
                     $this->flushStream();
@@ -292,7 +292,7 @@ class SubscriptionController extends Controller
         return [
             'reference'=>$reference,
             'status'=>$payment?->status ?? 'unknown',
-            'active'=>$payment?->subscription?->status === 'active',
+            'active'=>$payment?->status === 'paid' && $payment?->subscription?->status === 'active',
             'paid_at'=>$payment?->paid_at?->toIso8601String(),
             'subscription_status'=>$payment?->subscription?->status,
             'updated_at'=>$payment?->updated_at?->toIso8601String(),

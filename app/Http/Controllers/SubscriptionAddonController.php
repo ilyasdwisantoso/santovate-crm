@@ -222,7 +222,7 @@ class SubscriptionAddonController extends Controller
     {
         return [
             'reference'=>$reference,'status'=>$payment?->status??'unknown',
-            'active'=>$payment?->order?->status==='activated',
+            'active'=>$payment?->status === 'paid' && $payment?->order?->status==='activated',
             'paid_at'=>$payment?->paid_at?->toIso8601String(),
             'order_status'=>$payment?->order?->status,
             'activated_at'=>$payment?->order?->activated_at?->toIso8601String(),

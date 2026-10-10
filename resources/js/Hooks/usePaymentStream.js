@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { paymentIsComplete, paymentIsTerminal } from '../Utils/paymentStatusPolicy';
 
 export default function usePaymentStream({ reference, streamUrl, statusUrl, initialStatus = 'pending', onComplete }) {
     const [payment, setPayment] = useState({ status: initialStatus, active: false, reference });
@@ -27,12 +28,12 @@ export default function usePaymentStream({ reference, streamUrl, statusUrl, init
                 const data = JSON.parse(event.data || '{}');
                 setPayment(data);
                 setLastEventAt(new Date());
-                if (data.active && !completedRef.current) {
+                if (paymentIsComplete(data) && !completedRef.current) {
                     completedRef.current = true;
                     setConnection('complete');
                     onComplete?.(data);
                     source.close();
-                } else if (terminal) {
+                } else if (terminal || paymentIsTerminal(data)) {
                     setConnection('terminal');
                     source.close();
                 }
@@ -64,10 +65,12 @@ export default function usePaymentStream({ reference, streamUrl, statusUrl, init
                 const data = await response.json();
                 setPayment(data);
                 setLastEventAt(new Date());
-                if (data.active && !completedRef.current) {
+                if (paymentIsComplete(data) && !completedRef.current) {
                     completedRef.current = true;
                     setConnection('complete');
                     onComplete?.(data);
+                } else if (paymentIsTerminal(data)) {
+                    setConnection('terminal');
                 }
             } catch {
                 // Keep the UI usable while EventSource reconnects.
