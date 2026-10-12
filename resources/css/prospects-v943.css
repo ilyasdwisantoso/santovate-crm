@@ -1,0 +1,20 @@
+/* V9.4.3: progressively disclose optional prospect fields and streamline timeline.
+   Scoped to V943 classes so prior UI screens remain unchanged. */
+.p943-form-jump{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.p943-form-jump a{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:7px 12px;border:1px solid var(--line,#e1e5ec);border-radius:999px;background:var(--surface,#fff);font-size:12px;font-weight:650;color:var(--ink,#212b38);text-decoration:none}
+.p943-form-jump a:hover{background:var(--surface-2,#f7f9fa)}
+.p943-form-jump a:focus-visible,.p943-advanced-toggle button:focus-visible,.p943-timeline-toolbar select:focus-visible,.p943-timeline-more:focus-visible{outline:3px solid #7589ea;outline-offset:3px}
+.p943-advanced-toggle{grid-column:1/-1;margin-top:4px}
+.p943-advanced-toggle button{width:100%;min-height:42px;padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line,#e1e5ec);border-radius:11px;background:var(--surface-2,#f8fafb);color:var(--ink,#202a36);font-weight:700;text-align:left;cursor:pointer}
+.p943-advanced-toggle small{font-weight:500;color:var(--muted,#64748b)}
+.p943-advanced-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:12px 0 2px}
+.p943-advanced-grid>.span-2{grid-column:1/-1}
+.p943-required-note{margin:0 0 12px;color:var(--muted,#697584);font-size:12px}
+.p943-dirty-hint{margin:10px 0;color:var(--muted,#64748b);font-size:12px;line-height:1.55}
+.p943-timeline-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px;padding:10px 0;border-bottom:1px solid var(--line,#e4e8ed)}
+.p943-timeline-toolbar label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:650}
+.p943-timeline-toolbar select{min-height:36px;max-width:230px;padding:7px 10px;border:1px solid var(--line,#e4e8ed);border-radius:9px;background:var(--surface,#fff);color:var(--ink,#243044)}
+.p943-timeline-count{margin-left:auto;color:var(--muted,#66748a);font-size:12px}
+.p943-timeline-more{display:block;min-height:40px;margin:14px auto 0;padding:8px 16px;border:1px solid var(--line,#e3e8ef);border-radius:10px;background:var(--surface-2,#f7f9fb);font-weight:700;color:var(--ink,#223047)}
+.p943-source-warning{display:block;color:var(--muted,#697584);font-size:11px;margin-top:5px}
+@media (max-width:740px){.p943-form-jump{gap:6px}.p943-form-jump a{font-size:11px;flex:1;justify-content:center;min-width:90px}.p943-advanced-grid{grid-template-columns:minmax(0,1fr)}.p943-advanced-grid>.span-2{grid-column:1}.p943-timeline-toolbar{align-items:stretch}.p943-timeline-toolbar label{width:100%;justify-content:space-between}.p943-timeline-toolbar select{max-width:none;flex:1}.p943-timeline-count{margin-left:0;width:100%}}
