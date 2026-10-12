@@ -1,0 +1,109 @@
+/* Santovate CRM V9.4.1 — dashboard information hierarchy.
+   Scoped to dashboard classes; do not alter shared KPI computations. */
+
+.app-shell .dashboard-focus-v941 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 23px;
+    margin-bottom: 16px;
+    border: 1px solid #dce4f2;
+    border-radius: 19px;
+    background: linear-gradient(110deg, #f8faff 0%, #fff 70%, #f6faf8 100%);
+    box-shadow: 0 8px 28px rgba(37, 56, 91, .04);
+}
+
+.dashboard-focus-v941-copy { min-width: 0; }
+.dashboard-focus-v941-kicker {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 10px;
+    font-weight: 750;
+    color: #586bb0;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+.dashboard-focus-v941 h2 {
+    margin: 0;
+    font-size: clamp(18px, 1.8vw, 24px);
+    line-height: 1.22;
+    font-weight: 760;
+    letter-spacing: -.035em;
+    color: #1c2941;
+}
+.dashboard-focus-v941 p {
+    max-width: 670px;
+    margin: 8px 0 0;
+    color: #68788e;
+    font-size: 12px;
+    line-height: 1.6;
+}
+.dashboard-focus-v941-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+}
+.dashboard-focus-v941-actions .btn {
+    min-height: 42px;
+    white-space: nowrap;
+    font-size: 12px;
+}
+.app-shell .dashboard-focus-v941-actions .btn-secondary {
+    background: #fff;
+}
+.app-shell .dashboard-primary-metrics {
+    margin-bottom: 12px;
+}
+.app-shell .dashboard-primary-metrics .metric-card {
+    min-width: 0;
+}
+.app-shell .dashboard-primary-metrics .metric-value-row strong,
+.app-shell .dashboard-quick-stats .quick-stat-copy strong {
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+}
+.app-shell .dashboard-primary-metrics .metric-card:focus-visible,
+.app-shell .dashboard-quick-stats .quick-stat:focus-visible,
+.app-shell .dashboard-focus-v941 .btn:focus-visible {
+    outline: 3px solid #5268d9;
+    outline-offset: 3px;
+}
+.app-shell .dashboard-command-grid,
+.app-shell .dashboard-quick-stats {
+    min-width: 0;
+}
+.app-shell .dashboard-section-v941-description {
+    color: #78869a;
+    font-size: 11px;
+}
+
+@media (max-width: 1080px) {
+    .app-shell .dashboard-focus-v941 { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 640px) {
+    .app-shell .dashboard-focus-v941 {
+        margin-bottom: 11px;
+        padding: 16px 15px;
+        border-radius: 15px;
+        gap: 15px;
+    }
+    .dashboard-focus-v941 h2 { font-size: 19px; }
+    .dashboard-focus-v941 p { font-size: 11.5px; }
+    .dashboard-focus-v941-actions { width: 100%; }
+    .dashboard-focus-v941-actions .btn { min-height: 44px; flex: 1 1 135px; }
+}
+
+@media (max-width: 370px) {
+    .dashboard-focus-v941-actions { flex-direction: column; align-items: stretch; }
+    .dashboard-focus-v941-actions .btn { width: 100%; flex: initial; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-focus-v941 *, .dashboard-focus-v941 *::before, .dashboard-focus-v941 *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}

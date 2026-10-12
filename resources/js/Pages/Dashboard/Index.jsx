@@ -12,8 +12,9 @@ import {
     StatusBadge,
 } from '../../Components/Ui';
 import { compactMoney, dateTime, isDue, money } from '../../Utils/format';
+import { buildDashboardView, dashboardFocusState } from '../../Utils/dashboardView';
 
-function PerformanceCard({ performance, name }) {
+function PerformanceCard({ performance, name, canViewTargets = false }) {
     if (!performance) return null;
 
     const items = [
@@ -30,7 +31,7 @@ function PerformanceCard({ performance, name }) {
                 eyebrow="Performance"
                 title={name || performance.period.label}
                 description="Progress target bulan berjalan"
-                action={<Link href="/targets" className="text-link">Detail <Icon name="chevron" size={14}/></Link>}
+                action={canViewTargets ? <Link href="/targets" className="text-link">Detail <Icon name="chevron" size={14}/></Link> : null}
             />
 
             <div className="premium-performance-body">
@@ -185,10 +186,17 @@ function greeting() {
 }
 
 export default function Dashboard({ stats, pipeline, followUps, topProspects, salesPerformance, teamPerformance, financeSummary, salesMonitoring = [] }) {
-    const { auth } = usePage().props;
+    const { auth, entitlements } = usePage().props;
     const user = auth.user;
     const firstName = user.name?.split(' ')[0] || user.name;
-    const overdueCount = financeSummary?.overdue_count || 0;
+    const { primary, quick } = buildDashboardView({
+        stats, financeSummary, isAdmin: Boolean(user.is_admin),
+    });
+    const focus = dashboardFocusState(stats);
+    const hasTargets = Boolean(entitlements?.features?.targets);
+    const displayValue = (card) => card.format === 'money'
+        ? `Rp${compactMoney(card.value)}`
+        : card.format === 'percentage' ? `${card.value}%` : card.value;
 
     return (
         <AppLayout
@@ -198,59 +206,48 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
         >
             <Head title="Dashboard"/>
 
-            <section className="dashboard-primary-metrics">
-                <MetricCard
-                    label="Pipeline"
-                    value={`Rp${compactMoney(stats.pipeline_value || 0)}`}
-                    helper="Open pipeline"
-                    icon="pipeline"
-                    accent="violet"
+            <section className="dashboard-focus-v941" aria-labelledby="dashboard-focus-v941-title">
+                <div className="dashboard-focus-v941-copy">
+                    <span className="dashboard-focus-v941-kicker">Prioritas kerja</span>
+                    <h2 id="dashboard-focus-v941-title">{focus.heading}</h2>
+                    <p>{focus.description}</p>
+                </div>
+                <div className="dashboard-focus-v941-actions">
+                    <Link href="/follow-ups" className="btn btn-primary">Buka follow-up <Icon name="chevron" size={15}/></Link>
+                    <Link href="/pipeline" className="btn btn-secondary">Lihat pipeline</Link>
+                </div>
+            </section>
+
+            <section className="dashboard-primary-metrics" aria-label="KPI utama">
+                {primary.map(card => <MetricCard
+                    key={card.key}
+                    label={card.label}
+                    value={displayValue(card)}
+                    helper={card.helper}
+                    icon={card.icon}
+                    accent={card.accent}
                     featured
-                    href="/pipeline"
-                />
-                <MetricCard
-                    label="Deal Won"
-                    value={`Rp${compactMoney(stats.actual_deal_value || 0)}`}
-                    helper={`${stats.won_deals || 0} deal`}
-                    icon="check"
-                    accent="green"
-                    featured
-                    href="/deals"
-                />
-                <MetricCard
-                    label="Collected"
-                    value={`Rp${compactMoney(financeSummary?.paid_by_client || 0)}`}
-                    helper="Net payment"
-                    icon="check"
-                    accent="blue"
-                    featured
-                    href="/finance"
-                />
-                <MetricCard
-                    label="Outstanding"
-                    value={`Rp${compactMoney(financeSummary?.outstanding || 0)}`}
-                    helper={overdueCount ? `${overdueCount} overdue` : 'Receivable'}
-                    icon="alert"
-                    accent={overdueCount ? 'red' : 'amber'}
-                    featured
-                    href="/finance"
-                />
+                    href={card.href}
+                />)}
             </section>
 
             <section className="dashboard-quick-stats" aria-label="Ringkasan aktivitas">
-                <QuickStat label="Prospek" value={stats.total || 0} icon="building" tone="blue" href="/prospects"/>
-                <QuickStat label="Follow-up" value={stats.need_followup || 0} icon="calendar" tone={(stats.need_followup || 0) > 0 ? 'amber' : 'green'} href="/follow-ups"/>
-                <QuickStat label="Opportunity" value={`Rp${compactMoney(stats.opportunity_value || 0)}`} icon="target" tone="violet" href="/opportunities"/>
-                <QuickStat label="Quotation" value={`Rp${compactMoney(stats.quotation_value || 0)}`} icon="briefcase" tone="blue" href="/quotations"/>
-                <QuickStat label="Conversion" value={`${stats.conversion_rate || 0}%`} icon="pipeline" tone="green" href="/pipeline"/>
-                <QuickStat label="Earned Commission" value={`Rp${compactMoney(financeSummary?.earned_commission || 0)}`} icon="target" tone="amber" href="/finance/commissions"/>
+                {quick.map(card => <QuickStat
+                    key={card.key}
+                    label={card.label}
+                    value={displayValue(card)}
+                    helper={card.helper}
+                    icon={card.icon}
+                    tone={card.accent}
+                    href={card.href}
+                />)}
             </section>
 
             {user.is_admin && <SalesAssignmentMonitor rows={salesMonitoring}/>}
 
             <section className="dashboard-command-grid">
                 <div className="dashboard-command-main">
-                    {!user.is_admin && <PerformanceCard performance={salesPerformance}/>}
+                    {!user.is_admin && <PerformanceCard performance={salesPerformance} canViewTargets={hasTargets}/>}
 
                     {user.is_admin && (
                         <section className="panel dashboard-team-panel premium-team-panel">
@@ -258,7 +255,7 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
                                 eyebrow="Team"
                                 title="Account Executive"
                                 description="Progress target bulan berjalan"
-                                action={<Link href="/targets" className="text-link">Target AE <Icon name="chevron" size={14}/></Link>}
+                                action={hasTargets ? <Link href="/targets" className="text-link">Target AE <Icon name="chevron" size={14}/></Link> : null}
                             />
                             {teamPerformance.length ? (
                                 <div className="team-performance-list">

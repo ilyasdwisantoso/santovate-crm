@@ -36,6 +36,7 @@ import '../css/registration-revamp-v9311.css';
 import '../css/qr-display-v934.css';
 import '../css/qr-display-v935.css';
 import '../css/workspace-navigation.css';
+import '../css/dashboard-v941.css';
 import './landing-motion';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
