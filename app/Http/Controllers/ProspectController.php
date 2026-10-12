@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\BusinessConfigurationService;
 use App\Services\EntitlementService;
 use App\Services\ProspectStageService;
+use App\Support\ProspectIndexFilters;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,17 +19,27 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 class ProspectController extends Controller {
-    public function index(Request $request,BusinessConfigurationService $cfg): Response {
-        $q=Prospect::query()->visibleTo($request->user())->with(['assignedUser','products']);
-        if($s=trim((string)$request->query('q')))$q->where(fn($x)=>$x->where('company_name','like',"%$s%")->orWhere('city','like',"%$s%")->orWhere('contact_name','like',"%$s%")->orWhere('email','like',"%$s%")->orWhere('service','like',"%$s%"));
-        if($request->filled('priority'))$q->where('priority',$request->priority);
-        if($request->filled('status'))$q->where('status',$request->status);
-        if($request->filled('qualification_status'))$q->where('qualification_status',$request->qualification_status);
-        if($request->filled('assigned_to')&&$request->user()->isAdmin())$request->assigned_to==='unassigned'?$q->whereNull('assigned_to'):$q->where('assigned_to',$request->assigned_to);
-        if($request->query('followup')==='due')$q->whereNotNull('next_follow_up_at')->where('next_follow_up_at','<=',now()->endOfDay());
-        $pros=$q->orderByDesc('total_score')->orderByDesc('updated_at')->paginate(20)->withQueryString();
-        $pros->setCollection($pros->getCollection()->map(fn($p)=>(new ProspectResource($p))->resolve()));
-        return Inertia::render('Prospects/Index',['prospects'=>$pros,'filters'=>$request->only(['q','priority','status','qualification_status','assigned_to','followup']),'statuses'=>$cfg->statusLabels($request->user()->organization),'qualificationStatuses'=>$this->qualificationStatuses(),'priorities'=>Prospect::PRIORITIES,'salesUsers'=>$this->salesUsers($request)]);
+    public function index(Request $request, BusinessConfigurationService $cfg): Response {
+        $statuses = $cfg->statusLabels($request->user()->organization);
+        $allowedStatuses = array_values(array_unique(array_merge(array_keys(Prospect::STATUSES), array_keys($statuses))));
+        $isAdmin = $request->user()->isAdmin();
+        $filters = ProspectIndexFilters::normalize($request->query(), $isAdmin, $allowedStatuses);
+
+        // Tenant and AE visibility is mandatory, regardless of any URL filters.
+        $query = Prospect::query()->visibleTo($request->user())->with('assignedUser');
+        ProspectIndexFilters::apply($query, $filters, $isAdmin);
+        $paginationFilters = array_filter($filters, static fn ($value) => $value !== '' && $value !== 'score');
+        $prospects = $query->paginate(20)->appends($paginationFilters);
+        $prospects->setCollection($prospects->getCollection()->map(fn ($p) => (new ProspectResource($p))->resolve()));
+
+        return Inertia::render('Prospects/Index', [
+            'prospects' => $prospects,
+            'filters' => $filters,
+            'statuses' => $statuses,
+            'qualificationStatuses' => $this->qualificationStatuses(),
+            'priorities' => Prospect::PRIORITIES,
+            'salesUsers' => $this->salesUsers($request),
+        ]);
     }
     public function create(Request $request,BusinessConfigurationService $cfg): Response {
         return Inertia::render('Prospects/Form',['prospect'=>['fit_score'=>0,'pain_score'=>0,'contact_score'=>0,'status'=>'baru','qualification_status'=>'new','tracking_portal'=>null,'estimated_deal_value'=>0,'estimated_budget'=>'','probability'=>10,'assigned_to'=>$request->user()->isAdmin()?null:$request->user()->id,'product_ids'=>[]],'mode'=>'create','statuses'=>$cfg->statusLabels($request->user()->organization),'qualificationStatuses'=>$this->qualificationStatuses(),'salesUsers'=>$this->salesUsers($request),'products'=>Product::where('organization_id',$request->user()->organization_id)->where('is_active',true)->get()]);
