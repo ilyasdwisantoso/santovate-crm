@@ -81,6 +81,13 @@ class WhatsAppInboundCaptureService
                         'first_message_at' => $when,
                     ]
                 );
+                // An admin may have explicitly linked this sender to an existing
+                // tenant-owned prospect. Do not erase that verified relationship
+                // merely because another automatic phone match is absent.
+                if ($contact->prospect_id) {
+                    $manuallyLinked = Prospect::query()->where('organization_id', $orgId)->find($contact->prospect_id);
+                    if ($manuallyLinked) $prospect = $manuallyLinked;
+                }
                 $updates = [];
                 if ($contact->prospect_id !== $prospect?->id) $updates['prospect_id'] = $prospect?->id;
                 if ($profileName && $profileName !== $contact->profile_name) $updates['profile_name'] = $profileName;

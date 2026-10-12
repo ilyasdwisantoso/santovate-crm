@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /** Incoming WhatsApp contact, retained even when a CRM prospect does not exist. */
 class WhatsAppInboundContact extends Model
@@ -27,4 +28,5 @@ class WhatsAppInboundContact extends Model
 
     public function organization(): BelongsTo { return $this->belongsTo(Organization::class); }
     public function prospect(): BelongsTo { return $this->belongsTo(Prospect::class); }
+    public function review(): HasOne { return $this->hasOne(WhatsAppLeadReview::class, 'whatsapp_inbound_contact_id'); }
 }

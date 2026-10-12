@@ -1,0 +1,35 @@
+/* Santovate V9.5.1 — scoped WhatsApp lead review, no global component overrides */
+.wa951-intro { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:20px; }
+.wa951-intro h3 { margin:5px 0 6px; font-size:19px; }
+.wa951-intro p { margin:0; font-size:12px; color:#68748b; max-width:650px; line-height:1.65; }
+.wa951-toolbar { display:flex; justify-content:space-between; align-items:end; gap:14px; padding:16px 20px; margin-top:14px; }
+.wa951-toolbar form { display:flex; gap:10px; align-items:end; flex:1; }
+.wa951-toolbar label,.wa951-fields label,.wa951-convert-form label { display:grid; gap:6px; min-width:0; font-size:12px; font-weight:650; color:#57647b; }
+.wa951-toolbar input,.wa951-toolbar select,.wa951-fields select,.wa951-fields textarea,.wa951-convert-form input { min-height:39px; width:100%; border:1px solid #d8deeb; border-radius:10px; padding:9px 11px; background:#fff; color:#19243a; font:inherit; font-size:13px; }
+.wa951-toolbar form label { flex:1; }
+.wa951-toolbar > label { width:220px; }
+.wa951-list { display:grid; gap:14px; margin-top:14px; }
+.wa951-card { border:1px solid #e3e7f0; border-radius:18px; background:#fff; padding:20px; box-shadow:0 4px 18px rgba(27,44,75,.035); }
+.wa951-card-head,.wa951-identification { display:flex; align-items:center; gap:10px; justify-content:space-between; }
+.wa951-identification { justify-content:flex-start; flex-wrap:wrap; }
+.wa951-identification strong { font-size:15px; color:#14213a; }
+.wa951-status { border-radius:100px; padding:4px 10px; background:#eef2ff; color:#4356b9; font-size:10px; font-weight:700; }
+.wa951-card-head p { margin:5px 0; color:#46546b; font-size:12px; }
+.wa951-card-head small,.wa951-referral { font-size:11px; color:#7b879b; }
+.wa951-message { margin:15px 0 9px; padding:11px 14px; border-left:3px solid #8294e4; background:#f7f8fe; color:#45536e; white-space:pre-wrap; overflow-wrap:anywhere; border-radius:0 9px 9px 0; font-size:12px; }
+.wa951-fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+.wa951-wide { grid-column:1 / -1; }
+.wa951-actions { display:flex; justify-content:flex-end; margin-top:12px; }
+.wa951-convert { margin-top:17px; border-top:1px solid #edf0f6; padding-top:15px; display:grid; gap:12px; }
+.wa951-convert h4 { margin:0 0 8px; font-size:13px; color:#263754; }
+.wa951-convert p,.wa951-b2c-note { margin:0; font-size:12px; color:#68758a; line-height:1.65; }
+.wa951-match-list { display:flex; flex-wrap:wrap; gap:8px; }
+.wa951-convert-form { display:grid; grid-template-columns:1.5fr 1fr auto; align-items:end; gap:10px; margin-top:10px; }
+.wa951-pagination { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; padding:8px 3px 16px; font-size:12px; color:#68748b; }
+.wa951-pagination > div { display:flex; gap:8px; }
+.wa951-empty { padding:28px; text-align:center; margin-top:14px; }
+.wa951-empty h3 { font-size:16px; margin:9px 0; }
+.wa951-empty p { color:#768197; font-size:12px; }
+.wa951-card :is(input,select,textarea,button,a):focus-visible,.wa951-toolbar :is(input,select,button):focus-visible { outline:3px solid #8da5ff; outline-offset:2px; }
+@media (max-width:740px) { .wa951-intro,.wa951-card-head,.wa951-toolbar { align-items:stretch; flex-direction:column; } .wa951-toolbar > label { width:100%; } .wa951-fields { grid-template-columns:1fr 1fr; } .wa951-convert-form { grid-template-columns:1fr; } .wa951-card { padding:15px; } .wa951-pagination { align-items:flex-start; } }
+@media (max-width:430px) { .wa951-fields { grid-template-columns:1fr; } .wa951-toolbar form { flex-direction:column; align-items:stretch; } .wa951-pagination { flex-direction:column; } }

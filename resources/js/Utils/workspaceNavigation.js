@@ -25,6 +25,7 @@ const managementNav = [
     { href: '/products', label: 'Katalog Produk', icon: 'briefcase', hideInternal: true, match: (u) => u.startsWith('/products') },
     { href: '/campaigns', label: 'WA Campaign', icon: 'whatsapp', feature: 'campaigns', match: (u) => u.startsWith('/campaigns') },
     { href: '/settings/whatsapp', label: 'WhatsApp API', icon: 'whatsapp', feature: 'whatsapp_api', match: (u) => u.startsWith('/settings/whatsapp') },
+    { href: '/whatsapp/leads', label: 'WhatsApp Leads', icon: 'whatsapp', feature: 'whatsapp_api', match: (u) => u.startsWith('/whatsapp/leads') },
     { href: '/settings/business', label: 'Business Config', icon: 'spark', match: (u) => u.startsWith('/settings/business') },
     { href: '/subscription/addons', label: 'Subscription Add-ons', icon: 'spark', match: (u) => u.startsWith('/subscription/addons') },
     { href: '/admin/clients', label: 'Client Onboarding', icon: 'users', platformOnly: true, match: (u) => u.startsWith('/admin/clients') },

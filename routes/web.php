@@ -39,6 +39,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SubscriptionAddonController;
 use App\Http\Controllers\IpaymuPaymentAssetController;
 use App\Http\Controllers\WhatsAppSendController;
+use App\Http\Controllers\WhatsAppLeadReviewController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 Route::get('/',[PublicController::class,'home'])->name('home');
@@ -135,6 +136,11 @@ Route::middleware(['auth','account.active'])->group(function(){
             Route::get('/imports',[ImportController::class,'index'])->middleware('entitlement.feature:imports')->name('imports.index');Route::get('/imports/template',[ImportController::class,'template'])->middleware('entitlement.feature:imports')->name('imports.template');Route::get('/imports/sample',[ImportController::class,'sample'])->middleware('entitlement.feature:imports')->name('imports.sample');Route::post('/imports/preview',[ImportController::class,'preview'])->middleware('entitlement.feature:imports')->name('imports.preview');Route::post('/imports/commit',[ImportController::class,'commit'])->middleware('entitlement.feature:imports')->name('imports.commit');Route::get('/imports/{batch}',[ImportController::class,'show'])->middleware('entitlement.feature:imports')->name('imports.show');
             Route::resource('products',ProductController::class)->only(['index','store','update','destroy']);
             Route::get('/campaigns',[CampaignController::class,'index'])->middleware('entitlement.feature:campaigns')->name('campaigns.index');Route::post('/campaigns',[CampaignController::class,'store'])->middleware('entitlement.feature:campaigns')->name('campaigns.store');Route::post('/campaigns/{campaign}/send',[CampaignController::class,'send'])->middleware('entitlement.feature:campaigns')->name('campaigns.send');
+            // Admin-only WhatsApp lead review, guarded by tenant entitlement.
+            Route::get('/whatsapp/leads',[WhatsAppLeadReviewController::class,'index'])->middleware('entitlement.feature:whatsapp_api')->name('whatsapp.leads.index');
+            Route::post('/whatsapp/leads/{contact}/review',[WhatsAppLeadReviewController::class,'review'])->middleware(['entitlement.feature:whatsapp_api','throttle:30,1'])->name('whatsapp.leads.review');
+            Route::post('/whatsapp/leads/{contact}/link',[WhatsAppLeadReviewController::class,'link'])->middleware(['entitlement.feature:whatsapp_api','throttle:30,1'])->name('whatsapp.leads.link');
+            Route::post('/whatsapp/leads/{contact}/convert',[WhatsAppLeadReviewController::class,'convert'])->middleware(['entitlement.feature:whatsapp_api','throttle:15,1'])->name('whatsapp.leads.convert');
             Route::get('/settings/business',[BusinessSettingsController::class,'index'])->name('settings.business');Route::get('/settings/whatsapp',[WhatsAppSettingsController::class,'edit'])->middleware('entitlement.feature:whatsapp_api')->name('settings.whatsapp');Route::put('/settings/whatsapp',[WhatsAppSettingsController::class,'update'])->middleware('entitlement.feature:whatsapp_api')->name('settings.whatsapp.update');
             Route::middleware('platform.admin')->group(function(){Route::get('/admin/clients',[ClientOnboardingController::class,'index'])->name('admin.clients.index');Route::post('/admin/clients',[ClientOnboardingController::class,'store'])->name('admin.clients.store');});
             Route::prefix('admin')->name('admin.')->group(function(){
