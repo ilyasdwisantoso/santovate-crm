@@ -7,6 +7,7 @@ use App\Models\WhatsAppCampaignRecipient;
 use App\Models\WhatsAppChannel;
 use App\Models\WhatsAppMessage;
 use App\Services\ProspectStageService;
+use App\Services\WhatsAppInboundCaptureService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 class WhatsAppWebhookController extends Controller {
@@ -31,9 +32,15 @@ class WhatsAppWebhookController extends Controller {
         $payload=$request->json()->all();
         foreach (($payload['entry'] ?? []) as $entry) foreach (($entry['changes'] ?? []) as $change) {
             $value=$change['value'] ?? []; $phoneNumberId=data_get($value,'metadata.phone_number_id');
-            $channel=WhatsAppChannel::where('phone_number_id',$phoneNumberId)->first(); if (!$channel) continue;
+            // Fail closed when multiple tenant channels claim the same Meta phone ID.
+            if (!is_string($phoneNumberId) || $phoneNumberId === '') continue;
+            $channels=WhatsAppChannel::where('phone_number_id',$phoneNumberId)
+                ->where('is_active',true)->limit(2)->get();
+            if ($channels->count() > 1) return response('Ambiguous WhatsApp channel',503);
+            if ($channels->isEmpty()) continue;
+            $channel=$channels->first();
             foreach (($value['statuses'] ?? []) as $status) $this->status($channel->organization_id,$status);
-            foreach (($value['messages'] ?? []) as $message) $this->incoming($channel->organization_id,$message,$value,$stages);
+            foreach (($value['messages'] ?? []) as $message) $this->incoming($channel,$message,$value,$stages);
         }
         return response('EVENT_RECEIVED',200);
     }
@@ -68,24 +75,8 @@ class WhatsAppWebhookController extends Controller {
             if ($new==='failed' && $r->status!=='failed') { $r->update(['status'=>'failed','error'=>json_encode($status['errors'] ?? [])]); $campaign->increment('failed_count'); }
         }
     }
-    private function incoming(int $orgId,array $message,array $value,ProspectStageService $stages): void {
-        $from=Prospect::normalizePhone($message['from'] ?? null); if (!$from) return;
-        $p=Prospect::where('organization_id',$orgId)->where('phone_normalized',$from)->first();
-        if (!$p) return;
-        $body=data_get($message,'text.body') ?? data_get($message,'button.text') ?? '[Pesan WhatsApp]';
-        $providerMessageId=$message['id'] ?? null;
-        if (!$providerMessageId) return;
-        WhatsAppMessage::updateOrCreate(
-            ['provider_message_id'=>$providerMessageId],
-            [
-                'organization_id'=>$orgId,'prospect_id'=>$p->id,'direction'=>'inbound','type'=>$message['type'] ?? 'text','status'=>'received','from_phone'=>$from,'body'=>$body,'provider_payload'=>$message,
-            ]
-        );
-        $now=now(); $p->update(['whatsapp_status'=>'valid','whatsapp_id'=>$message['from'] ?? $from,'whatsapp_verified_at'=>$now,'last_customer_reply_at'=>$now,'last_contact_at'=>$now,'replied_at'=>$p->replied_at ?: $now,'follow_up_snoozed_until'=>null]);
-        ProspectActivity::create(['prospect_id'=>$p->id,'user_id'=>null,'type'=>'customer_reply','title'=>'Balasan WhatsApp diterima otomatis','description'=>$body,'occurred_at'=>$now]);
-        if (in_array($p->status,['baru','diriset','dihubungi'],true)) {
-            $actor=$p->assignedUser ?: $p->creator ?: $p->organization?->users()->where('role','admin')->first();
-            if ($actor) $stages->transition($p,'membalas',$actor,'WhatsApp webhook');
-        }
+    private function incoming(WhatsAppChannel $channel,array $message,array $value,ProspectStageService $stages): void {
+        app(WhatsAppInboundCaptureService::class)->capture($channel,$message,$value,$stages);
     }
+
 }
