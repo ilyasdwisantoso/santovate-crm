@@ -11,15 +11,23 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 class WhatsAppWebhookController extends Controller {
     public function verify(Request $request): Response {
-        if ($request->query('hub_mode')==='subscribe' && hash_equals((string)config('santovate.whatsapp.verify_token'),(string)$request->query('hub_verify_token'))) return response((string)$request->query('hub_challenge'),200);
+        $configuredToken = trim((string) config('santovate.whatsapp.verify_token'));
+        $receivedToken = (string) $request->query('hub_verify_token', '');
+        // An empty configured token must never match an empty request token.
+        if ($configuredToken !== '' && $receivedToken !== ''
+            && $request->query('hub_mode') === 'subscribe'
+            && hash_equals($configuredToken, $receivedToken)) {
+            return response((string) $request->query('hub_challenge'), 200);
+        }
         return response('Forbidden',403);
     }
     public function receive(Request $request, ProspectStageService $stages): Response {
         $raw=$request->getContent(); $secret=(string)config('santovate.whatsapp.app_secret');
-        if ($secret !== '') {
-            $sig=(string)$request->header('X-Hub-Signature-256'); $expected='sha256='.hash_hmac('sha256',$raw,$secret);
-            if (!$sig || !hash_equals($expected,$sig)) return response('Invalid signature',401);
-        }
+        // Fail closed: receiving unsigned webhook events when APP_SECRET is empty
+        // could let arbitrary callers impersonate customer replies or delivery events.
+        if (trim($secret) === '') return response('Webhook not configured',503);
+        $sig=(string)$request->header('X-Hub-Signature-256'); $expected='sha256='.hash_hmac('sha256',$raw,$secret);
+        if ($sig === '' || !hash_equals($expected,$sig)) return response('Invalid signature',401);
         $payload=$request->json()->all();
         foreach (($payload['entry'] ?? []) as $entry) foreach (($entry['changes'] ?? []) as $change) {
             $value=$change['value'] ?? []; $phoneNumberId=data_get($value,'metadata.phone_number_id');

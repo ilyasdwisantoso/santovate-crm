@@ -1,4 +1,6 @@
-# Santovate CRM 2.1 Final
+# Santovate CRM — Dokumentasi instalasi legacy 2.1
+
+> **Perhatian:** dokumen ini adalah panduan instalasi versi lama, bukan changelog Santovate CRM terbaru. Versi source saat ini ada di file `VERSION` dan catatan `README_V9312.md`. Jangan menjalankan installer/seeder lama atau menyalin akun contoh di bawah ke production.
 
 CRM internal Santovate berbasis **Laravel 12 + React 19 + Inertia + MySQL/MariaDB**. Paket ini dibuat untuk **fresh install**, bukan upgrade dari v1/v2 lama.
 
@@ -77,23 +79,9 @@ Buka:
 http://127.0.0.1:8000
 ```
 
-### Akun default
+### Akun demo (khusus development)
 
-Admin:
-
-```text
-admin@santovate.local
-Santovate123!
-```
-
-Sales:
-
-```text
-sales@santovate.local
-Sales123!
-```
-
-Ganti password default sebelum penggunaan production.
+Akun contoh disediakan oleh `database/seeders/DemoAccountSeeder.php` untuk lingkungan pengembangan lokal. **Jangan menggunakan password default atau menjalankan seeder demo pada database production.** Gunakan akun yang dibuat melalui registrasi/Team Invitation resmi untuk environment production.
 
 ## Verifikasi instalasi
 

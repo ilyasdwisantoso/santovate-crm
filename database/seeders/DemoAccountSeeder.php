@@ -15,6 +15,12 @@ class DemoAccountSeeder extends Seeder
 {
     public function run(): void
     {
+        // Never reset accounts to hard-coded demo credentials in production.
+        // SaasFoundationSeeder can be invoked explicitly for legitimate catalog setup.
+        if (app()->environment('production') || config('app.env') === 'production') {
+            throw new \RuntimeException('DemoAccountSeeder dilarang dijalankan di production. Gunakan migrasi dan provisioning akun resmi.');
+        }
+
         $this->call(SaasFoundationSeeder::class);
 
         $workspaces = [
