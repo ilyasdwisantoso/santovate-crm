@@ -1,0 +1,40 @@
+/* Santovate UI foundation — reusable focus/accessibility primitives.
+   Do not delete legacy styles until later visual-regression audits. */
+:root {
+    --sv-ui-focus: #6674e9;
+    --sv-ui-focus-ring: 0 0 0 3px rgba(102, 116, 233, .34);
+    --sv-ui-touch-target: 40px;
+}
+
+.premium-app-shell :is(.side-link, .mobile-sidebar-link, .bottom-link,
+    .notification-trigger, .mobile-menu-trigger, .mobile-sidebar-close,
+    .sidebar-profile-link, .mobile-sidebar-logout, .icon-button):focus-visible {
+    outline: 2px solid var(--sv-ui-focus);
+    outline-offset: 3px;
+    box-shadow: var(--sv-ui-focus-ring);
+}
+
+/* Current-page styling is now reflected in the accessibility tree, not just CSS classes. */
+.premium-app-shell .side-link[aria-current="page"] .side-link-label,
+.premium-app-shell .mobile-sidebar-link[aria-current="page"] .mobile-sidebar-link-copy {
+    font-weight: 700;
+}
+
+.premium-app-shell .mobile-sidebar-close,
+.premium-app-shell .mobile-menu-trigger,
+.premium-app-shell .notification-trigger {
+    min-width: var(--sv-ui-touch-target);
+    min-height: var(--sv-ui-touch-target);
+}
+
+/* Keep desktop navigation usable at short viewport heights without masking controls. */
+@media (min-width: 901px) {
+    .premium-app-shell .premium-sidebar-nav { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .premium-app-shell :is(.side-link, .bottom-link, .mobile-sidebar-drawer) {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
