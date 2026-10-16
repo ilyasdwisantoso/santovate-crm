@@ -40,7 +40,7 @@ class CommissionController extends Controller
             'deal'=>[
                 'id'=>$commission->deal?->id,
                 'deal_number'=>$commission->deal?->deal_number,
-                'client'=>$commission->deal?->prospect?->company_name,
+                'client'=>$commission->deal?->prospect?->display_name,
             ],
             'sales'=>[
                 'id'=>$commission->user?->id,

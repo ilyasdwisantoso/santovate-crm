@@ -1,3 +1,4 @@
+import { prospectDisplayName } from '../../Utils/prospectIdentity';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AppLayout from '../../Layouts/AppLayout';
@@ -28,7 +29,7 @@ export default function Form({mode,opportunity,prospects,salesUsers,stages,statu
         <section className="sv-context-banner sv-context-guide"><span className="sv-context-icon"><Icon name="spark" size={19}/></span><div><strong>Kapan form ini dipakai?</strong><p>Gunakan setelah prospek punya kebutuhan/project yang cukup nyata. Fokus pada masalah, proses sekarang, target hasil, solution yang relevan, budget, decision maker, dan next step.</p></div></section>
         <form onSubmit={submit} className="form-layout sv-guided-form"><div className="form-main">
             <section className="panel form-section"><div className="section-head"><span className="section-number">01</span><div><h3>Context</h3><p>Siapa client dan peluang apa yang sedang dikerjakan.</p></div></div><div className="form-grid">
-                <Field label="Prospek *" help="Perusahaan/client yang mempunyai peluang ini." error={f.errors.prospect_id}><select value={f.data.prospect_id} onChange={e=>f.setData('prospect_id',e.target.value)}><option value="">Pilih prospek</option>{prospects.map(p=><option value={p.id} key={p.id}>{p.company_name}</option>)}</select></Field>
+                <Field label="Prospek *" help="Perusahaan/client yang mempunyai peluang ini." error={f.errors.prospect_id}><select value={f.data.prospect_id} onChange={e=>f.setData('prospect_id',e.target.value)}><option value="">Pilih prospek</option>{prospects.map(p=><option value={p.id} key={p.id}>{prospectDisplayName(p)}</option>)}</select></Field>
                 <Field label="Nama Opportunity *" help="Gunakan nama project/upsell yang mudah dikenali." error={f.errors.name}><input value={f.data.name} onChange={e=>f.setData('name',e.target.value)} placeholder="Logistics Tracking & Customer Portal"/></Field>
                 <Field label="Owner" help="Sales/AE yang bertanggung jawab."><select value={f.data.owner_id} onChange={e=>f.setData('owner_id',e.target.value)}><option value="">Belum diassign</option>{salesUsers.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field>
                 <Field label="Stage" help="Posisi opportunity dalam proses penjualan."><select value={f.data.stage} onChange={e=>f.setData('stage',e.target.value)}>{Object.entries(stages).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></Field>

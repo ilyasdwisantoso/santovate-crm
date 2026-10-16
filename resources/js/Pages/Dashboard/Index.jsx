@@ -1,3 +1,4 @@
+import { prospectDisplayName } from '../../Utils/prospectIdentity';
 import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Icon from '../../Components/Icon';
@@ -64,7 +65,7 @@ function PerformanceCard({ performance, name, canViewTargets = false }) {
             </div>
 
             <div className="performance-footer">
-                <span><b>{performance.actual.active_companies}</b> perusahaan aktif</span>
+                <span><b>{performance.actual.active_companies}</b> prospek aktif</span>
                 <span className={performance.actual.overdue_followups > 0 ? 'text-danger' : ''}><b>{performance.actual.overdue_followups}</b> overdue</span>
             </div>
         </article>
@@ -77,7 +78,7 @@ function FollowUpMiniCard({ prospect }) {
         <Link href={`/prospects/${prospect.id}`} className="dashboard-followup-card premium-followup-card">
             <span className={`followup-dot ${overdue ? 'overdue' : ''}`}/>
             <div className="dashboard-followup-copy">
-                <strong>{prospect.company_name}</strong>
+                <strong>{prospectDisplayName(prospect)}</strong>
                 <small>{dateTime(prospect.next_follow_up_at)}</small>
             </div>
             <PriorityBadge priority={prospect.priority}/>
@@ -90,9 +91,9 @@ function MobileProspectCard({ prospect }) {
         <Link href={`/prospects/${prospect.id}`} className="dashboard-prospect-card premium-prospect-card">
             <div className="dashboard-prospect-card-head">
                 <div className="company-cell">
-                    <span className="company-avatar">{prospect.company_name?.[0]}</span>
+                    <span className="company-avatar">{prospectDisplayName(prospect)?.[0]}</span>
                     <div>
-                        <strong>{prospect.company_name}</strong>
+                        <strong>{prospectDisplayName(prospect)}</strong>
                         <small>{[prospect.city, prospect.service].filter(Boolean).join(' · ') || 'Belum dilengkapi'}</small>
                     </div>
                 </div>
@@ -328,8 +329,8 @@ export default function Dashboard({ stats, pipeline, followUps, topProspects, sa
                                         <tr key={prospect.id}>
                                             <td>
                                                 <div className="company-cell">
-                                                    <span className="company-avatar">{prospect.company_name?.[0]}</span>
-                                                    <div><strong>{prospect.company_name}</strong><small>{[prospect.city, prospect.service].filter(Boolean).join(' · ') || 'Belum dilengkapi'}</small></div>
+                                                    <span className="company-avatar">{prospectDisplayName(prospect)?.[0]}</span>
+                                                    <div><strong>{prospectDisplayName(prospect)}</strong><small>{[prospect.city, prospect.service].filter(Boolean).join(' · ') || 'Belum dilengkapi'}</small></div>
                                                 </div>
                                             </td>
                                             <td>{prospect.assigned_user?.name || 'Belum diassign'}</td>

@@ -22,7 +22,7 @@ class OpportunityController extends Controller
         if ($request->filled('stage')) $query->where('stage', (string)$request->query('stage'));
         if ($request->filled('q')) {
             $q = trim((string)$request->query('q'));
-            $query->where(fn ($x) => $x->where('name','like',"%{$q}%")->orWhereHas('prospect', fn ($p) => $p->where('company_name','like',"%{$q}%")));
+            $query->where(fn ($x) => $x->where('name','like',"%{$q}%")->orWhereHas('prospect', fn ($p) => $p->searchIdentity($q)));
         }
         $items = $query->orderByRaw("FIELD(status,'open','won','lost')")->orderByDesc('expected_value')->paginate(20)->withQueryString();
         $items->through(fn ($o) => $this->payload($o));
@@ -42,7 +42,7 @@ class OpportunityController extends Controller
             'mode'=>'create',
             'opportunity'=>[
                 'prospect_id'=>$prospect?->id,'owner_id'=>$prospect?->assigned_to ?: ($request->user()->isAdmin()?null:$request->user()->id),
-                'name'=>$prospect ? 'Project '.$prospect->company_name : '', 'stage'=>'qualification','status'=>'open',
+                'name'=>$prospect ? 'Project '.$prospect->display_name : '', 'stage'=>'qualification','status'=>'open',
                 'business_problem'=>'','current_process'=>'','required_solution'=>'','required_features'=>'',
                 'expected_value'=>(float)($prospect?->estimated_deal_value ?? 0),'budget'=>$prospect?->estimated_budget ? (float)$prospect->estimated_budget : '',
                 'probability'=>(int)($prospect?->probability ?? 10),'target_go_live'=>$prospect?->target_go_live?->format('Y-m-d'),
@@ -144,8 +144,8 @@ class OpportunityController extends Controller
 
     private function prospects(Request $request): array
     {
-        return Prospect::query()->visibleTo($request->user())->orderBy('company_name')->get(['id','company_name','assigned_to','estimated_deal_value'])->map(fn($p)=>[
-            'id'=>$p->id,'company_name'=>$p->company_name,'assigned_to'=>$p->assigned_to,'estimated_deal_value'=>(float)$p->estimated_deal_value,
+        return Prospect::query()->visibleTo($request->user())->orderByIdentity()->get(array_merge(Prospect::identityColumns(),['assigned_to','estimated_deal_value']))->map(fn($p)=>[
+            ...$p->identityPayload(),'assigned_to'=>$p->assigned_to,'estimated_deal_value'=>(float)$p->estimated_deal_value,
         ])->all();
     }
 
@@ -162,7 +162,7 @@ class OpportunityController extends Controller
             'estimated_users'=>$o->estimated_users,'budget'=>$o->budget!==null?(float)$o->budget:null,'expected_value'=>(float)$o->expected_value,'probability'=>(int)$o->probability,
             'target_go_live'=>$o->target_go_live?->format('Y-m-d'),'decision_maker'=>$o->decision_maker,'decision_process'=>$o->decision_process,'urgency'=>$o->urgency,'next_action'=>$o->next_action,
             'next_follow_up_at'=>$o->next_follow_up_at?->toIso8601String(),'lost_reason'=>$o->lost_reason,'competitor'=>$o->competitor,'recontact_at'=>$o->recontact_at?->toIso8601String(),
-            'prospect'=>$o->relationLoaded('prospect') && $o->prospect ? ['id'=>$o->prospect->id,'company_name'=>$o->prospect->company_name,'contact_name'=>$o->prospect->contact_name,'email'=>$o->prospect->email,'phone'=>$o->prospect->phone] : null,
+            'prospect'=>$o->relationLoaded('prospect') && $o->prospect ? [...$o->prospect->identityPayload(),'contact_name'=>$o->prospect->contact_name,'email'=>$o->prospect->email,'phone'=>$o->prospect->phone] : null,
             'owner'=>$o->relationLoaded('owner') && $o->owner ? ['id'=>$o->owner->id,'name'=>$o->owner->name] : null,
             'solution_item_ids'=>$o->relationLoaded('solutionItems') ? $o->solutionItems->pluck('id')->values()->all() : [],
             'solutions'=>$o->relationLoaded('solutionItems') ? $o->solutionItems->map(fn($s)=>['id'=>$s->id,'code'=>$s->code,'name'=>$s->name,'category'=>$s->category,'recommended_price'=>(float)$s->recommended_price])->values() : [],

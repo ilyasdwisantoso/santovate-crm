@@ -1,10 +1,13 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import AppLayout from '../../Layouts/AppLayout';
 import Icon from '../../Components/Icon';
 import { dateTime } from '../../Utils/format';
 
 function LeadCard({ lead, salesUsers }) {
+    const { crm } = usePage().props;
+    const [individualName,setIndividualName] = useState(lead.profile_name || '');
+    const [forceDuplicate,setForceDuplicate] = useState(false);
     const [status, setStatus] = useState(lead.status);
     const [kind, setKind] = useState(lead.lead_kind);
     const [assignee, setAssignee] = useState(lead.assigned_to ?? '');
@@ -13,6 +16,7 @@ function LeadCard({ lead, salesUsers }) {
     const [city, setCity] = useState('');
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState('');
+    useEffect(()=>{setForceDuplicate(false);},[kind,companyName,individualName,city]);
 
     const submit = (url, payload) => {
         setError('');
@@ -39,7 +43,7 @@ function LeadCard({ lead, salesUsers }) {
         {lead.last_message && <blockquote className="wa951-message">{lead.last_message}</blockquote>}
         {lead.source_id && <small className="wa951-referral">Meta Referral ID: {lead.source_id} · Penempatan iklan belum terverifikasi</small>}
         <div className="wa951-fields">
-            <label><span>Jenis calon pelanggan</span><select value={kind} onChange={e => setKind(e.target.value)} disabled={processing}>
+            <label><span>Jenis calon pelanggan</span><select value={kind} onChange={e => setKind(e.target.value)} disabled={processing || Boolean(lead.prospect)}>
                 <option value="unknown">Belum diketahui</option><option value="individual">Individu / B2C</option><option value="business">Perusahaan / B2B</option>
             </select></label>
             <label><span>Status review</span><select value={status} onChange={e => setStatus(e.target.value)} disabled={processing}>
@@ -59,8 +63,13 @@ function LeadCard({ lead, salesUsers }) {
             {kind === 'business' ? <div>
                 <h4>Konversi ke prospek perusahaan baru</h4>
                 <p>Masukkan nama perusahaan sebenarnya. Periksa duplikasi dan kapasitas paket sebelum konversi.</p>
-                <div className="wa951-convert-form"><label><span>Nama perusahaan *</span><input value={companyName} maxLength={255} onChange={e => setCompanyName(e.target.value)} placeholder="PT / CV / Nama usaha"/></label><label><span>Kota (opsional)</span><input value={city} maxLength={255} onChange={e => setCity(e.target.value)}/></label><button type="button" className="btn btn-dark btn-sm" disabled={processing || companyName.trim().length < 2} onClick={() => submit(`${path}/convert`, { company_name: companyName, city })}>Buat prospek B2B</button></div>
-            </div> : <p className="wa951-b2c-note">{kind === 'individual' ? 'Lead individu tetap disimpan, dapat ditugaskan, dan diberi status. Konversi native B2C ke Prospek menunggu pembaruan skema berikutnya; nama orang tidak akan dimasukkan sebagai nama perusahaan.' : 'Pilih jenis pelanggan terlebih dahulu. Nomor baru tetap tersimpan sebagai lead WhatsApp.'}</p>}
+                <div className="wa951-convert-form"><label><span>Nama perusahaan *</span><input value={companyName} maxLength={255} onChange={e => setCompanyName(e.target.value)} placeholder="PT / CV / Nama usaha"/></label><label><span>Kota (opsional)</span><input value={city} maxLength={255} onChange={e => setCity(e.target.value)}/></label><button type="button" className="btn btn-dark btn-sm" disabled={processing || companyName.trim().length < 2} onClick={() => submit(`${path}/convert`, { entity_type: 'business', company_name: companyName, city, force_duplicate: forceDuplicate })}>Buat prospek B2B</button></div>
+            </div> : kind === 'individual' && crm?.native_individuals_enabled ? <div>
+                <h4>Konversi ke prospek individu baru</h4>
+                <p>Konfirmasi nama pelanggan. Satu individu memakai satu kuota Prospect. Konversi tidak memberikan persetujuan marketing.</p>
+                <div className="wa951-convert-form"><label><span>Nama individu *</span><input value={individualName} maxLength={255} onChange={e=>setIndividualName(e.target.value)} autoComplete="name"/></label><label><span>Kota (opsional)</span><input value={city} maxLength={255} onChange={e=>setCity(e.target.value)}/></label><button type="button" className="btn btn-dark btn-sm" disabled={processing || !individualName.trim()} onClick={()=>submit(`${path}/convert`,{entity_type:'individual',individual_name:individualName,city,force_duplicate:forceDuplicate})}>Buat prospek B2C</button></div>
+            </div> : <p className="wa951-b2c-note">{kind === 'individual' ? 'Konversi B2C belum diaktifkan. Kontak tetap tersimpan dan dapat direview tanpa memakai kuota Prospect.' : 'Pilih jenis pelanggan terlebih dahulu. Nomor baru tetap tersimpan sebagai lead WhatsApp.'}</p>}
+            {(kind==='business' || (kind==='individual' && crm?.native_individuals_enabled)) && <label className="check-line"><input type="checkbox" checked={forceDuplicate} onChange={e=>setForceDuplicate(e.target.checked)}/><span>Saya telah meninjau kandidat duplikat; identitas ini berbeda dan harus disimpan terpisah.</span></label>}
         </div>}
         {error && <div className="alert alert-error" role="alert">{error}</div>}
     </article>;

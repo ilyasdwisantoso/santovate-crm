@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 class ProspectResource extends JsonResource {
     public function toArray(Request $request): array { return [
-        'id'=>$this->id,'company_name'=>$this->company_name,'website'=>$this->website,'city'=>$this->city,'service'=>$this->service,'route'=>$this->route,'company_size'=>$this->company_size,
+        'id'=>$this->id,'entity_type'=>$this->entity_type,'individual_name'=>$this->individual_name,'display_name'=>$this->display_name,'company_name'=>$this->company_name,'website'=>$this->website,'city'=>$this->city,'service'=>$this->service,'route'=>$this->route,'company_size'=>$this->company_size,
         'contact_name'=>$this->contact_name,'contact_position'=>$this->contact_position,'decision_maker_name'=>$this->decision_maker_name,'decision_maker_position'=>$this->decision_maker_position,
         'phone'=>$this->phone,'phone_normalized'=>$this->phone_normalized,'whatsapp_status'=>$this->whatsapp_status,'whatsapp_verified_at'=>$this->whatsapp_verified_at?->toIso8601String(),
         'whatsapp_opt_in_at'=>$this->whatsapp_opt_in_at?->toIso8601String(),'whatsapp_opt_out_at'=>$this->whatsapp_opt_out_at?->toIso8601String(),'email'=>$this->email,

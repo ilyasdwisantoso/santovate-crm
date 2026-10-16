@@ -1,3 +1,4 @@
+import { prospectDisplayName } from '../../Utils/prospectIdentity';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import AppLayout from '../../Layouts/AppLayout';
@@ -27,16 +28,16 @@ function ProspectTable({ prospects }) {
     return <div className="prospect-table-wrap desktop-only">
         <table className="prospect-table">
             <caption className="sr-only">Daftar prospek sesuai pencarian dan filter</caption>
-            <thead><tr><th>Perusahaan</th><th>Kontak / PIC</th><th>Prioritas</th><th>Status</th><th>Account Executive</th><th>Follow-up</th><th>Potensi</th><th><span className="sr-only">Detail</span></th></tr></thead>
+            <thead><tr><th>Pelanggan</th><th>Kontak / PIC</th><th>Prioritas</th><th>Status</th><th>Account Executive</th><th>Follow-up</th><th>Potensi</th><th><span className="sr-only">Detail</span></th></tr></thead>
             <tbody>{prospects.map((p) => <tr key={p.id}>
-                <td><Link href={`/prospects/${p.id}`} className="company-cell"><span className="company-avatar">{p.company_name?.[0]}</span><div><strong>{p.company_name}</strong><small>{[p.city, p.service].filter(Boolean).join(' · ') || 'Data belum lengkap'}</small></div></Link></td>
+                <td><Link href={`/prospects/${p.id}`} className="company-cell"><span className="company-avatar">{prospectDisplayName(p)?.[0]}</span><div><strong>{prospectDisplayName(p)}</strong><small>{p.entity_type==='individual'?'Individu / B2C':'Perusahaan / B2B'}</small><small>{[p.city, p.service].filter(Boolean).join(' · ') || 'Data belum lengkap'}</small></div></Link></td>
                 <td><div className="stacked-cell"><strong>{p.contact_name || 'Belum ada PIC'}</strong><small>{p.contact_position || p.email || p.phone || 'Kontak belum ditemukan'}</small></div></td>
                 <td><div className="priority-cell"><PriorityBadge priority={p.priority}/><ScoreDots value={p.total_score >= 7 ? 3 : p.total_score >= 4 ? 2 : p.total_score > 0 ? 1 : 0}/><small>{p.total_score}/9</small></div></td>
                 <td><StatusBadge status={p.status} label={p.status_label}/></td>
                 <td>{p.assigned_user ? <div className="user-cell"><Avatar name={p.assigned_user.name} size="sm"/><span>{p.assigned_user.name}</span></div> : <span className="muted">Belum ditugaskan</span>}</td>
                 <td><div className={`stacked-cell ${isDue(p.next_follow_up_at) ? 'due' : ''}`}><strong>{p.next_follow_up_at ? dateTime(p.next_follow_up_at) : 'Belum dijadwalkan'}</strong><small>{isDue(p.next_follow_up_at) ? 'Perlu tindakan' : 'Terjadwal'}</small></div></td>
                 <td><strong>{money(p.estimated_deal_value)}</strong></td>
-                <td><Link className="icon-button" href={`/prospects/${p.id}`} aria-label={`Detail ${p.company_name}`}><Icon name="chevron" size={17}/></Link></td>
+                <td><Link className="icon-button" href={`/prospects/${p.id}`} aria-label={`Detail ${prospectDisplayName(p)}`}><Icon name="chevron" size={17}/></Link></td>
             </tr>)}</tbody>
         </table>
     </div>;
@@ -45,7 +46,7 @@ function ProspectTable({ prospects }) {
 function MobileProspectList({ prospects }) {
     return <div className="mobile-prospect-list mobile-only">{prospects.map((p) =>
         <Link href={`/prospects/${p.id}`} className="mobile-prospect-card" key={p.id}>
-            <div className="mobile-prospect-top"><div className="company-cell"><span className="company-avatar">{p.company_name?.[0]}</span><div><strong>{p.company_name}</strong><small>{[p.city, p.service].filter(Boolean).join(' · ') || 'Data belum lengkap'}</small></div></div><span className="score-pill">{p.total_score}/9</span></div>
+            <div className="mobile-prospect-top"><div className="company-cell"><span className="company-avatar">{prospectDisplayName(p)?.[0]}</span><div><strong>{prospectDisplayName(p)}</strong><small>{p.entity_type==='individual'?'Individu / B2C':'Perusahaan / B2B'}</small><small>{[p.city, p.service].filter(Boolean).join(' · ') || 'Data belum lengkap'}</small></div></div><span className="score-pill">{p.total_score}/9</span></div>
             <div className="mobile-badges"><PriorityBadge priority={p.priority}/><StatusBadge status={p.status} label={p.status_label}/></div>
             <div className="mobile-prospect-meta">
                 <div><span>PIC</span><strong>{p.contact_name || 'Belum ada'}</strong></div>
@@ -61,13 +62,13 @@ export default function Index({ prospects, filters = {}, statuses = {}, qualific
     const isAdmin = Boolean(auth.user.is_admin);
     const applied = prospectFilterState(filters);
     const [form, setForm] = useState(applied);
-    const [showAdvanced, setShowAdvanced] = useState(Boolean(applied.priority || applied.status || applied.qualification_status || applied.assigned_to));
+    const [showAdvanced, setShowAdvanced] = useState(Boolean(applied.entity_type || applied.priority || applied.status || applied.qualification_status || applied.assigned_to));
     const chips = prospectActiveChips(applied, { statuses, qualifications: qualificationStatuses, priorities, salesUsers, isAdmin });
     const hasFilters = chips.length > 0;
 
     // Inertia back/forward navigation should synchronize draft fields to the URL.
     useEffect(() => { setForm(prospectFilterState(filters)); }, [
-        filters.q, filters.priority, filters.status, filters.qualification_status,
+        filters.q, filters.entity_type, filters.priority, filters.status, filters.qualification_status,
         filters.assigned_to, filters.followup, filters.import_batch, filters.sort,
     ]);
 
@@ -93,7 +94,7 @@ export default function Index({ prospects, filters = {}, statuses = {}, qualific
                     <label className="p942-search" htmlFor="p942-search-input"><Icon name="search" size={18}/>
                         <input id="p942-search-input" name="q" type="search" maxLength={120} value={form.q}
                             onChange={e => update('q', e.target.value)}
-                            placeholder="Cari bisnis, PIC, email, nomor WhatsApp..." autoComplete="off"/>
+                            placeholder="Cari pelanggan, PIC, email, nomor WhatsApp..." autoComplete="off"/>
                     </label>
                     <div className="p942-toolbar-actions">
                         <button className="p942-toggle" type="button" onClick={() => setShowAdvanced(!showAdvanced)}
@@ -108,6 +109,7 @@ export default function Index({ prospects, filters = {}, statuses = {}, qualific
                     </div>
                 </div>
                 {showAdvanced && <div id="p942-advanced" className="p942-advanced">
+                    <div className="p942-field"><label htmlFor="p952-type">Jenis pelanggan</label><select id="p952-type" value={form.entity_type} onChange={e=>update('entity_type',e.target.value)}><option value="">Semua jenis</option><option value="business">Perusahaan / B2B</option><option value="individual">Individu / B2C</option></select></div>
                     <div className="p942-field"><label htmlFor="p942-priority">Prioritas</label><select id="p942-priority" value={form.priority} onChange={e => update('priority', e.target.value)}><option value="">Semua prioritas</option>{Object.entries(priorities).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
                     <div className="p942-field"><label htmlFor="p942-status">Status pipeline</label><select id="p942-status" value={form.status} onChange={e => update('status', e.target.value)}><option value="">Semua status</option>{Object.entries(statuses).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
                     <div className="p942-field"><label htmlFor="p942-qualification">Kualifikasi</label><select id="p942-qualification" value={form.qualification_status} onChange={e => update('qualification_status', e.target.value)}><option value="">Semua kualifikasi</option>{Object.entries(qualificationStatuses).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>

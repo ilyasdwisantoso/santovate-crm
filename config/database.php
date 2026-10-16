@@ -15,6 +15,23 @@ return [
             'journal_mode' => null,
             'synchronous' => null,
         ],
+        // Deliberately separate credentials and schema from the development connection.
+        'mysql_testing' => [
+            'driver' => 'mysql',
+            'url' => null,
+            'host' => env('TEST_DB_HOST', '127.0.0.1'),
+            'port' => env('TEST_DB_PORT', '3307'),
+            'database' => env('TEST_DB_DATABASE', ''),
+            'username' => env('TEST_DB_USERNAME', ''),
+            'password' => env('TEST_DB_PASSWORD', ''),
+            'unix_socket' => '',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? [PDO::ATTR_TIMEOUT => 5] : [],
+        ],
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),

@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 
 class Prospect extends Model
 {
@@ -25,7 +27,7 @@ class Prospect extends Model
     public const PRIORITIES = ['tinggi'=>'Tinggi','sedang'=>'Sedang','rendah'=>'Rendah'];
 
     protected $fillable = [
-        'organization_id','company_key','company_name','website','city','service','route','company_size','contact_name',
+        'entity_type','individual_name','organization_id','company_key','company_name','website','city','service','route','company_size','contact_name',
         'contact_position','decision_maker_name','decision_maker_position','phone','phone_normalized','whatsapp_status','whatsapp_id','whatsapp_verified_at','whatsapp_opt_in_at',
         'whatsapp_opt_out_at','whatsapp_last_error','email','current_system','tracking_portal','pain_hypothesis','fit_score',
         'pain_score','contact_score','total_score','priority','status','qualification_status','last_contact_at','next_follow_up_at','last_outbound_at',
@@ -50,7 +52,26 @@ class Prospect extends Model
     protected static function booted(): void
     {
         static::saving(function (Prospect $prospect) {
-            $prospect->company_key = static::makeCompanyKey($prospect->company_name, $prospect->city, $prospect->organization_id);
+            $type = $prospect->entity_type;
+            if (!in_array($type, ['business','individual'], true)) {
+                throw ValidationException::withMessages(['entity_type'=>'Jenis identitas tidak valid.']);
+            }
+            if ($prospect->exists && ($prospect->getRawOriginal('entity_type') ?? 'business') !== $type) {
+                throw ValidationException::withMessages(['entity_type'=>'Jenis identitas tidak dapat diubah melalui edit biasa.']);
+            }
+            if ($type === 'individual') {
+                $prospect->individual_name = trim((string)$prospect->individual_name);
+                if ($prospect->individual_name === '' || filled($prospect->company_name)) {
+                    throw ValidationException::withMessages(['individual_name'=>'Nama individu wajib diisi tanpa nama perusahaan.']);
+                }
+                $prospect->company_name = null;
+                $prospect->company_key = null;
+            } else {
+                if (blank($prospect->company_name) || filled($prospect->individual_name)) {
+                    throw ValidationException::withMessages(['company_name'=>'Nama perusahaan wajib diisi untuk prospek bisnis.']);
+                }
+                $prospect->company_key = static::makeCompanyKey($prospect->company_name, $prospect->city, $prospect->organization_id);
+            }
             $prospect->phone_normalized = static::normalizePhone($prospect->phone);
             $scoring = app(ProspectScoringService::class)->calculate(
                 (int) $prospect->fit_score,
@@ -75,6 +96,47 @@ class Prospect extends Model
         if (str_starts_with($digits, '0')) $digits = '62'.substr($digits, 1);
         elseif (str_starts_with($digits, '8')) $digits = '62'.$digits;
         return $digits;
+    }
+
+    public function getEntityTypeAttribute(?string $value): string { return $value ?? 'business'; }
+    public function getDisplayNameAttribute(): string { return (string)($this->entity_type === 'individual' ? $this->individual_name : $this->company_name); }
+
+    public static function hasNativeIdentitySchema(): bool
+    {
+        return Schema::hasColumns('prospects', ['entity_type','individual_name']);
+    }
+
+    public static function nativeIndividualsEnabled(): bool
+    {
+        return (bool)config('santovate.crm.native_individuals_enabled', false) && static::hasNativeIdentitySchema();
+    }
+
+    public static function identityColumns(): array
+    {
+        return static::hasNativeIdentitySchema() ? ['id','company_name','entity_type','individual_name'] : ['id','company_name'];
+    }
+
+    public function identityPayload(): array
+    {
+        return ['id'=>$this->id,'entity_type'=>$this->entity_type,'individual_name'=>$this->individual_name,'company_name'=>$this->company_name,'display_name'=>$this->display_name];
+    }
+
+    public function scopeBusinessIdentity(Builder $query): Builder
+    {
+        return static::hasNativeIdentitySchema() ? $query->where('entity_type','business') : $query;
+    }
+
+    public function scopeSearchIdentity(Builder $query, string $term): Builder
+    {
+        return $query->where(function (Builder $q) use ($term) {
+            $q->where('company_name','like','%'.$term.'%');
+            if (static::hasNativeIdentitySchema()) $q->orWhere('individual_name','like','%'.$term.'%');
+        });
+    }
+
+    public function scopeOrderByIdentity(Builder $query): Builder
+    {
+        return static::hasNativeIdentitySchema() ? $query->orderByRaw('COALESCE(individual_name, company_name)')->orderBy('id') : $query->orderBy('company_name')->orderBy('id');
     }
 
     public function organization(): BelongsTo { return $this->belongsTo(Organization::class); }

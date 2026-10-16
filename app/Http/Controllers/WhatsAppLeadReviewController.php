@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Organization;
 use App\Models\Prospect;
-use App\Models\ProspectActivity;
 use App\Models\User;
 use App\Models\WhatsAppInboundContact;
 use App\Models\WhatsAppLeadReview;
@@ -35,7 +33,7 @@ class WhatsAppLeadReviewController extends Controller
                 'review' => fn ($q) => $q->where('organization_id', $orgId)
                     ->with(['assignee' => fn ($u) => $u->where('organization_id', $orgId)]),
                 'prospect' => fn ($q) => $q->where('organization_id', $orgId)
-                    ->select(['id','company_name','organization_id']),
+                    ->select(array_merge(Prospect::identityColumns(),['organization_id'])),
             ]);
         if ($search !== '') {
             $escaped = addcslashes($search, '%_\\');
@@ -57,7 +55,7 @@ class WhatsAppLeadReviewController extends Controller
             ->keyBy('provider_message_id');
         $matches = Prospect::query()->where('organization_id',$orgId)
             ->whereIn('phone_normalized',$phones)->orderBy('id')->limit(250)
-            ->get(['id','company_name','phone_normalized'])->groupBy('phone_normalized');
+            ->get(array_merge(Prospect::identityColumns(),['phone_normalized']))->groupBy('phone_normalized');
         $contacts->setCollection($rows->map(function ($contact) use ($lastMessages,$matches) {
             $review = $contact->review;
             return [
@@ -72,9 +70,9 @@ class WhatsAppLeadReviewController extends Controller
                 'notes'=>$review?->notes ?: '',
                 'assigned_to'=>$review?->assigned_to,
                 'assignee_name'=>$review?->assignee?->name,
-                'prospect'=>$contact->prospect ? ['id'=>$contact->prospect->id,'name'=>$contact->prospect->company_name] : null,
+                'prospect'=>$contact->prospect ? ['id'=>$contact->prospect->id,'name'=>$contact->prospect->display_name,'entity_type'=>$contact->prospect->entity_type] : null,
                 'matching_prospects'=>($matches->get($contact->phone_normalized) ?? collect())
-                    ->map(fn ($p) => ['id'=>$p->id,'name'=>$p->company_name])->values()->all(),
+                    ->map(fn ($p) => ['id'=>$p->id,'name'=>$p->display_name,'entity_type'=>$p->entity_type])->values()->all(),
             ];
         }));
 
@@ -103,7 +101,7 @@ class WhatsAppLeadReviewController extends Controller
             WhatsAppLeadReview::updateOrCreate(
                 ['whatsapp_inbound_contact_id'=>$locked->id],
                 ['organization_id'=>$locked->organization_id,'status'=>$data['status'],
-                    'lead_kind'=>$data['lead_kind'],'assigned_to'=>$assignee?->id,
+                    'lead_kind'=>$locked->prospect_id ? Prospect::where('organization_id',$locked->organization_id)->findOrFail($locked->prospect_id)->entity_type : $data['lead_kind'],'assigned_to'=>$assignee?->id,
                     'notes'=>$data['notes'] ?? null,'reviewed_by'=>$request->user()->id,'reviewed_at'=>now()]
             );
         });
@@ -112,72 +110,16 @@ class WhatsAppLeadReviewController extends Controller
 
     public function link(Request $request, WhatsAppInboundContact $contact): RedirectResponse
     {
-        $this->assertTenant($request, $contact);
-        $data = $request->validate(['prospect_id'=>['required','integer']]);
-        DB::transaction(function () use ($request, $contact, $data) {
-            $locked = WhatsAppInboundContact::query()->where('organization_id',$request->user()->organization_id)
-                ->lockForUpdate()->findOrFail($contact->id);
-            if ($locked->prospect_id) throw ValidationException::withMessages(['prospect_id'=>'Kontak sudah terhubung dengan prospek.']);
-            $p = Prospect::query()->where('organization_id',$locked->organization_id)->findOrFail($data['prospect_id']);
-            if ($p->phone_normalized !== $locked->phone_normalized)
-                throw ValidationException::withMessages(['prospect_id'=>'Nomor prospek tidak cocok dengan kontak WhatsApp.']);
-            $locked->update(['prospect_id'=>$p->id]);
-            $this->linkMessages($locked, $p);
-            $this->markQualified($request, $locked, 'business');
-        });
-        return back()->with('success','Kontak terhubung ke prospek lama.');
+        $this->assertTenant($request,$contact);
+        $data=$request->validate(['prospect_id'=>['required','integer']]);
+        app(\App\Services\WhatsAppLeadConversionService::class)->link($request->user(),$contact,(int)$data['prospect_id']);
+        return back()->with('success','Kontak terhubung ke prospek.');
     }
 
     public function convert(Request $request, WhatsAppInboundContact $contact, EntitlementService $entitlements): RedirectResponse
     {
-        $this->assertTenant($request, $contact);
-        $data = $request->validate([
-            'company_name'=>['required','string','min:2','max:255'],
-            'city'=>['nullable','string','max:255'],
-        ]);
-        $company = trim($data['company_name']);
-        $city = trim($data['city'] ?? '');
-        if ($company === '') throw ValidationException::withMessages(['company_name'=>'Nama perusahaan wajib diisi.']);
-
-        $createdId = DB::transaction(function () use ($request,$contact,$company,$city,$entitlements) {
-            $orgId = (int)$request->user()->organization_id;
-            $org = Organization::query()->whereKey($orgId)->lockForUpdate()->firstOrFail();
-            $locked = WhatsAppInboundContact::query()->where('organization_id',$orgId)
-                ->lockForUpdate()->findOrFail($contact->id);
-            if ($locked->prospect_id) throw ValidationException::withMessages(['company_name'=>'Lead sudah memiliki prospek.']);
-            $key = Prospect::makeCompanyKey($company, $city, $orgId);
-            if (Prospect::query()->where('organization_id',$orgId)->where('company_key',$key)->exists())
-                throw ValidationException::withMessages(['company_name'=>'Perusahaan sudah tercatat; gunakan tombol Hubungkan Prospek.']);
-            if (Prospect::query()->where('organization_id',$orgId)->where('phone_normalized',$locked->phone_normalized)->exists())
-                throw ValidationException::withMessages(['company_name'=>'Nomor WhatsApp sudah terkait prospek; hubungkan prospek yang ada agar tidak duplikat.']);
-            // Quota is enforced at conversion, NEVER while preserving inbound messages.
-            $entitlements->assertCanConsume($org,'prospects',1);
-            $review = WhatsAppLeadReview::where('organization_id',$orgId)
-                ->where('whatsapp_inbound_contact_id',$locked->id)->first();
-            $assigned = $review?->assigned_to;
-            if ($assigned && !User::query()->where('organization_id',$orgId)->where('role','sales')->where('is_active',true)->whereKey($assigned)->exists()) $assigned = null;
-            $p = Prospect::create([
-                'organization_id'=>$orgId, 'company_name'=>$company, 'city'=>$city ?: null,
-                'contact_name'=>$locked->profile_name,
-                'phone'=>$locked->phone_normalized, 'assigned_to'=>$assigned,
-                'created_by'=>$request->user()->id, 'status'=>'baru',
-                'source_name'=>$locked->source_name ?: 'WhatsApp', 'source_url'=>$locked->source_url,
-                'whatsapp_status'=>'valid', 'whatsapp_id'=>$locked->wa_id,
-                'whatsapp_verified_at'=>now(), 'last_customer_reply_at'=>$locked->last_message_at,
-                'last_contact_at'=>$locked->last_message_at,
-            ]);
-            $locked->update(['prospect_id'=>$p->id]);
-            $this->linkMessages($locked,$p);
-            $this->markQualified($request,$locked,'business');
-            ProspectActivity::create([
-                'prospect_id'=>$p->id,'user_id'=>$request->user()->id,'type'=>'note',
-                'title'=>'Dikonversi dari lead WhatsApp',
-                'description'=>'Lead WhatsApp ditinjau dan dikonversi menjadi prospek bisnis.',
-                'occurred_at'=>now(),
-            ]);
-            return $p->id;
-        });
-        return redirect()->route('prospects.show',$createdId)->with('success','Prospek bisnis berhasil dibuat dari kontak WhatsApp.');
+        $p=app(\App\Services\WhatsAppLeadConversionService::class)->convert($request->user(),$contact,$request->all(),$entitlements);
+        return redirect()->route('prospects.show',$p)->with('success','Prospek berhasil dibuat dari kontak WhatsApp.');
     }
 
     private function assertTenant(Request $request, WhatsAppInboundContact $contact): void
@@ -191,19 +133,5 @@ class WhatsAppLeadReviewController extends Controller
             ->where('role','sales')->where('is_active',true)->find($id);
         if (!$user) throw ValidationException::withMessages(['assigned_to'=>'Account Executive tidak valid untuk workspace ini.']);
         return $user;
-    }
-    private function linkMessages(WhatsAppInboundContact $contact, Prospect $prospect): void
-    {
-        WhatsAppMessage::query()->where('organization_id',$contact->organization_id)
-            ->where('direction','inbound')->where('from_phone',$contact->phone_normalized)
-            ->whereNull('prospect_id')->update(['prospect_id'=>$prospect->id]);
-    }
-    private function markQualified(Request $request, WhatsAppInboundContact $contact, string $kind): void
-    {
-        WhatsAppLeadReview::updateOrCreate(
-            ['whatsapp_inbound_contact_id'=>$contact->id],
-            ['organization_id'=>$contact->organization_id,'status'=>'qualified','lead_kind'=>$kind,
-                'reviewed_by'=>$request->user()->id,'reviewed_at'=>now()]
-        );
     }
 }

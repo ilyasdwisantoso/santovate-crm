@@ -34,7 +34,7 @@ class FinanceController extends Controller
                 $invoice->where('invoice_number', 'like', "%{$search}%")
                     ->orWhereHas('deal', fn ($deal) => $deal
                         ->where('deal_number', 'like', "%{$search}%")
-                        ->orWhereHas('prospect', fn ($prospect) => $prospect->where('company_name', 'like', "%{$search}%")));
+                        ->orWhereHas('prospect', fn ($prospect) => $prospect->searchIdentity($search)));
             });
         }
 
@@ -52,7 +52,7 @@ class FinanceController extends Controller
             'deal'=>[
                 'id'=>$invoice->deal?->id,
                 'deal_number'=>$invoice->deal?->deal_number,
-                'client'=>$invoice->deal?->prospect?->company_name,
+                'client'=>$invoice->deal?->prospect?->display_name,
                 'owner'=>$invoice->deal?->owner?->name,
             ],
             'schedule'=>$invoice->paymentSchedule?->label,

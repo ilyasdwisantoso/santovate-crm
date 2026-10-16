@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'crm' => ['native_individuals_enabled' => (bool)env('SANTOVATE_B2C_ENABLED', false)],
     'support' => [
         'email' => env('SANTOVATE_SUPPORT_EMAIL'),
         'phone' => env('SANTOVATE_SUPPORT_PHONE', '081293047587'),

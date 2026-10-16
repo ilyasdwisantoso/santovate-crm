@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Signed, tenant-routed webhook processing. Unknown numbers stay in the inbound
  * contacts queue without being misrepresented as companies in the B2B CRM.
- * The next increment will implement conversion to native B2C prospects.
+ * Individual identities are connected only after explicit lead review.
  */
 class WhatsAppInboundCaptureService
 {
@@ -65,14 +65,10 @@ class WhatsAppInboundCaptureService
             ): void {
                 if (WhatsAppMessage::query()->where('provider_message_id', $id)->exists()) return;
 
-                // Do not choose arbitrarily when two B2B prospects share a phone.
-                $matches = Prospect::query()->where('organization_id', $orgId)
-                    ->where('phone_normalized', $from)->limit(2)->get();
-                $prospect = $matches->count() === 1 ? $matches->first() : null;
                 $contact = WhatsAppInboundContact::query()->firstOrCreate(
                     ['organization_id' => $orgId, 'phone_normalized' => $from],
                     [
-                        'prospect_id' => $prospect?->id, 'wa_id' => $waId,
+                        'prospect_id' => null, 'wa_id' => $waId,
                         'profile_name' => $profileName,
                         'source_name' => $isMetaAd ? 'Meta Ads' : null,
                         'source_id' => $isMetaAd ? $sourceId : null,
@@ -81,11 +77,16 @@ class WhatsAppInboundCaptureService
                         'first_message_at' => $when,
                     ]
                 );
+                // Serialize against conversion/link before deriving or persisting associations.
+                $contact = WhatsAppInboundContact::where('organization_id',$orgId)->lockForUpdate()->findOrFail($contact->id);
+                $matches = Prospect::where('organization_id',$orgId)->where('phone_normalized',$from)->limit(2)->get();
+                // Preserve unique B2B routing; new individual associations require manual review.
+                $prospect = $matches->count() === 1 && $matches->first()->entity_type === 'business' ? $matches->first() : null;
                 // An admin may have explicitly linked this sender to an existing
                 // tenant-owned prospect. Do not erase that verified relationship
                 // merely because another automatic phone match is absent.
                 if ($contact->prospect_id) {
-                    $manuallyLinked = Prospect::query()->where('organization_id', $orgId)->find($contact->prospect_id);
+                    $manuallyLinked = Prospect::query()->where('organization_id', $orgId)->lockForUpdate()->find($contact->prospect_id);
                     if ($manuallyLinked) $prospect = $manuallyLinked;
                 }
                 $updates = [];

@@ -62,6 +62,7 @@ class HandleInertiaRequests extends Middleware
 
         return [
             ...parent::share($request),
+            'crm'=>['native_individuals_enabled'=>\App\Models\Prospect::nativeIndividualsEnabled()],
             'auth'=>['user'=>$user ? [
                 'id'=>$user->id,'organization_id'=>$user->organization_id,'name'=>$user->name,'email'=>$user->email,'phone'=>$user->phone,
                 'job_title'=>$user->job_title,'department'=>$user->department,'profile_initials'=>$user->profile_initials,

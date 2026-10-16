@@ -127,7 +127,7 @@ class FollowUpService
         $product=$prospect->primaryProduct() ?: Product::query()->where('organization_id',$prospect->organization_id)->where('is_active',true)->first();
         $firstName=trim(explode(' ',trim($user->name))[0]??$user->name);
         $message=strtr($template->message,[
-            '{contact_name}'=>$prospect->contact_name ?: 'Bapak/Ibu','{company_name}'=>$prospect->company_name,
+            '{contact_name}'=>$prospect->contact_name ?: ($prospect->entity_type === 'individual' ? $prospect->display_name : 'Bapak/Ibu'),'{company_name}'=>$prospect->display_name,'{customer_name}'=>$prospect->display_name,'{display_name}'=>$prospect->display_name,
             '{business_name}'=>$prospect->organization?->name ?: 'Santovate','{ae_name}'=>$user->name,'{ae_first_name}'=>$firstName,
             '{ae_phone}'=>$user->phone ?: '','{service}'=>$prospect->service ?: 'solusi CRM','{lead_age_days}'=>$prospect->created_at?(string)max(0,(int)$prospect->created_at->diffInDays(now())):'0',
             '{product_name}'=>$product?->name ?: ($prospect->service ?: 'produk'),'{product_variant}'=>$product?->variant ?: '',

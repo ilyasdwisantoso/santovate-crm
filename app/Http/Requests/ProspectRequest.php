@@ -4,11 +4,30 @@ use App\Models\Prospect;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 class ProspectRequest extends FormRequest {
+    protected function prepareForValidation(): void {
+        $prospect = $this->route('prospect');
+        $this->merge([
+            'entity_type'=>$this->input('entity_type', $prospect instanceof Prospect ? $prospect->entity_type : 'business'),
+        ]);
+    }
+    public function withValidator($validator): void {
+        $validator->after(function($validator) {
+            if ($validator->errors()->isNotEmpty()) return;
+            $prospect=$this->route('prospect');
+            if ($prospect instanceof Prospect && $prospect->entity_type !== $this->input('entity_type')) {
+                $validator->errors()->add('entity_type','Jenis identitas tidak dapat diubah melalui edit biasa.');
+            } elseif (!$prospect && $this->input('entity_type') === 'individual' && !Prospect::nativeIndividualsEnabled()) {
+                $validator->errors()->add('entity_type','Pembuatan prospek individu belum diaktifkan.');
+            }
+        });
+    }
     public function authorize(): bool { return $this->user()!==null; }
     public function rules(): array {
         $org=$this->user()?->organization_id;
         return [
-            'company_name'=>['required','string','max:255'],'website'=>['nullable','url','max:255'],'city'=>['nullable','string','max:255'],
+            'entity_type'=>['required',Rule::in(['business','individual'])],
+            'individual_name'=>['required_if:entity_type,individual','prohibited_unless:entity_type,individual','nullable','string','max:255'],
+            'company_name'=>['required_if:entity_type,business','prohibited_unless:entity_type,business','nullable','string','max:255'],'website'=>['nullable','url','max:255'],'city'=>['nullable','string','max:255'],
             'service'=>['nullable','string','max:255'],'route'=>['nullable','string','max:255'],'company_size'=>['nullable','string','max:255'],
             'contact_name'=>['nullable','string','max:255'],'contact_position'=>['nullable','string','max:255'],
             'decision_maker_name'=>['nullable','string','max:255'],'decision_maker_position'=>['nullable','string','max:255'],

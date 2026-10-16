@@ -1,6 +1,6 @@
 /* Canonical URL/filter helpers shared by desktop and mobile prospect views. */
 export const DEFAULT_FILTERS = Object.freeze({
-    q: '', priority: '', status: '', qualification_status: '',
+    q: '', entity_type: '', priority: '', status: '', qualification_status: '',
     assigned_to: '', followup: '', import_batch: '', sort: 'score',
 });
 
@@ -24,6 +24,7 @@ export function prospectActiveChips(filters = {}, { statuses = {}, qualification
     const state = prospectFilterState(filters);
     const chips = [];
     if (state.q) chips.push({ key: 'q', label: `Pencarian: ${state.q}` });
+    if (state.entity_type) chips.push({ key: 'entity_type', label: `Jenis: ${state.entity_type === 'individual' ? 'Individu / B2C' : 'Perusahaan / B2B'}` });
     if (state.priority) chips.push({ key: 'priority', label: `Prioritas: ${priorities[state.priority] || state.priority}` });
     if (state.status) chips.push({ key: 'status', label: `Status: ${statuses[state.status] || state.status}` });
     if (state.qualification_status) chips.push({ key: 'qualification_status', label: `Kualifikasi: ${qualifications[state.qualification_status] || state.qualification_status}` });

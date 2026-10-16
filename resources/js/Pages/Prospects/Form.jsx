@@ -2,6 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import AppLayout from '../../Layouts/AppLayout';
 import Icon from '../../Components/Icon';
+import { prospectDisplayName } from '../../Utils/prospectIdentity';
 import { money } from '../../Utils/format';
 import { shouldExpandProspectAdvanced } from '../../Utils/prospectExperience';
 
@@ -12,16 +13,29 @@ function Field({ label, error, hint, span=false, children }) { return <label cla
 function ScorePicker({ label, value, onChange, description }) { return <div className="score-picker"><div><strong>{label}</strong><small>{description}</small></div><div className="score-options">{[0,1,2,3].map(n=><button type="button" key={n} className={Number(value)===n?'active':''} aria-pressed={Number(value)===n} aria-label={`${label}: ${n} dari 3`} onClick={()=>onChange(n)}>{n}</button>)}</div></div>; }
 
 export default function Form({ prospect, mode, statuses, qualificationStatuses, salesUsers }) {
-    const { auth }=usePage().props;
+    const { auth, crm }=usePage().props;
     const editing=mode==='edit';
     const { data,setData,post,put,processing,errors,isDirty }=useForm({
-        company_name:prospect.company_name||'',website:prospect.website||'',city:prospect.city||'',service:prospect.service||'',route:prospect.route||'',company_size:prospect.company_size||'',
+        entity_type:prospect.entity_type||'business',individual_name:prospect.individual_name||'',company_name:prospect.company_name||'',website:prospect.website||'',city:prospect.city||'',service:prospect.service||'',route:prospect.route||'',company_size:prospect.company_size||'',
         contact_name:prospect.contact_name||'',contact_position:prospect.contact_position||'',decision_maker_name:prospect.decision_maker_name||'',decision_maker_position:prospect.decision_maker_position||'',phone:prospect.phone||'',email:prospect.email||'',current_system:prospect.current_system||'',tracking_portal:nullableSelect(prospect.tracking_portal),
         pain_hypothesis:prospect.pain_hypothesis||'',fit_score:Number(prospect.fit_score||0),pain_score:Number(prospect.pain_score||0),contact_score:Number(prospect.contact_score||0),status:prospect.status||'baru',qualification_status:prospect.qualification_status||'new',
         last_contact_at:toLocal(prospect.last_contact_at),next_follow_up_at:toLocal(prospect.next_follow_up_at),source_name:prospect.source_name||'',source_url:prospect.source_url||'',notes:prospect.notes||'',
         estimated_deal_value:Number(prospect.estimated_deal_value||0),estimated_budget:prospect.estimated_budget??'',expected_timeline:prospect.expected_timeline||'',target_go_live:prospect.target_go_live||'',urgency:prospect.urgency||'',probability:prospect.probability??10,next_action:prospect.next_action||'',actual_deal_value:prospect.actual_deal_value??'',assigned_to:prospect.assigned_user?.id||prospect.assigned_to||'',assignment_reason:'',force_duplicate:false,
     });
     const [advancedOpen,setAdvancedOpen]=useState(editing);
+    const [candidates,setCandidates]=useState(null);
+    const [checking,setChecking]=useState(false);
+    const [candidateError,setCandidateError]=useState('');
+    const checkCandidates=async()=>{
+        setChecking(true);setCandidateError('');
+        try{
+            const params=new URLSearchParams(Object.entries({entity_type:data.entity_type,company_name:data.company_name,individual_name:data.individual_name,city:data.city,phone:data.phone,email:data.email}).filter(([,value])=>value));
+            const response=await fetch('/prospects/check-duplicates?'+params,{headers:{Accept:'application/json'},credentials:'same-origin'});
+            if(!response.ok)throw new Error('Pemeriksaan kandidat gagal. Periksa isian dan coba kembali.');
+            setCandidates((await response.json()).duplicates);
+        }catch(error){setCandidateError(error.message);}finally{setChecking(false);}
+    };
+    useEffect(()=>{setData('force_duplicate',false);setCandidates(null);setCandidateError('');},[data.entity_type,data.company_name,data.individual_name,data.city,data.phone,data.email]);
     useEffect(()=>{if(shouldExpandProspectAdvanced(editing,errors))setAdvancedOpen(true);},[editing,errors]);
     const submit=(e)=>{e.preventDefault(); editing?put(`/prospects/${prospect.id}`):post('/prospects');};
     const total=Number(data.fit_score)+Number(data.pain_score)+Number(data.contact_score);
@@ -32,11 +46,14 @@ export default function Form({ prospect, mode, statuses, qualificationStatuses, 
         <nav className="p943-form-jump" aria-label="Bagian formulir prospek">
             <a href="#p943-profile">01 · Profil</a><a href="#p943-contact">02 · Kontak</a><a href="#p943-sales">03 · Penjualan</a>
         </nav>
-        <p className="p943-required-note">Isi nama perusahaan terlebih dahulu. Informasi lain dapat dilengkapi secara bertahap.</p>
+        <p className="p943-required-note">Isi identitas pelanggan terlebih dahulu. Informasi lain dapat dilengkapi secara bertahap.</p>
         <form onSubmit={submit} className="form-layout">
             <div className="form-main">
-                <section className="panel form-section" id="p943-profile"><div className="section-head"><span className="section-number">01</span><div><h3>Profil perusahaan</h3><p>Identitas dan jenis bisnis calon client.</p></div></div><div className="form-grid">
-                    <Field label="Nama Perusahaan *" error={errors.company_name}><input required maxLength={255} autoComplete="organization" value={data.company_name} onChange={e=>setData('company_name',e.target.value)} placeholder="PT Contoh Logistik"/></Field>
+                <section className="panel form-section" id="p943-profile"><div className="section-head"><span className="section-number">01</span><div><h3>Profil pelanggan</h3><p>Identitas calon pelanggan perusahaan atau individu.</p></div></div><div className="form-grid">
+                    <Field label="Jenis pelanggan" error={errors.entity_type}><select value={data.entity_type} disabled={editing || !crm?.native_individuals_enabled} onChange={e=>setData({...data,entity_type:e.target.value,company_name:'',individual_name:''})}><option value="business">Perusahaan / B2B</option><option value="individual">Individu / B2C</option></select>{editing&&<small>Jenis identitas tetap setelah dibuat.</small>}</Field>
+                    {data.entity_type==='individual'
+                        ? <Field label="Nama individu *" error={errors.individual_name}><input required maxLength={255} autoComplete="name" value={data.individual_name} onChange={e=>setData('individual_name',e.target.value)}/></Field>
+                        : <Field label="Nama Perusahaan *" error={errors.company_name}><input required maxLength={255} autoComplete="organization" value={data.company_name} onChange={e=>setData('company_name',e.target.value)} placeholder="PT Contoh Logistik"/></Field>}
                     <Field label="Kota" error={errors.city}><input value={data.city} onChange={e=>setData('city',e.target.value)} placeholder="Jakarta"/></Field>
                     <Field label="Website" error={errors.website}><input value={data.website} onChange={e=>setData('website',e.target.value)} placeholder="https://..."/></Field>
                     <Field label="Ukuran Perusahaan" error={errors.company_size}><input value={data.company_size} onChange={e=>setData('company_size',e.target.value)} placeholder="10–50 karyawan"/></Field>
@@ -74,7 +91,10 @@ export default function Form({ prospect, mode, statuses, qualificationStatuses, 
                     <Field label="URL Sumber" error={errors.source_url}><input value={data.source_url} onChange={e=>setData('source_url',e.target.value)} placeholder="https://..."/></Field>
                     <Field label="Catatan Internal" span error={errors.notes}><textarea rows="4" value={data.notes} onChange={e=>setData('notes',e.target.value)} placeholder="Catatan untuk Account Executive..."/></Field>
                     </div>}
-                    {!editing&&<Field label="Duplicate Override" span error={errors.duplicate}><span className="check-line"><input type="checkbox" checked={data.force_duplicate} onChange={e=>setData('force_duplicate',e.target.checked)}/><span>Tetap simpan jika sistem menemukan potential duplicate yang memang berbeda.</span></span></Field>}
+                    {!editing&&<div className="span-2"><button type="button" className="btn btn-secondary" disabled={checking} onClick={checkCandidates}>{checking?'Memeriksa...':'Periksa kandidat duplikat'}</button>
+                    {candidateError&&<p role="alert">{candidateError}</p>}
+                    {candidates&&<div aria-live="polite">{candidates.length?<ul>{candidates.map(p=><li key={p.id}><Link href={p.url}>{prospectDisplayName(p)}</Link> {[p.city,p.phone,p.email].filter(Boolean).join(' · ')}</li>)}</ul>:<p>Tidak ada kandidat pada prospek yang dapat Anda akses. Pemeriksaan akhir dilakukan saat menyimpan.</p>}</div>}</div>}
+                    {!editing&&<Field label="Konfirmasi review duplikasi" span error={errors.duplicate}><span className="check-line"><input type="checkbox" checked={data.force_duplicate} onChange={e=>setData('force_duplicate',e.target.checked)}/><span>Tetap simpan jika sistem menemukan potential duplicate yang memang berbeda.</span></span></Field>}
                 </div></section>
             </div>
 

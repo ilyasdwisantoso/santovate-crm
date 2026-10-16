@@ -43,7 +43,7 @@ class ApprovalService
         $reasons = $this->quotationReasons($quotation);
         $scope = $this->isInternalOrganization($quotation->organization) ? 'platform' : 'tenant';
         $title = 'Approval quotation '.$quotation->quotation_number;
-        $summary = trim(($quotation->prospect?->company_name ?: 'Client').' · '.implode(' · ', array_column($reasons,'label')));
+        $summary = trim(($quotation->prospect?->display_name ?: 'Client').' · '.implode(' · ', array_column($reasons,'label')));
         $payload = [
             'organization_id'=>$quotation->organization_id,
             'requested_by'=>$quotation->created_by,
@@ -57,7 +57,7 @@ class ApprovalService
             'amount'=>$quotation->grand_total,
             'metadata'=>[
                 'quotation_number'=>$quotation->quotation_number,
-                'company_name'=>$quotation->prospect?->company_name,
+                'company_name'=>$quotation->prospect?->company_name,'display_name'=>$quotation->prospect?->display_name,
                 'revision_number'=>$quotation->revision_number,
                 'reasons'=>$reasons,
                 'grand_total'=>(float)$quotation->grand_total,

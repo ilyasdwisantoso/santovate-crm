@@ -79,7 +79,7 @@ class WhatsAppService
     {
         $product=$p->primaryProduct();
         return match($key) {
-            'contact_name'=>$p->contact_name ?: 'Bapak/Ibu','company_name'=>$p->company_name,'business_name'=>$p->organization?->name ?: 'Santovate',
+            'contact_name'=>$p->contact_name ?: ($p->entity_type === 'individual' ? $p->display_name : 'Bapak/Ibu'),'company_name','customer_name','display_name'=>$p->display_name,'business_name'=>$p->organization?->name ?: 'Santovate',
             'ae_name'=>$u->name,'ae_first_name'=>explode(' ',trim($u->name))[0] ?? $u->name,'ae_phone'=>$u->phone ?: '',
             'service'=>$p->service ?: 'solusi CRM','product_name'=>$product?->name ?: ($p->service ?: 'produk'),
             'product_variant'=>$product?->variant ?: '','product_price'=>$product?'Rp '.number_format((int)$product->price,0,',','.'):'',

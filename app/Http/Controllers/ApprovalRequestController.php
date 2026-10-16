@@ -29,7 +29,7 @@ class ApprovalRequestController extends Controller
             'requestTypes'=>collect(ApprovalRequest::TYPES)->only(['final_price','payment_terms','custom_scope','meeting_expense','project_exception']),
             'canDecide'=>$request->user()->isAdmin()
                 && !($request->user()->organization?->slug === 'santovate-internal' || (bool)data_get($request->user()->organization?->settings,'internal',false)),
-            'prospects'=>Prospect::query()->visibleTo($request->user())->latest('updated_at')->limit(50)->get(['id','company_name']),
+            'prospects'=>Prospect::query()->visibleTo($request->user())->latest('updated_at')->limit(50)->get(Prospect::identityColumns())->map(fn($p)=>$p->identityPayload()),
         ]);
     }
 

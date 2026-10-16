@@ -32,6 +32,7 @@ final class ProspectIndexFilters
 
         return [
             'q' => $q,
+            'entity_type'=>in_array(self::string($query,'entity_type'),['business','individual'],true)?self::string($query,'entity_type'):'',
             'priority' => in_array($priority, self::PRIORITIES, true) ? $priority : '',
             'status' => in_array($status, $allowedStatuses, true) ? $status : '',
             'qualification_status' => in_array($qualification, self::QUALIFICATIONS, true) ? $qualification : '',
@@ -47,11 +48,15 @@ final class ProspectIndexFilters
         if ($term = $filters['q']) {
             $digits = preg_replace('/\D+/', '', $term);
             $query->where(function (Builder $sub) use ($term, $digits) {
-                foreach (['company_name', 'city', 'contact_name', 'email', 'service', 'phone'] as $column) {
+                foreach (array_merge(['company_name', 'city', 'contact_name', 'email', 'service', 'phone'], \App\Models\Prospect::hasNativeIdentitySchema()?['individual_name']:[]) as $column) {
                     $sub->orWhere($column, 'like', '%'.$term.'%');
                 }
                 if ($digits !== '') $sub->orWhere('phone_normalized', 'like', '%'.$digits.'%');
             });
+        }
+        if (($filters['entity_type'] ?? '') !== '') {
+            if (\App\Models\Prospect::hasNativeIdentitySchema()) $query->where('entity_type',$filters['entity_type']);
+            elseif ($filters['entity_type'] === 'individual') $query->whereRaw('1=0');
         }
         if ($filters['priority'] !== '') $query->where('priority', $filters['priority']);
         if ($filters['status'] !== '') $query->where('status', $filters['status']);

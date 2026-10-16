@@ -1,3 +1,4 @@
+import { prospectDisplayName } from '../../Utils/prospectIdentity';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AppLayout from '../../Layouts/AppLayout';
@@ -16,7 +17,7 @@ export default function Pipeline({ columns, closed }) {
                 <header><div><span className={`stage-dot stage-${col.key}`}/><strong>{col.label}</strong><b>{col.count}</b></div><small>{money(col.value)}</small></header>
                 <div className="kanban-cards">{col.prospects.length?col.prospects.map((p)=><article className="kanban-card" key={p.id} draggable onDragStart={()=>setDragged(p.id)} onDragEnd={()=>setDragged(null)}>
                     <div className="kanban-card-top"><PriorityBadge priority={p.priority}/><span className="score-pill">{p.total_score}/9</span></div>
-                    <Link href={`/prospects/${p.id}`}><h4>{p.company_name}</h4></Link><p>{[p.city,p.service].filter(Boolean).join(' · ')||'Data belum lengkap'}</p>
+                    <Link href={`/prospects/${p.id}`}><h4>{prospectDisplayName(p)}</h4></Link><p>{[p.city,p.service].filter(Boolean).join(' · ')||'Data belum lengkap'}</p>
                     <div className="kanban-value"><span>Potensi</span><strong>{money(p.estimated_deal_value)}</strong></div>
                     <div className="kanban-owner"><span>{p.assigned_user?.name||'Belum diassign'}</span><select value={p.status} onChange={e=>move(p.id,e.target.value)}>{columns.map((c)=><option key={c.key} value={c.key}>{c.label}</option>)}</select></div>
                 </article>):<div className="kanban-empty">Belum ada prospek</div>}</div>

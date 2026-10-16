@@ -35,9 +35,10 @@ class WhatsAppLeadReviewTest extends TestCase
         DB::purge('sqlite');
         Schema::create('organizations',function(Blueprint $t){$t->id();$t->string('name');$t->string('slug')->unique();$t->string('status')->default('active');$t->json('settings')->nullable();$t->timestamps();});
         Schema::create('users',function(Blueprint $t){$t->id();$t->unsignedBigInteger('organization_id');$t->string('name');$t->string('email')->unique();$t->string('password');$t->string('role')->default('sales');$t->boolean('is_active')->default(true);$t->timestamps();});
-        Schema::create('prospects',function(Blueprint $t){$t->id();$t->unsignedBigInteger('organization_id');$t->string('company_key')->unique();$t->string('company_name');$t->string('phone')->nullable();$t->string('phone_normalized')->nullable();$t->string('contact_name')->nullable();$t->string('city')->nullable();$t->string('source_name')->nullable();$t->text('source_url')->nullable();$t->string('whatsapp_status')->nullable();$t->string('whatsapp_id')->nullable();$t->timestamp('whatsapp_verified_at')->nullable();$t->timestamp('last_customer_reply_at')->nullable();$t->timestamp('last_contact_at')->nullable();$t->unsignedTinyInteger('fit_score')->default(0);$t->unsignedTinyInteger('pain_score')->default(0);$t->unsignedTinyInteger('contact_score')->default(0);$t->unsignedTinyInteger('total_score')->default(0);$t->string('priority')->default('rendah');$t->string('status')->default('baru');$t->unsignedBigInteger('assigned_to')->nullable();$t->unsignedBigInteger('created_by')->nullable();$t->timestamps();});
+        Schema::create('prospects',function(Blueprint $t){$t->id();$t->unsignedBigInteger('organization_id');$t->string('company_key')->index();$t->string('company_name');$t->string('phone')->nullable();$t->string('phone_normalized')->nullable();$t->string('contact_name')->nullable();$t->string('city')->nullable();$t->string('source_name')->nullable();$t->text('source_url')->nullable();$t->string('whatsapp_status')->nullable();$t->string('whatsapp_id')->nullable();$t->timestamp('whatsapp_verified_at')->nullable();$t->timestamp('last_customer_reply_at')->nullable();$t->timestamp('last_contact_at')->nullable();$t->unsignedTinyInteger('fit_score')->default(0);$t->unsignedTinyInteger('pain_score')->default(0);$t->unsignedTinyInteger('contact_score')->default(0);$t->unsignedTinyInteger('total_score')->default(0);$t->string('priority')->default('rendah');$t->string('status')->default('baru');$t->unsignedBigInteger('assigned_to')->nullable();$t->unsignedBigInteger('created_by')->nullable();$t->timestamps();});
         Schema::create('whatsapp_inbound_contacts',function(Blueprint $t){$t->id();$t->unsignedBigInteger('organization_id');$t->unsignedBigInteger('prospect_id')->nullable();$t->string('phone_normalized');$t->string('wa_id')->nullable();$t->string('profile_name')->nullable();$t->string('source_name')->nullable();$t->string('source_id')->nullable();$t->text('source_url')->nullable();$t->json('referral')->nullable();$t->timestamp('first_message_at')->nullable();$t->timestamp('last_message_at')->nullable();$t->string('last_message_id')->nullable();$t->timestamps();$t->unique(['organization_id','phone_normalized']);});
         Schema::create('whatsapp_messages',function(Blueprint $t){$t->id();$t->unsignedBigInteger('organization_id');$t->unsignedBigInteger('prospect_id')->nullable();$t->string('provider_message_id')->unique();$t->string('direction');$t->string('from_phone')->nullable();$t->text('body')->nullable();$t->timestamps();});
+        Schema::create('prospect_assignment_histories',function(Blueprint $t){$t->id();$t->unsignedBigInteger('organization_id');$t->unsignedBigInteger('prospect_id');$t->unsignedBigInteger('from_user_id')->nullable();$t->unsignedBigInteger('to_user_id')->nullable();$t->unsignedBigInteger('changed_by');$t->string('reason')->nullable();$t->timestamps();});
         Schema::create('prospect_activities',function(Blueprint $t){$t->id();$t->unsignedBigInteger('prospect_id');$t->unsignedBigInteger('user_id')->nullable();$t->string('type');$t->string('title');$t->text('description')->nullable();$t->timestamp('occurred_at');$t->timestamps();});
         (require database_path('migrations/2026_10_12_160000_create_whatsapp_lead_reviews_table.php'))->up();
     }
@@ -75,6 +76,17 @@ class WhatsAppLeadReviewTest extends TestCase
     {
         $this->assertSame('whatsapp_lead_reviews', (new WhatsAppLeadReview())->getTable());
         $this->assertTrue(Schema::hasTable((new WhatsAppLeadReview())->getTable()));
+    }
+
+    public function test_baseline_allows_explicitly_distinct_businesses_with_the_same_company_key(): void
+    {
+        [$org] = $this->tenant('same-key');
+        $first = Prospect::create(['organization_id'=>$org->id, 'company_name'=>'Nama Usaha Sama', 'city'=>'Jakarta']);
+        $second = Prospect::create(['organization_id'=>$org->id, 'company_name'=>'Nama Usaha Sama', 'city'=>'Jakarta']);
+
+        $this->assertNotSame($first->id, $second->id);
+        $this->assertSame($first->company_key, $second->company_key);
+        $this->assertSame(2, Prospect::where('organization_id', $org->id)->count());
     }
 
     public function test_review_saves_individual_as_lead_without_fake_prospect(): void

@@ -32,7 +32,7 @@ class InvoiceController extends Controller
             ->map(fn (Deal $deal) => [
                 'id'=>$deal->id,
                 'deal_number'=>$deal->deal_number,
-                'client'=>$deal->prospect?->company_name,
+                'client'=>$deal->prospect?->display_name,
                 'owner'=>$deal->owner?->name,
                 'actual_deal_value'=>(float) $deal->actual_deal_value,
                 'allocated_invoice_amount'=>(float) $deal->invoices->where('status', '!=', 'void')->sum('total_amount'),
@@ -287,7 +287,7 @@ class InvoiceController extends Controller
 
         try {
             $result = $ipaymu->createCommercialCheckout($transaction, [
-                'name'=>$prospect?->contact_name ?: $prospect?->company_name ?: 'Customer',
+                'name'=>$prospect?->contact_name ?: $prospect?->display_name ?: 'Customer',
                 'email'=>$prospect?->email ?: $request->user()->email,
                 'phone'=>$prospect?->phone ?: '',
                 'payment_method'=>$data['payment_method'],
@@ -346,7 +346,7 @@ class InvoiceController extends Controller
                 'deal_number'=>$invoice->deal?->deal_number,
                 'actual_deal_value'=>(float) ($invoice->deal?->actual_deal_value ?? 0),
                 'commissionable_value'=>(float) ($invoice->deal?->commissionable_value ?? 0),
-                'client'=>$invoice->deal?->prospect?->company_name,
+                'client'=>$invoice->deal?->prospect?->display_name,
                 'contact_name'=>$invoice->deal?->prospect?->contact_name,
                 'email'=>$invoice->deal?->prospect?->email,
                 'phone'=>$invoice->deal?->prospect?->phone,
