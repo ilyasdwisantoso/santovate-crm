@@ -1,0 +1,118 @@
+[
+    {
+        "sha256":  "438119D834D612B92E1B42D7677F31DFA6664E347B5F2C6A1C9E279D7AA30963",
+        "file":  "01-dashboard-desktop.png"
+    },
+    {
+        "sha256":  "26A9BF7E82A154C57EEF3A1126DB0EC04A59FEB52985636DFC890D43CAC29E99",
+        "file":  "02-legacy-b2b.png"
+    },
+    {
+        "sha256":  "39EE72C914EC89B4317D3E21B9C35744513735FC194D5E284430E1917A0B6466",
+        "file":  "03-individual-form-desktop.png"
+    },
+    {
+        "sha256":  "4B29F3BC3FA462D9AD1B546B3674FCF8658F40A9F3605F9D072DB26ABF7060B2",
+        "file":  "04-individual-detail-desktop.png"
+    },
+    {
+        "sha256":  "31A8C81099A4F9A52B8E04A60576730E25AE8792128368EA313D35A374A908BD",
+        "file":  "05-duplicate-manual-review.png"
+    },
+    {
+        "sha256":  "B0759F6434E367C597744B01353E64DBFBDB52303901E615EDBBB84C782B42AB",
+        "file":  "06-whatsapp-convert-individual.png"
+    },
+    {
+        "sha256":  "9D557C1EFC5917C555C26461E355825C0AE16486708D233F7B5AB49774977FD0",
+        "file":  "07-whatsapp-individual-detail.png"
+    },
+    {
+        "sha256":  "BEA0A136838CA9F69C300B317833DBF335C4A87AFF82E33E13BF8847D5E82351",
+        "file":  "08-individual-search-filter.png"
+    },
+    {
+        "sha256":  "E40E85B188AC2121F3E63C672347EAE273E4BF2F176A2178FD939F875740E159",
+        "file":  "09-quotation-B2B-print.png"
+    },
+    {
+        "sha256":  "E6E6E2DF4F141B5C92F2D4E274349C07F42A2A33A7C8F4CC08D34F20C7AFB521",
+        "file":  "09-quotation-B2C-print.png"
+    },
+    {
+        "sha256":  "79FB059DB79806689DEFE7FFBAF20EB1349372A303A02C2F25D24F76C3E59BA0",
+        "file":  "10-invoice-B2B-detail.png"
+    },
+    {
+        "sha256":  "68A632050276E831794A2BB71448467901B6EEB67A3D2AD1D0BDD9AD3AD54794",
+        "file":  "10-invoice-B2C-detail.png"
+    },
+    {
+        "sha256":  "1F9EEBA4560B5C9945D1E515C705FCF67406F0C16558CFAE6BC482EA7CA71D03",
+        "file":  "11-invoice-B2B-print.png"
+    },
+    {
+        "sha256":  "CD3965746B1F32EBE005EAEEED28658967EF84AE6AE0509AF989C8A8C849FA13",
+        "file":  "11-invoice-B2C-print.png"
+    },
+    {
+        "sha256":  "5C21ECE1D5CD9C37EEB7BE04011705CA586C656A82549CEE5DCC40C1D55D1D57",
+        "file":  "12-finance-commissions.png"
+    },
+    {
+        "sha256":  "48A03E34E0C3C55C0FA25EC60CE096F18A3582BB858BA5EF8CAED7C8A760F641",
+        "file":  "13-quota-full-staging-retained.png"
+    },
+    {
+        "sha256":  "8F50BF4CDFA8A1C639AC6201C9D4F490533FF0D8B160ACB46BBA8E4970497CF2",
+        "file":  "14-flag-off-staging.png"
+    },
+    {
+        "sha256":  "7218FDAD9FAC5775ED4BC792D57FC55278EA55100EF05580A09545C6EDA59539",
+        "file":  "15-mobile-prospect-list.png"
+    },
+    {
+        "sha256":  "F53D5DC572585618521BE54BB7BD84DAA2E26CAB0AC99A58E7092C4D6131BB13",
+        "file":  "16-mobile-individual-detail.png"
+    },
+    {
+        "sha256":  "F8AA763B69F81DCD4573C8D8C9CA6534AA88A687FC1CBB56E839594AA3E4FFFC",
+        "file":  "17-mobile-individual-form.png"
+    },
+    {
+        "sha256":  "18421585FE7F49C12C8ABF9919F68AFE3767AE347403D4996BFB68B0E3DC7102",
+        "file":  "18-mobile-whatsapp-linked.png"
+    },
+    {
+        "sha256":  "68CD08DE93F0B103FC8A5BD9FDC756A9B24771876841134D47E6BE38AF1CF160",
+        "file":  "browser-scenarios.mjs"
+    },
+    {
+        "sha256":  "5C09F8F93C811A90FDB542252921D98F5A6B088D660FC15EE5E459D0DCD1ACF5",
+        "file":  "database-postconditions.json"
+    },
+    {
+        "sha256":  "838B8209E5C4142B91F6BBCC2F7F0B5121C724070C96D2C9852475D1BA769299",
+        "file":  "invoice-B2B.pdf"
+    },
+    {
+        "sha256":  "118E92D5C98A319314EBD8743E9FF88CDC9F5E788CEDF910170333E0922BD02E",
+        "file":  "invoice-B2C.pdf"
+    },
+    {
+        "sha256":  "1A643BDF700EE63B02D3EF112512E5746AA1DFC573E3F99BB2C51BD8852F20A0",
+        "file":  "quotation-B2B.pdf"
+    },
+    {
+        "sha256":  "0FD6A5CC7C1B4094445BA36BDE200AF2EBA6692B472327015E744BCDB51C93D2",
+        "file":  "quotation-B2C.pdf"
+    },
+    {
+        "sha256":  "F9A4CAFCE10AAA9216A0BBFF6DB9CD06EF912A7B86807D674C3F556A06317E61",
+        "file":  "results.json"
+    },
+    {
+        "sha256":  "56C0ECD7D0C61C48DE3C7E428DF6657895B68204A63D2C2A284B8040976FA72D",
+        "file":  "verification.json"
+    }
+]

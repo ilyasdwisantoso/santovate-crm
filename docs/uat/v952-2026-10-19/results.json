@@ -1,0 +1,205 @@
+{
+  "sourceCommit": "c5c0539e771b7cca723402fab17fa7cd499995ec",
+  "started": "2026-10-19T02:55:14.497Z",
+  "browser": "155.0.8059.84",
+  "results": [
+    {
+      "id": "01",
+      "name": "Login admin dan dashboard desktop",
+      "status": "PASS",
+      "seconds": 3.18
+    },
+    {
+      "id": "02",
+      "name": "Prospect B2B sebelum migrasi tetap terbaca",
+      "status": "PASS",
+      "seconds": 3.7
+    },
+    {
+      "id": "03",
+      "name": "Buat individu melalui form desktop",
+      "status": "PASS",
+      "seconds": 5.4
+    },
+    {
+      "id": "04",
+      "name": "Duplikasi memerlukan review dan menyimpan ID berbeda",
+      "status": "PASS",
+      "seconds": 4.99
+    },
+    {
+      "id": "05",
+      "name": "Regresi pembuatan perusahaan B2B",
+      "status": "PASS",
+      "seconds": 2.17
+    },
+    {
+      "id": "06",
+      "name": "Review dan konversi WhatsApp menjadi individu",
+      "status": "PASS",
+      "seconds": 3.66
+    },
+    {
+      "id": "07",
+      "name": "Konversi WhatsApp B2B tetap memakai nama perusahaan",
+      "status": "PASS",
+      "seconds": 1.88
+    },
+    {
+      "id": "08",
+      "name": "Pencarian dan filter jenis pelanggan melalui UI",
+      "status": "PASS",
+      "seconds": 2.17
+    },
+    {
+      "id": "09",
+      "name": "Jenis identitas terkunci saat edit",
+      "status": "PASS",
+      "seconds": 1.26
+    },
+    {
+      "id": "10",
+      "name": "Quotation B2C: create, accepted, tampilan dan PDF",
+      "status": "PASS",
+      "seconds": 7.13
+    },
+    {
+      "id": "11",
+      "name": "Deal dan invoice B2C: create, tampilan dan PDF",
+      "status": "PASS",
+      "seconds": 6.75
+    },
+    {
+      "id": "12",
+      "name": "Quotation B2B: create, accepted, tampilan dan PDF",
+      "status": "PASS",
+      "seconds": 3.98
+    },
+    {
+      "id": "13",
+      "name": "Deal dan invoice B2B: create, tampilan dan PDF",
+      "status": "PASS",
+      "seconds": 7
+    },
+    {
+      "id": "14",
+      "name": "Nama individu pada selector Opportunity",
+      "status": "PASS",
+      "seconds": 1.76
+    },
+    {
+      "id": "15",
+      "name": "Smoke rendering Dashboard, Pipeline, Follow-up dan Finance",
+      "status": "PASS",
+      "seconds": 7.16
+    },
+    {
+      "id": "16",
+      "name": "Batas tenant: detail pelanggan tenant lain ditolak",
+      "status": "PASS",
+      "seconds": 0.8
+    },
+    {
+      "id": "17",
+      "name": "Kuota penuh: staging tetap ada dan konversi ditolak",
+      "status": "PASS",
+      "seconds": 7.66
+    },
+    {
+      "id": "18",
+      "name": "Flag OFF: individu tetap terbaca/diedit, create baru tertutup",
+      "status": "PASS",
+      "seconds": 9.88
+    },
+    {
+      "id": "19",
+      "name": "Mobile 390px: login, daftar, detail dan create individu",
+      "status": "PASS",
+      "seconds": 14.37
+    },
+    {
+      "id": "20",
+      "name": "Mobile: review WhatsApp dan jenis identitas linked",
+      "status": "PASS",
+      "seconds": 1.52
+    },
+    {
+      "id": "21",
+      "name": "Postcondition database: identitas, consent, link dan data lama",
+      "status": "PASS",
+      "seconds": 0.74
+    },
+    {
+      "id": "22",
+      "name": "Tidak ada error JavaScript atau respons HTTP 5xx",
+      "status": "PASS",
+      "seconds": 0
+    }
+  ],
+  "errors": [],
+  "httpErrors": [
+    {
+      "status": 403,
+      "method": "GET",
+      "url": "http://127.0.0.1:8095/prospects/3"
+    },
+    {
+      "status": 422,
+      "method": "POST",
+      "url": "http://127.0.0.1:8095/prospects"
+    }
+  ],
+  "externalBlocked": [
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.googleapis.com"
+  ],
+  "ids": {
+    "legacy": 1,
+    "individual": 4,
+    "duplicate": 5,
+    "business": 6,
+    "waIndividual": 7,
+    "waBusiness": 8,
+    "quotationB2C": 1,
+    "dealB2C": 1,
+    "invoiceB2C": 1,
+    "quotationB2B": 2,
+    "dealB2B": 2,
+    "invoiceB2B": 2,
+    "mobile": 9
+  }
+}

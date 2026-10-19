@@ -1,0 +1,21 @@
+{
+    "legacy_all_original_values_preserved": true,
+    "individual_company_fields_null": true,
+    "individual_marketing_opt_in_absent": true,
+    "migrations_applied": 26,
+    "main_prospects": 7,
+    "full_tenant_prospects": 1,
+    "full_tenant_staging_pending": 1,
+    "whatsapp_assignee_preserved": true,
+    "active_database_connections_available": [
+        "sqlite",
+        "mysql_testing"
+    ],
+    "db_driver": "mysql",
+    "server": "10.4.32-MariaDB",
+    "total_prospects": 9,
+    "total_individuals": 5,
+    "total_quotations": 2,
+    "total_deals": 2,
+    "total_invoices": 2
+}

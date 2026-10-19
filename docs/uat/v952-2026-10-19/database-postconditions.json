@@ -1,0 +1,192 @@
+{
+  "prospects": [
+    {
+      "id": 1,
+      "org": 2,
+      "entity_type": "business",
+      "company_name": "PT UAT Legacy B2B",
+      "company_key": "2-pt-uat-legacy-b2bjakarta",
+      "individual_name": null,
+      "display_name": "PT UAT Legacy B2B",
+      "phone": "6281111100004",
+      "whatsapp_opt_in_at": null,
+      "notes": null
+    },
+    {
+      "id": 2,
+      "org": 3,
+      "entity_type": "business",
+      "company_name": "PT UAT Full Quota",
+      "company_key": "3-pt-uat-full-quota",
+      "individual_name": null,
+      "display_name": "PT UAT Full Quota",
+      "phone": null,
+      "whatsapp_opt_in_at": null,
+      "notes": null
+    },
+    {
+      "id": 3,
+      "org": 4,
+      "entity_type": "individual",
+      "company_name": null,
+      "company_key": null,
+      "individual_name": "UAT Other Tenant Private",
+      "display_name": "UAT Other Tenant Private",
+      "phone": null,
+      "whatsapp_opt_in_at": null,
+      "notes": null
+    },
+    {
+      "id": 4,
+      "org": 2,
+      "entity_type": "individual",
+      "company_name": null,
+      "company_key": null,
+      "individual_name": "UAT Individu Form",
+      "display_name": "UAT Individu Form",
+      "phone": "6281111100010",
+      "whatsapp_opt_in_at": null,
+      "notes": "UAT edited while B2C flag disabled"
+    },
+    {
+      "id": 5,
+      "org": 2,
+      "entity_type": "individual",
+      "company_name": null,
+      "company_key": null,
+      "individual_name": "UAT Individu Berbeda",
+      "display_name": "UAT Individu Berbeda",
+      "phone": "6281111100010",
+      "whatsapp_opt_in_at": null,
+      "notes": null
+    },
+    {
+      "id": 6,
+      "org": 2,
+      "entity_type": "business",
+      "company_name": "PT UAT New B2B",
+      "company_key": "2-pt-uat-new-b2bsurabaya",
+      "individual_name": null,
+      "display_name": "PT UAT New B2B",
+      "phone": null,
+      "whatsapp_opt_in_at": null,
+      "notes": null
+    },
+    {
+      "id": 7,
+      "org": 2,
+      "entity_type": "individual",
+      "company_name": null,
+      "company_key": null,
+      "individual_name": "UAT WhatsApp Native",
+      "display_name": "UAT WhatsApp Native",
+      "phone": "6281111100001",
+      "whatsapp_opt_in_at": null,
+      "notes": null
+    },
+    {
+      "id": 8,
+      "org": 2,
+      "entity_type": "business",
+      "company_name": "PT UAT WhatsApp B2B",
+      "company_key": "2-pt-uat-whatsapp-b2b",
+      "individual_name": null,
+      "display_name": "PT UAT WhatsApp B2B",
+      "phone": "6281111100002",
+      "whatsapp_opt_in_at": null,
+      "notes": null
+    },
+    {
+      "id": 9,
+      "org": 2,
+      "entity_type": "individual",
+      "company_name": null,
+      "company_key": null,
+      "individual_name": "UAT Mobile Individual",
+      "display_name": "UAT Mobile Individual",
+      "phone": null,
+      "whatsapp_opt_in_at": null,
+      "notes": null
+    }
+  ],
+  "contacts": [
+    {
+      "id": 1,
+      "organization_id": 2,
+      "prospect_id": 7,
+      "phone_normalized": "6281111100001"
+    },
+    {
+      "id": 2,
+      "organization_id": 2,
+      "prospect_id": 8,
+      "phone_normalized": "6281111100002"
+    },
+    {
+      "id": 3,
+      "organization_id": 3,
+      "prospect_id": null,
+      "phone_normalized": "6281111100003"
+    }
+  ],
+  "messages": [
+    {
+      "id": 1,
+      "organization_id": 2,
+      "prospect_id": 7,
+      "provider_message_id": "wamid-uat-1-6281111100001"
+    },
+    {
+      "id": 2,
+      "organization_id": 2,
+      "prospect_id": 8,
+      "provider_message_id": "wamid-uat-1-6281111100002"
+    },
+    {
+      "id": 3,
+      "organization_id": 3,
+      "prospect_id": null,
+      "provider_message_id": "wamid-uat-2-6281111100003"
+    }
+  ],
+  "quotations": [
+    {
+      "id": 1,
+      "prospect_id": 4,
+      "status": "accepted",
+      "grand_total": "1000000.00"
+    },
+    {
+      "id": 2,
+      "prospect_id": 6,
+      "status": "accepted",
+      "grand_total": "1000000.00"
+    }
+  ],
+  "deals": [
+    {
+      "id": 1,
+      "prospect_id": 4,
+      "actual_deal_value": "1000000.00"
+    },
+    {
+      "id": 2,
+      "prospect_id": 6,
+      "actual_deal_value": "1000000.00"
+    }
+  ],
+  "invoices": [
+    {
+      "id": 1,
+      "deal_id": 1,
+      "total_amount": "1000000.00",
+      "status": "issued"
+    },
+    {
+      "id": 2,
+      "deal_id": 2,
+      "total_amount": "1000000.00",
+      "status": "issued"
+    }
+  ]
+}
